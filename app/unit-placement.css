@@ -1,0 +1,4 @@
+.unit-grid.has-selection .board-slot.filled:not(.selected){position:relative;cursor:pointer;border:1px dashed #e6d69480}
+.unit-grid.has-selection .board-slot.filled:not(.selected):after{content:'↔';position:absolute;right:1px;top:1px;font:700 12px/1 sans-serif;color:#fff1bb;background:#263d26d9;border-radius:3px;padding:1px 2px;pointer-events:none}
+.unit-grid.has-selection .board-slot.filled:not(.selected):hover{background:#e9cc6930;border-color:#ffe3a0}
+.board-slot:focus-visible{outline:2px solid #fff0b5;outline-offset:1px}
