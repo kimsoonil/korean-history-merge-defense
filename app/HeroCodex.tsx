@@ -33,7 +33,7 @@ export default function HeroCodex({scene,onSelect,onClose}:Props){
         <div><small><Images size={13}/> 전설의 영웅 · 5단계</small><h2 id="hero-codex-title">영웅 도감</h2></div>
         <button ref={closeRef} className="hero-codex-close" onClick={onClose} aria-label="영웅 도감 닫기"><X size={18}/> 닫기</button>
       </header>
-      <p id="hero-codex-description">{heroSkillDescription(scene.name)}<br/>발동 배경: 투명도 50% · 1초. 도감을 열면 전투가 일시 정지됩니다.</p>
+      <p id="hero-codex-description">{heroSkillDescription(scene.name)}<br/>발동 배경: 불투명도 80% · 2초. 도감을 열면 전투가 일시 정지됩니다.</p>
       <div className="hero-codex-body">
         <nav className="hero-codex-heroes" aria-label="도감 영웅 선택">
           {legendaryScenes.map(item=>{

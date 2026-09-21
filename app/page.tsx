@@ -158,9 +158,9 @@ export default function Game(){
     if(skill.gold)setGold(g=>g+skill.gold);
     if(skill.hearts)setWall(h=>Math.min(10,h+skill.hearts));
     flashQueue.current=[...new Set([...flashQueue.current,...skill.casts])];
-    // Each hero gets its own one-second image, even when multiple skills fire together.
+    // Each hero gets its own two-second image, even when multiple skills fire together.
     if(flashQueue.current.length&&Date.now()>=flashSerial.current){
-     const name=flashQueue.current.shift()!;flashSerial.current=Date.now()+1000;
+     const name=flashQueue.current.shift()!;flashSerial.current=Date.now()+2000;
      setSkillFlash({names:[name],serial:flashSerial.current,expiresAt:flashSerial.current});
     }
    }
