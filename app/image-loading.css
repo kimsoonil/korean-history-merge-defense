@@ -1,0 +1,8 @@
+.image-loading-indicator{position:absolute!important;left:50%!important;top:50%!important;inset:auto!important;left:50%!important;top:50%!important;width:22px!important;height:22px!important;max-width:45%;max-height:45%;transform:translate(-50%,-50%)!important;z-index:2;pointer-events:none;fill:none;stroke:#f1dba3;stroke-width:2;stroke-linecap:round;filter:drop-shadow(0 1px 2px #172b22)}
+.image-loading-indicator .loading-track{opacity:.25}
+.image-loading-indicator .loading-arc{transform-origin:12px 12px;animation:image-loading-spin .85s linear infinite}
+.game-brand-logo{position:relative}
+.hero-codex-stage{background:#34472b}
+.codex-loading-ground{position:absolute;inset:0;background-position:center;background-size:cover}
+@keyframes image-loading-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.image-loading-indicator .loading-arc{animation:none}}

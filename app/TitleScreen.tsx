@@ -1,4 +1,6 @@
 'use client';
+import LoadingImage,{LoadingBackground,useImageStatus,ImageLoadingIndicator} from './LoadingImage';
+
 import {useEffect,useRef} from 'react';
 import {ArrowRight,BookOpen,ChevronRight,Coins,Heart,Images,Play,Sparkles,X} from 'lucide-react';
 import {byName} from '@/lib/game';
@@ -8,7 +10,7 @@ type Props={save:GameSave|null;ready:boolean;storageError:boolean;inert:boolean;
 export default function TitleScreen({save,ready,storageError,inert,onNew,onContinue,onCodex,onBook}:Props){
   const resumable=canContinue(save);
   return <main className="title-screen" inert={inert}>
-    <div className="title-landscape" aria-hidden="true"/>
+    <LoadingBackground className="title-landscape" src="/cinematics/jeongjo.png"/>
     <div className="title-grain" aria-hidden="true"/>
     <section className="title-content" aria-labelledby="game-title">
       <div className="title-eyebrow"><span/> 역사를 잇는 작은 영웅들</div>
@@ -27,7 +29,7 @@ export default function TitleScreen({save,ready,storageError,inert,onNew,onConti
     </section>
     <aside className="title-heroes" aria-label="시대를 넘어 모인 전설의 영웅들">
       <div className="title-hero-heading"><span>시대를 넘어, 하나의 전장으로</span><b>전설을 조합하다</b></div>
-      <div className="title-hero-lineup">{['세종대왕','이순신','광개토대왕'].map((name,index)=>{const sprite=byName[name].atlas!;return <div key={name} className={`title-hero hero-${index}`}><div className="title-hero-sprite"><img src={sprite.src} alt={name} style={{left:`-${sprite.col*100}%`,top:`-${sprite.row*100}%`}}/></div><span>{name}</span></div>})}</div>
+      <div className="title-hero-lineup">{['세종대왕','이순신','광개토대왕'].map((name,index)=>{const sprite=byName[name].atlas!;return <div key={name} className={`title-hero hero-${index}`}><div className="title-hero-sprite"><LoadingImage src={sprite.src} alt={name} style={{left:`-${sprite.col*100}%`,top:`-${sprite.row*100}%`}}/></div><span>{name}</span></div>})}</div>
       <div className="title-hero-ground" aria-hidden="true"/>
       <p>일곱 병종의 만남이, 새로운 역사가 됩니다.</p>
     </aside>

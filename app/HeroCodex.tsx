@@ -1,4 +1,6 @@
 'use client';
+import LoadingImage,{LoadingBackground,useImageStatus,ImageLoadingIndicator} from './LoadingImage';
+
 import {useEffect,useRef} from 'react';
 import {ChevronLeft,ChevronRight,Images,X} from 'lucide-react';
 import {byName} from '@/lib/game';
@@ -37,12 +39,12 @@ export default function HeroCodex({scene,onSelect,onClose}:Props){
           {legendaryScenes.map(item=>{
             const sprite=byName[item.name].atlas!;
             return <button key={item.slug} onClick={()=>onSelect(item.name)} className={item.name===scene.name?'active':''} aria-label={`${item.name} 이미지 보기`} aria-pressed={item.name===scene.name}>
-              <span className="hero-codex-portrait" aria-hidden="true"><img src={sprite.src} alt="" style={{left:`-${sprite.col*100}%`,top:`-${sprite.row*100}%`}}/></span>
+              <span className="hero-codex-portrait" aria-hidden="true"><LoadingImage src={sprite.src} alt="" style={{left:`-${sprite.col*100}%`,top:`-${sprite.row*100}%`}}/></span>
               <b>{item.name}</b><small>{item.symbol}</small>
             </button>;
           })}
         </nav>
-        <div className="hero-codex-canvas"><div className="hero-codex-stage">
+        <div className="hero-codex-canvas"><div className="hero-codex-stage"><LoadingBackground className="codex-loading-ground" src="/terrain/forest-ground.png"/>
           <LegendaryReveal key={scene.slug} scene={scene} preview embedded onClose={onClose}/>
         </div></div>
       </div>
