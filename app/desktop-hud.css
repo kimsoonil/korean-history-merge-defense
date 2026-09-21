@@ -1,0 +1,43 @@
+/* Keep battle information at the sides so the desktop battlefield owns the height. */
+@media(min-width:761px){
+  .game-header{height:44px;padding:0 16px}
+  .game-status{display:none}
+  .game-main{grid-template-columns:210px minmax(0,1fr) 230px;gap:8px;padding:8px 10px}
+  .stage-panel,.detail-side{padding:13px}
+  .stage-panel{gap:0}
+  .hud-stage{padding:14px 0 15px;border-bottom:1px solid #8a9b65}
+  .hud-stage small,.hud-stat small,.hud-speed small{display:block;color:#c7d3a8;font-size:10px;letter-spacing:.03em}
+  .hud-stage strong{display:block;color:#f7db8e;font:700 31px/1.2 'Noto Serif KR',serif;margin:5px 0}
+  .hud-stage strong span{font:11px 'DM Sans',sans-serif;color:#c2cb9f}
+  .hud-stage>b{font:700 15px 'Noto Serif KR',serif;color:#fff0c2}
+  .hud-stat{padding:14px 0;border-bottom:1px solid #839665}
+  .hud-stat>div:first-child{display:flex;align-items:baseline;justify-content:space-between;gap:5px}
+  .hud-stat strong{display:flex;align-items:center;gap:3px;color:#f6d88a;font:700 25px/1 'Noto Serif KR',serif;white-space:nowrap}
+  .hud-stat strong span{font:11px 'DM Sans',sans-serif;color:#d4ddb4}
+  .hud-enemies strong{color:#ffe4a6}
+  .hud-stat p{margin:8px 0 0;font-size:10px;line-height:1.5;color:#d1d9b4}
+  .hud-stat .heart-row{display:flex;gap:2px;margin-top:9px}
+  .hud-stat .heart-row svg{width:16px;height:16px;flex:none}
+  .hud-speed{padding:14px 0}
+  .hud-speed>div{display:flex;gap:5px;margin-top:8px}
+  .hud-speed button{height:30px;flex:1;border:1px solid #9aaa72;background:#50633e;color:#eee9c4;font-size:11px}
+  .hud-speed button.on{border-color:#ffe29a;background:#e8c875;color:#3d391f;font-weight:800}
+  .hud-rule{margin:auto 0 0!important;padding-top:13px;border-top:1px solid #839665;font-size:10px!important;line-height:1.6!important;color:#d5dfb4!important}
+  .arena-heading{height:36px}
+  .arena-heading h1{font-size:17px;margin:1px 0}
+  .arena-board{width:min(100%,calc(100dvh - 215px));max-height:100%}
+  .arena-foot{height:52px}
+  .arena-message{height:20px;padding:3px 8px}
+  .wave-action{height:32px;padding:2px 6px 2px 9px}
+  .wave-action button{height:27px;min-width:122px;font-size:11px}
+  .game-actions{height:64px;padding:6px 12px}
+  .game-actions .action-gold{display:none}
+  .game-actions button{height:49px}
+}
+@media(min-width:761px) and (max-width:1020px){
+  .game-main{grid-template-columns:175px minmax(0,1fr) 190px}
+  .stage-panel,.detail-side{padding:9px}
+  .hud-stat .heart-row svg{width:13px;height:13px}
+  .hud-stat .heart-row{gap:1px}
+}
+@media(max-width:760px){.stage-panel{display:none}}

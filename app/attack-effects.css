@@ -1,0 +1,10 @@
+.battle-effects{position:absolute;inset:0;width:100%;height:100%;z-index:8;pointer-events:none;overflow:visible}
+.attack-glow{stroke:var(--fx-color);stroke-width:.8;stroke-linecap:round;opacity:0;filter:blur(.6px);animation:attack-glow .32s ease-out forwards}
+.attack-streak{stroke:var(--fx-color);stroke-width:.38;stroke-linecap:round;stroke-dasharray:16 100;stroke-dashoffset:100;opacity:0;filter:drop-shadow(0 0 2px var(--fx-color));animation:attack-streak .3s linear forwards}
+.attack-origin{fill:var(--fx-color);opacity:0;animation:attack-origin .26s ease-out forwards}
+.attack-impact{fill:#fff6dc;stroke:var(--fx-color);stroke-width:.3;opacity:0;transform-box:fill-box;transform-origin:center;animation:attack-impact .32s ease-out forwards}
+@keyframes attack-glow{12%{opacity:.32}80%{opacity:.2}100%{opacity:0}}
+@keyframes attack-streak{5%{opacity:0}15%{opacity:.95}75%{opacity:.9}100%{stroke-dashoffset:0;opacity:0}}
+@keyframes attack-origin{10%{opacity:.85}100%{opacity:0}}
+@keyframes attack-impact{0%,60%{opacity:0;transform:scale(.3)}72%{opacity:.95;transform:scale(1.3)}100%{opacity:0;transform:scale(1.8)}}
+@media(prefers-reduced-motion:reduce){.battle-effects{display:none}}

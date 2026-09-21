@@ -1,0 +1,13 @@
+@media(max-width:760px){
+ .game-status{height:100px;display:grid;grid-template-columns:82px minmax(0,1fr) 76px;grid-template-rows:57px 41px;padding:0 8px;flex:none}
+ .game-status>div{min-width:0;padding:5px 7px}
+ .game-status .status-wall{max-width:none}
+ .game-status .status-gold{border-right:0}
+ .game-status .status-wall .heart-row{gap:1px;flex-wrap:nowrap}
+ .game-status .heart-row svg{width:10px;height:12px}
+ .game-status .status-speed{display:flex!important;grid-column:1/-1;flex-direction:row;align-items:center;justify-content:flex-end;gap:10px;margin:0;border-top:1px solid #64704d;padding:3px 0}
+ .game-status .status-speed>small{margin-right:auto;font-size:10px}
+ .game-status .status-speed>div{display:flex;gap:6px}
+ .game-status .status-speed button{width:46px;height:32px;border-radius:4px;font-size:12px;touch-action:manipulation}
+ .game-status .status-speed button:focus-visible{outline:2px solid #fff0b4;outline-offset:1px}
+}

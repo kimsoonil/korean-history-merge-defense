@@ -1,0 +1,45 @@
+/* Original forest-and-earth visual direction inspired by the supplied game images. */
+.game-root{background:radial-gradient(ellipse at 50% 36%,#536a32 0,#283822 52%,#1a261b 100%);color:#f5edcc}
+.game-header{background:linear-gradient(180deg,#3b3727,#2b2e21);border-bottom:2px solid #746a44;box-shadow:0 2px 8px #1c2216}
+.game-brand>span{background:#5a5335;border-color:#bda36c;color:#ffdda2;box-shadow:inset 0 0 0 2px #393925}
+.game-brand small,.game-chapter{color:#d7caa8}.icon-button{background:#4b4a31;border-color:#8c7d52;color:#f5deaa}
+.game-status{background:linear-gradient(180deg,#3a462b,#2d3c27);border-bottom:2px solid #68744a}
+.game-status>div{border-right-color:#64704d}.game-status small,.status-stage span{color:#b9c4a0}
+.status-stage b,.status-enemy b,.status-gold b{color:#f4d788}.status-wall>div span{color:#d4dcb9}.status-wall>i{background:#1c321f}.status-wall>i>span{background:linear-gradient(90deg,#8cc35b,#f3d46e)}
+.status-wall .heart-row{display:flex;justify-content:flex-start;align-items:center;gap:3px;min-width:0}.heart-row svg{flex:none;filter:drop-shadow(0 1px 1px #1c2718)}
+.status-speed button{background:#485637;border-color:#89925a;color:#ede4bc}.status-speed button.on{background:#e5c36e;border-color:#f3d689;color:#343421}
+.stage-panel,.detail-side{background:linear-gradient(145deg,#405331,#2e402b 58%,#293824);border:2px solid #8e8556;box-shadow:inset 0 0 0 3px #304029,0 3px 12px #15201666}
+.panel-kicker,.arena-heading small{color:#e2ca7e}.stage-panel h2 em{color:#f6d882}.stage-panel p,.detail-placeholder{color:#d1d8ac}
+.stage-items{border-top-color:#91a269}.stage-item{color:#c2ceac}.stage-item.active{background:#78914c;color:#fff3c6;border-left-color:#ffe18b}.stage-item.done{color:#f2df9b}
+.arena-stage{background:radial-gradient(circle at center,#788e4c,#3b5730 75%);border:2px solid #8c8351;box-shadow:inset 0 0 0 3px #40532f}
+.arena-board{border:3px solid #594a2d;background:#74a148;box-shadow:0 0 0 3px #b69a61,0 7px 18px #1e2e1eaa;isolation:isolate}
+.board-surface{background-image:linear-gradient(#71963616,#71963616),url('/terrain/forest-ground.png');background-position:center;background-size:cover}
+.road{background-color:#c9ac76;background-image:
+ radial-gradient(ellipse at 20% 45%,#eed6a0 0 2px,transparent 3px),
+ radial-gradient(ellipse at 70% 75%,#aa8956 0 2px,transparent 3px),
+ radial-gradient(ellipse at 51% 17%,#e6c991 0 3px,transparent 4px),
+ linear-gradient(135deg,#d6b882,#bfa06c);background-size:37px 29px,49px 37px,66px 41px,100% 100%;box-shadow:inset 0 0 0 2px #e0c690,inset 0 0 0 4px #987849,0 0 0 2px #49692f}
+.board-entry{background:#7b5937;color:#ffe2a6;border-color:#f0c783}.board-center-mark{color:#386b2c45;text-shadow:0 1px #c6dd8444}.board-count{background:#3e5132e8;color:#f6e5aa}
+.board-slot{background:transparent;border:1px solid transparent;color:transparent;transition:background .15s,border-color .15s,opacity .15s}
+.board-slot:not(.filled){opacity:0}
+.board-slot.filled,.board-slot.tier-4,.board-slot.tier-5{background:transparent;border-color:transparent;color:#fff5c9;overflow:visible;filter:drop-shadow(0 2px 3px #24371d)}
+.board-slot.filled>span:last-child:not(.unit-portrait){background:#354c29db;color:#ffefc2;padding:1px 2px;border-radius:3px;font-weight:700;text-shadow:0 1px #182915}
+.unit-grid:has(.board-slot.selected) .board-slot:not(.filled){opacity:1;border:1px dashed #ffe4a4;background:#f6db9040;color:#fff0b4}
+.board-slot.selected,.board-slot.filled.selected{opacity:1;outline:2px solid #ffe58b;outline-offset:1px;border-color:#f9e196;background:#ffe28a59}
+.unit-portrait{background:#496b36;border-color:#e7c178;color:#f8dc8f}
+.unit-portrait.tiny{width:24px;height:24px;background:#536d3d;border-radius:50%;border:1px solid #d3b773;font-size:15px;box-shadow:0 2px 4px #25361e}
+.unit-portrait img{object-fit:contain;filter:drop-shadow(0 2px 2px #1f2f1a88)}
+.unit-portrait.tiny.is-loaded{width:100%;height:calc(100% - 11px);max-width:44px;max-height:52px;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible}
+.unit-portrait.normal.is-loaded,.unit-portrait.large.is-loaded{background:transparent;border:0;overflow:visible}
+.unit-portrait.tiny.is-loaded img{transform:scale(1.12);transform-origin:center bottom}
+.selected-top .unit-portrait.large.is-loaded{width:88px;height:88px}
+.invader{background:#9c5539;border-color:#f5c68a;box-shadow:0 2px 7px #3d2b1d}.invader.boss{background:#ae4838;border-color:#ffe195}
+.arena-foot{background:#3d4e31;border-color:#8e895b}.arena-message{color:#f2e4b7;border-bottom-color:#778354}.wave-action>span{color:#f3dfaa}.wave-action button{background:#e7c674;border-color:#f8dc94;color:#413719}.wave-action button:disabled{background:#6f7650;border-color:#929164;color:#ebebc5}
+.phase-label{background:#53633d;border-color:#a3a06c;color:#f6e4aa}.phase-label.battle{background:#74503a;color:#ffe0ac}.phase-label.cleared,.phase-label.won{background:#598347;color:#e8f6b2}
+.selected-top>div>span,.selected-stats b,.side-help{color:#f2db93}.selected-skill,.selected-stats span,.side-help span{color:#cfddb4}.selected-stats,.selected-stats span,.side-help{border-color:#879c68}
+.side-sell,.side-book{background:#596b3c;border-color:#b4a368;color:#ffedb4}.detail-placeholder>span{color:#f2d687}
+.game-actions{background:linear-gradient(180deg,#3a432d,#2a3426);border-top:2px solid #95885d}.game-actions button{background:#4b5b3b;border-color:#9c9869;color:#f4e6b8}.game-actions button small{color:#d0d8b3}.game-actions .action-summon{background:linear-gradient(#f6d777,#e0ad4f);border-color:#ffe193;color:#3b311a;box-shadow:inset 0 1px #fff0af}.game-actions .action-summon small{color:#67532d}.action-gold{color:#f7d979}
+.overlay-shade{background:#172015d9}.book-modal,.help-modal{background:linear-gradient(145deg,#3e5133,#293c2b);border:2px solid #c3a66c;box-shadow:0 20px 60px #10170fbb,inset 0 0 0 4px #263a29}.book-modal>header{border-color:#9a9d6f}.book-modal>header>div,.help-modal h2{color:#ffe3a0}.book-tabs button{background:#526840;border-color:#8c9b65;color:#e3edc5}.book-tabs button.active{background:#efcf76;border-color:#ffe49c;color:#3b391e}.book-card{background:#415834;border-color:#829b64}.book-card.ready{background:#667d44;border-color:#f4d88d}.book-card-head small{color:#f5db95}.book-ingredients span{background:#34482f;border-color:#768960;color:#e3e7c5}.book-ingredients span.have{background:#72894b;color:#fff5cb;border-color:#e9d589}.book-card>button{background:#f1ce73;color:#3c391d}.book-card>button:disabled{background:#536547;border-color:#879769;color:#cbd7ad}.help-modal b{color:#f5d98b}.help-modal p{color:#e0e6c9}.help-done{background:#efcf76;color:#34351e}
+.mobile-unit-info{background:#3b5033f5;border-color:#e5c783;color:#fff0bd}.mobile-unit-head span{color:#f4d789}.mobile-unit-info p,.mobile-unit-bottom{color:#dfebc2}.mobile-unit-bottom button{background:#e8c86f;color:#3d371d}
+@media(max-width:760px){.mobile-unit-info:has(.unit-portrait.is-loaded){min-height:115px}.mobile-unit-head .unit-portrait.normal.is-loaded{width:54px;height:54px;flex:none}}
+@media(max-width:380px){.heart-row svg{width:11px;height:11px}.status-wall .heart-row{gap:1px}}

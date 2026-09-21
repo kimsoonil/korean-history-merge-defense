@@ -1,0 +1,39 @@
+.hero-codex-open{display:flex;align-items:center;justify-content:center;gap:5px;min-height:30px;padding:4px 8px;border:1px solid #d4b978;border-radius:4px;background:#665636;color:#ffe8ae;font-size:10px;white-space:nowrap}
+.hero-codex-shade{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:12px;background:#101b16e8;backdrop-filter:blur(6px)}
+.hero-codex-modal{width:min(1040px,100%);height:min(760px,calc(100dvh - 24px));display:flex;flex-direction:column;min-height:0;padding:16px;border:2px solid #c6ab70;border-radius:8px;background:linear-gradient(140deg,#3f5134,#23372c);box-shadow:0 20px 70px #0009;color:#fff0ca}
+.hero-codex-header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none}
+.hero-codex-header small{display:flex;align-items:center;gap:5px;font-size:10px;color:#dec27f;letter-spacing:.06em}
+.hero-codex-header h2{margin:4px 0 0;font:700 22px/1.4 'Noto Serif KR',serif}
+.hero-codex-close,.hero-codex-footer button{display:flex;align-items:center;justify-content:center;gap:5px;min-height:36px;padding:5px 12px;border:1px solid #c1ac77;border-radius:4px;background:#5b603d;color:#fff0c3;font-size:12px;flex:none}
+#hero-codex-description{flex:none;font-size:11px;line-height:1.6;color:#d0dbb9;margin:9px 0 14px}
+.hero-codex-body{display:grid;grid-template-columns:204px minmax(0,1fr);gap:16px;flex:1;min-height:0}
+.hero-codex-heroes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:8px;min-height:0}
+.hero-codex-heroes button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:0;padding:5px;border:1px solid #7c9260;border-radius:5px;background:#30472d;color:#e7e5c7}
+.hero-codex-heroes button.active{border:2px solid #f3d28a;background:#677947;color:#fff2c5;box-shadow:inset 0 0 15px #f0d18422}
+.hero-codex-heroes button b{font-size:12px;line-height:1.4;white-space:nowrap}
+.hero-codex-heroes button small{font-size:9px;color:#d6d5ae;white-space:nowrap}
+.hero-codex-portrait{position:relative;display:block;width:42px;height:50px;overflow:hidden;flex-shrink:1;min-height:18px}
+.hero-codex-portrait img{position:absolute;width:400%;height:200%;max-width:none;object-fit:fill}
+.hero-codex-canvas{display:grid;place-items:center;min-height:0;min-width:0;container-type:size;border:1px solid #71835b;background:#233924;border-radius:5px;padding:4px}
+.hero-codex-stage{position:relative;width:min(100%,100cqh);aspect-ratio:1;overflow:hidden;background:linear-gradient(#71963616,#71963616),url('/terrain/forest-ground.png') center/cover;border:2px solid #c4ac6d;isolation:isolate}
+.hero-codex-footer{flex:none;display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:12px}
+.hero-codex-footer>span{min-width:0;text-align:center}.hero-codex-footer b,.hero-codex-footer small{display:block;line-height:1.5}.hero-codex-footer b{font-size:12px}.hero-codex-footer small{font-size:10px;color:#c7d5b2}
+.hero-codex-modal button:focus-visible,.hero-codex-open:focus-visible{outline:2px solid #fff0b5;outline-offset:2px}
+@media(max-width:650px){
+  .hero-codex-open{min-width:54px;padding:4px 6px;font-size:10px}
+  .hero-codex-shade{padding:8px}.hero-codex-modal{height:min(780px,calc(100dvh - 16px));padding:10px}
+  .hero-codex-header h2{font-size:17px}.hero-codex-header small{font-size:9px}.hero-codex-close{padding:4px 8px;min-height:34px;font-size:11px}
+  #hero-codex-description{font-size:10px;margin:7px 0 9px;line-height:1.5}
+  .hero-codex-body{grid-template-columns:minmax(0,1fr);grid-template-rows:124px minmax(0,1fr);gap:9px}
+  .hero-codex-heroes{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:5px}
+  .hero-codex-heroes button{padding:3px;gap:1px}.hero-codex-heroes button b{font-size:10px}.hero-codex-heroes button small{display:none}
+  .hero-codex-portrait{width:26px;height:34px}
+  .hero-codex-footer{padding-top:9px}.hero-codex-footer button{padding:4px 7px;font-size:11px;min-height:32px}.hero-codex-footer b{font-size:11px}.hero-codex-footer small{font-size:8px}
+}
+@media(max-height:540px){
+  .hero-codex-modal{padding:8px}.hero-codex-header h2{font-size:16px}#hero-codex-description{margin:4px 0;font-size:9px}
+  .hero-codex-body{grid-template-columns:156px minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:8px}
+  .hero-codex-heroes{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:4px}
+  .hero-codex-heroes button{flex-direction:row;padding:2px;gap:2px}.hero-codex-heroes button b{font-size:9px}.hero-codex-heroes button small{display:none}
+  .hero-codex-portrait{width:20px;height:27px}.hero-codex-footer{padding-top:5px}
+}

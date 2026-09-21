@@ -1,0 +1,2 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;800&family=Noto+Serif+KR:wght@500;600;700&display=swap');
+:root{color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;background:#0d181d;color:#f1ead6;font-family:'DM Sans','Noto Sans KR',sans-serif}button{font:inherit;cursor:pointer}button:disabled{cursor:not-allowed}

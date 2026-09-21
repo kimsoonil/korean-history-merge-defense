@@ -1,0 +1,14 @@
+.header-tools{display:flex;align-items:center;gap:9px;flex:none}
+.music-controls{display:flex;align-items:center;gap:7px;padding:0 8px;height:30px;border:1px solid #8c7d52;border-radius:5px;background:#303c28;color:#d9cfab}
+.music-controls audio{display:none}
+.music-toggle{display:flex;align-items:center;gap:5px;border:0;background:none;color:inherit;padding:0;min-height:26px;font-size:10px;font-weight:700;cursor:pointer}
+.music-controls.is-playing{color:#f4d488;border-color:#c4a869;background:#475434}
+.music-toggle:focus-visible,.music-volume:focus-visible{outline:2px solid #ffe2a2;outline-offset:3px}
+.music-toggle i{display:flex;align-items:center;gap:2px;height:12px;width:12px}
+.music-toggle i b{width:2px;height:3px;background:currentColor;border-radius:1px}
+.is-playing .music-toggle i b{animation:music-meter 1.05s ease-in-out infinite alternate}
+.is-playing .music-toggle i b:nth-child(2){animation-delay:-.35s}.is-playing .music-toggle i b:nth-child(3){animation-delay:-.7s}
+.music-volume{width:58px;height:20px;margin:0;accent-color:#e4c276;cursor:pointer}
+@keyframes music-meter{to{height:11px}}
+@media(max-width:600px){.game-header .game-chapter{display:none}.header-tools{gap:6px}.music-controls{padding:0 6px;gap:5px}.music-volume{width:48px}}
+@media(prefers-reduced-motion:reduce){.is-playing .music-toggle i b{animation:none;height:8px}}

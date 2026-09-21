@@ -1,0 +1,10 @@
+/* Final compact sizing for the square field and all four action buttons. */
+.arena-board{width:min(100%,calc(100dvh - 345px))}
+@media(min-width:761px){.book-modal{height:min(500px,calc(100dvh - 24px))}}
+@media(max-width:380px){
+  .game-actions .action-sell{display:flex}
+  .game-actions button{padding:3px 2px;gap:2px}
+  .game-actions button b{font-size:9px}
+  .game-actions button small{font-size:7px}
+  .action-gold{min-width:51px}
+}
