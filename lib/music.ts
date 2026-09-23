@@ -1,17 +1,18 @@
 export const MUSIC_STORAGE_KEY='salsu-bgm-v1';
-export const MUSIC_TRACK='/audio/forest-calm.wav';
+export const MUSIC_TRACK='/audio/ketchaku.mp3';
 export const MUSIC_TRACKS={
-  normal:{src:MUSIC_TRACK,title:'고요한 숲길',seconds:40},
+  normal:{src:MUSIC_TRACK,title:'決着 · 작곡하는김의홍',seconds:66.481625},
   boss:{src:'/audio/salsu-boss.wav',title:'살수 결전',seconds:25.6},
 } as const;
-export type MusicMood='silent'|'boss';
+export type MusicMood='silent'|'normal'|'boss';
 export function getMusicMood(phase:string,enemies:readonly {boss:boolean;hp:number}[]):MusicMood{
-  return phase==='battle'&&enemies.some(enemy=>enemy.boss&&enemy.hp>0)?'boss':'silent';
+  if(phase!=='battle')return 'silent';
+  return enemies.some(enemy=>enemy.boss&&enemy.hp>0)?'boss':'normal';
 }
 export const DEFAULT_MUSIC_SETTINGS={enabled:true,volume:30};
 export type MusicSettings={enabled:boolean;volume:number};
 export function shouldPlayMusic(mood:MusicMood,enabled:boolean,hidden:boolean){
-  return mood==='boss'&&enabled&&!hidden;
+  return mood!=='silent'&&enabled&&!hidden;
 }
 
 export function readMusicSettings(raw:string|null):MusicSettings{
