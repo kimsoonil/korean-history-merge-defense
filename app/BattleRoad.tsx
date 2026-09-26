@@ -1,6 +1,7 @@
+import {ROAD_EDGE,ROAD_PATH} from '@/lib/battlefield';
 /** One closed path keeps the four corners seamless and matches pathAt's centerline. */
 export default function BattleRoad(){
-  const route='M9 9H91V91H9Z';
+  const route=ROAD_PATH;
   return <svg className="battle-road" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
     <defs>
       <pattern id="battle-soil" width="7" height="6" patternUnits="userSpaceOnUse">
@@ -11,10 +12,8 @@ export default function BattleRoad(){
       </pattern>
     </defs>
     <g fill="none" strokeLinejoin="round">
-      <path d={route} stroke="#49612f" strokeWidth="9.2" opacity=".65"/>
-      <path d={route} stroke="#947549" strokeWidth="8.5"/>
-      <path d={route} stroke="#e0c690" strokeWidth="7.9"/>
-      <path d={route} stroke="url(#battle-soil)" strokeWidth="7.2"/>
+      {/* Centerline 5%, width 10%: outside edge 0%, flush with the inner map. */}
+      <path d={route} stroke="url(#battle-soil)" strokeWidth={ROAD_EDGE*2}/>
     </g>
   </svg>;
 }

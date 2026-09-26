@@ -1,0 +1,13 @@
+.prologue{overflow:hidden}
+.prologue-museum{position:absolute;inset:0;z-index:-3;background-size:cover;background-position:center 38%;background-color:#14212d}
+.prologue .prologue-aura{z-index:-2;background:linear-gradient(180deg,#08111b20,transparent 35%,#08111b44 58%,#08111be6)}
+.prologue>header{position:absolute;top:0;right:0;left:0;justify-content:flex-end;padding:16px;gap:10px;border:0;z-index:5;pointer-events:none}
+.prologue>header button{pointer-events:auto;display:inline-flex;align-items:center;gap:6px;min-height:40px;background:#12212bbd;border-color:#c5b58b80;padding:8px 14px;backdrop-filter:blur(5px)}
+.prologue .prologue-stage{width:100%;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:0;padding:70px 24px max(24px,env(safe-area-inset-bottom));margin:0;flex:1;box-sizing:border-box}
+.prologue .prologue-copy{width:min(760px,100%);max-height:100%;overflow-y:auto;padding:24px 28px;border-top:1px solid #d5bd8255;border-radius:12px;background:linear-gradient(135deg,#142531e8,#101820e8);box-shadow:0 8px 40px #0005;outline:none;box-sizing:border-box}
+.prologue .prologue-line{font-size:18px;line-height:1.85;margin:0 0 18px}
+.prologue .prologue-next{display:flex;margin-left:auto;min-height:42px}
+.scene-rift .prologue-museum{animation:museum-rift 1.8s ease-in both}
+@keyframes museum-rift{50%{filter:brightness(1.5)}100%{filter:brightness(.35)}}
+@media(max-width:760px){.prologue .prologue-stage{padding:66px 14px 18px}.prologue .prologue-copy{padding:20px 18px}.prologue .prologue-line{font-size:16px;line-height:1.75}.prologue .prologue-input{flex-wrap:wrap}.prologue .prologue-input input{flex-basis:140px}.prologue form small{font-size:11px}.prologue .prologue-museum{background-position:center 32%}}
+@media(min-width:761px){.prologue .prologue-museum{background-size:auto 125%;background-repeat:no-repeat}.prologue .prologue-aura{background:linear-gradient(90deg,#0b1621,transparent 35%,transparent 65%,#0b1621),linear-gradient(0deg,#0b1621b0,transparent 65%)}}

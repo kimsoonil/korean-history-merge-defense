@@ -1,5 +1,7 @@
 import {chapterOneBattles,FINAL_WAVE,waveCombatLevel} from './campaign.ts';
-import {roundBossName} from './rounds.ts';
+import {globalRound,roundBossName} from './rounds.ts';
+import {roadPosition} from './battlefield.ts';
+import {enemyStats,type Difficulty} from './enemy-stats.ts';
 export type UnitDef = { name:string; tier:number; icon:string; role:string; skill:string; damage:number; range:number; rate:number; color:string; recipe?:string[]; portrait?:string; atlas?:{src:string;col:number;row:number} };
 const portraitSlugs:Record<string,string>={창병:'spearman',활병:'archer',수병:'sailor',포수:'gunner',의병:'militia',기병:'cavalry',유생:'scholar'};
 const heroSheets=[
@@ -17,11 +19,16 @@ make('선덕여왕',3,'✦','지원','지혜의 등불 · 아군 강화',108,3.9
 make('연개소문',4,'⚔','전열','막리지 · 적진 섬멸',345,3.8,1.35,'#88a987',['문무왕','최영','온달','창병']),make('김춘추',4,'✦','책략','외교전 · 전장 통솔',315,4.3,1.35,'#d7b47c',['선덕여왕','정몽주','서희','유생']),make('대조영',4,'♞','기동','발해의 기상 · 광역 돌격',370,4.1,1.3,'#a7a6cf',['윤관','태종 이방원','신숭겸','기병','활병']),make('왕건',4,'♛','군주','개국 · 전군 사기 상승',325,4.2,1.35,'#d7b47c',['태종 이방원','사명대사','황희','수병']),make('강감찬',4,'✦','책략','귀주 · 대규모 책략 공격',360,4.6,1.2,'#d4c38b',['윤관','정몽주','허준','활병']),make('권율',4,'🚩','수성','행주 · 밀집 적군 제압',385,4.2,1.15,'#d2a778',['최영','사명대사','곽재우','포수']),make('계백',4,'⚔','전열','결사 · 단일 대상 강타',410,3.5,1.2,'#88a987',['선덕여왕','정약용','김시민','창병','의병']),make('장보고',4,'⚓','수군','청해진 · 강가 광역 공격',380,4.3,1.15,'#83b9c7',['문무왕','정약용','최무선','수병','포수']),
 make('이순신',5,'⚓','수군','학익진 · 보스와 수로 적군에 막대한 피해',1100,5.2,1.35,'#83b9c7',['장보고','권율','정약용','곽재우','수병']),make('세종대왕',5,'✦','군주','훈민정음 · 모든 아군 공격 지원',940,5.3,1.35,'#d7b47c',['김춘추','왕건','선덕여왕','황희','유생']),make('광개토대왕',5,'♞','기동','광개토 · 넓은 범위 정복',1150,4.9,1.4,'#a7a6cf',['연개소문','대조영','윤관','온달','기병']),make('을지문덕',5,'🌊','책략','살수대첩 · 수나라 군대 추가 피해',1200,5.6,1.25,'#83b9c7',['연개소문','강감찬','문무왕','서희','수병']),make('김유신',5,'⚔','전열','삼국통일 · 전열 광역 공격',1080,4.8,1.4,'#88a987',['김춘추','계백','최영','신숭겸','창병']),make('이성계',5,'🏹','기동','위화도 · 원거리 일제 사격',1120,5.1,1.3,'#b4c68c',['왕건','장보고','태종 이방원','김시민','활병']),make('척준경',5,'⚔','전열','검성 · 보스 처치 특화',1300,4.3,1.35,'#88a987',['강감찬','계백','사명대사','허준','의병']),make('정조',5,'♛','군주','장용영 · 정예 화포 집중 사격',1050,5.2,1.4,'#d7b47c',['권율','대조영','정몽주','최무선','포수'])
 ];
+// Naval units trade splash for stronger single-target attacks than same-tier tacticians.
+for(const unit of units)if(unit.role==='수군'){
+ unit.damage=Math.max(unit.damage,Math.ceil(Math.max(0,...units.filter(u=>u.tier===unit.tier&&u.role==='책략').map(u=>u.damage))*1.2));
+ unit.skill='해상 제압 · 단일 공격과 방어도 감소';
+}
 export const byName=Object.fromEntries(units.map(u=>[u.name,u])) as Record<string,UnitDef>;
 export const basics=units.filter(u=>u.tier===1);
 export const recipes=units.filter(u=>!!u.recipe);
 export type Soldier={id:number; name:string; slot:number};
-export type Enemy={id:number; name:string; hp:number; maxHp:number; progress:number; speed:number; boss:boolean; reward:number; originStage:number};
+export type Enemy={id:number; name:string; hp:number; maxHp:number; progress:number; speed:number; boss:boolean; reward:number; originStage:number;bossSeconds?:number;armor?:number;stunSeconds?:number};
 export const waveNames=chapterOneBattles.map(battle=>battle.name);
 export const enemyNames=['수나라 보병','수나라 창병','수나라 궁병','수나라 기병','수나라 공성병','수나라 정예군'];
 export const enemyPortraits=Object.fromEntries([...enemyNames,'수양제'].map((name,index)=>[name,{src:'/portraits/sui-enemies-atlas.png',col:index%4,row:Math.floor(index/4)}])) as Record<string,{src:string;col:number;row:number}>;
@@ -29,11 +36,12 @@ export function createInvader(stage:number,index:number,id:number):Enemy{const l
 export function recipeStatus(recipe:string[],owned:Soldier[]){const pool=[...owned]; return recipe.map(n=>{const i=pool.findIndex(s=>s.name===n);if(i<0)return false;pool.splice(i,1);return true})}
 // The general deliberately reuses an enlarged elite soldier, rather than the emperor art.
 enemyPortraits['수나라 장군']=enemyPortraits['수나라 정예군'];
-export function createRoundInvader(stage:number,round:number,index:number,id:number):Enemy{
+for(const name of ['수나라 선봉장','수나라 공성대장','우문술','내호아','우중문','우중문 & 우문술'])enemyPortraits[name]=enemyPortraits['수나라 정예군'];
+export function createRoundInvader(stage:number,round:number,index:number,id:number,difficulty:Difficulty='normal'):Enemy{
  const bossName=index===0?roundBossName(stage,round):null;
- const level=waveCombatLevel(stage)+Math.floor((round-1)/5);
- const hp=bossName?(55+level*38+54)*10:55+level*38+(index%4)*18;
- return {id,name:bossName??enemyNames[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))],hp,maxHp:hp,progress:0,speed:bossName?.025:.043+(index%4)*.003,reward:bossName?850:11+level*2,boss:!!bossName,originStage:stage};
+ const level=Math.ceil(globalRound(stage,round)/5);
+ const {hp,armor}=enemyStats(round,index,!!bossName,bossName==='수양제',difficulty);
+ return {id,name:bossName??enemyNames[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))],hp,maxHp:hp,armor,progress:0,speed:bossName?.025:.043+(index%4)*.003,reward:bossName?30*round:difficulty==='hard'?15:20,boss:!!bossName,originStage:stage};
 }
 // The invaders make one complete lap around the square unit field.
-export function pathAt(t:number){const pts=[[9,9],[91,9],[91,91],[9,91],[9,9]];let p=Math.max(0,Math.min(.999,t))*(pts.length-1),i=Math.floor(p),a=p-i;return {x:pts[i][0]+(pts[i+1][0]-pts[i][0])*a,y:pts[i][1]+(pts[i+1][1]-pts[i][1])*a}}
+export const pathAt=roadPosition;

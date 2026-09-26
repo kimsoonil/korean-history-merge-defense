@@ -1,0 +1,19 @@
+.battle-settings-trigger{display:flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;border:1px solid #a79f72;border-radius:5px;background:#344c38;color:#f3e3b2;flex:none;cursor:pointer}
+.battle-settings-dialog{width:min(380px,calc(100vw - 28px));max-height:calc(100dvh - 32px);box-sizing:border-box;margin:auto;padding:20px;overflow:auto;border:1px solid #b9a774;border-radius:14px;background:#20392f;color:#f4e8c5;box-shadow:0 24px 80px #0008}
+.battle-settings-dialog::backdrop{background:#071c21b3;backdrop-filter:blur(4px)}
+.battle-settings-dialog>header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.battle-settings-dialog h2{font-size:22px;margin:0}
+.battle-settings-dialog>header button{display:grid;place-items:center;width:40px;height:40px;background:none;border:1px solid #8f9b7066;border-radius:6px;color:inherit}
+.settings-music{padding:14px 0;border-block:1px solid #92a17a44;margin-bottom:16px}
+.settings-music h3{margin:0 0 10px;font-size:13px}
+.settings-music .music-controls{width:100%;box-sizing:border-box;justify-content:space-between;min-height:42px}
+.settings-music .music-volume{width:110px}
+.settings-links{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.settings-links button{display:flex;align-items:center;justify-content:flex-start;gap:8px;min-height:48px;padding:10px;border:1px solid #91a07670;border-radius:6px;background:#354d3b;color:#f4e8c5;font-size:12px;cursor:pointer}
+.settings-links button:disabled{opacity:.4;cursor:default}
+.battle-settings-dialog>p{font-size:11px;line-height:1.7;color:#b6c4a5;margin:16px 0 0}
+.battle-settings-dialog button:focus-visible,.battle-settings-trigger:focus-visible{outline:2px solid #ffe3a2;outline-offset:2px}
+.game-header:has(.battle-settings-trigger){height:48px!important;min-height:48px!important;flex-wrap:nowrap!important;padding-block:0!important;gap:10px}
+.game-header:has(.battle-settings-trigger) .player-profile{flex:1;max-width:none;min-width:0}
+.game-header:has(.battle-settings-trigger) .header-tools{flex:0 0 auto;flex-wrap:nowrap}
+@media(max-width:380px){.settings-links{grid-template-columns:1fr}.battle-settings-dialog{padding:16px}}

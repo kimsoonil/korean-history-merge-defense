@@ -16,7 +16,7 @@ test('saved music settings are restored without allowing invalid volume',()=>{
 
 test('only a living boss in an active battle selects urgent music',()=>{
   for(let stage=1;stage<8;stage++)assert.equal(getMusicMood('battle',[createInvader(stage,0,stage)]),'normal');
-  const boss=createInvader(8,0,10),regular=createInvader(8,1,11);
+  const boss=createInvader(10,0,10),regular=createInvader(10,1,11);
   assert.equal(getMusicMood('battle',[boss,regular]),'boss');
   assert.equal(getMusicMood('battle',[regular]),'normal');
   assert.equal(getMusicMood('battle',[{...boss,hp:0},regular]),'normal');
@@ -35,7 +35,7 @@ test('clicks, volume changes and tab return cannot start music outside an active
 });
 
 test('a boss encounter switches from normal music to boss music and back',()=>{
-  const boss=createInvader(8,0,1),regular=createInvader(8,1,2);
+  const boss=createInvader(10,0,1),regular=createInvader(10,1,2);
   assert.deepEqual([
     getMusicMood('ready',[]),getMusicMood('battle',[regular]),
     getMusicMood('battle',[boss,regular]),getMusicMood('battle',[{...boss,hp:0},regular]),

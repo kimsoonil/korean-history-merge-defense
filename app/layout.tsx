@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import './profile-settings.css';
 import './arena.css';
 import './arena-tune.css';
 import './mobile-unit.css';
@@ -26,6 +27,16 @@ import './hero-skills.css';
 import './image-loading.css';
 import './unit-placement.css';
 import './merge-success.css';
+import './fronts.css';
+import './mobile-compact.css';
+import './home-screen.css';
+import './region-map.css';
+import './prologue-cinematic.css';
+import './story-books.css';
+import './open-story-book.css';
+import './battle-settings.css';
+import './unit-bag.css';
+import './battle-intro.css';
 import AdPlaceholder from './AdPlaceholder';
 export const metadata: Metadata = { title: '한국사 조합 디펜스', description: '병사를 모집하고 한국사의 영웅을 조합하여 다양한 전장에 도전하세요.' };
 export default function RootLayout({ children }: Readonly<{children: React.ReactNode}>) { return <html lang="ko"><body><div className="ad-layout"><AdPlaceholder side="left"/>{children}<AdPlaceholder side="right"/></div></body></html>; }

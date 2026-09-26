@@ -4,10 +4,11 @@ import {canSkipStage,stageClearGold,canAutoAdvanceRound} from '../lib/stage-flow
 
 const clearedEarly={phase:'battle',timeLeft:19,spawned:7,maxSpawn:7,enemyCount:0,paused:false};
 
-test('automatic advance waits for the timer and every enemy, without a skip click',()=>{
+test('automatic advance waits for the timer but carries living enemies forward',()=>{
  const ended={...clearedEarly,timeLeft:0};
  assert.equal(canAutoAdvanceRound(ended),true);
- for(const change of [{timeLeft:1},{enemyCount:1},{spawned:6},{paused:true},{phase:'won'},{phase:'lost'},{phase:'ready'},{phase:'cleared'}])assert.equal(canAutoAdvanceRound({...ended,...change}),false);
+ assert.equal(canAutoAdvanceRound({...ended,enemyCount:99}),true);
+ for(const change of [{timeLeft:1},{spawned:6},{paused:true},{phase:'won'},{phase:'lost'},{phase:'ready'},{phase:'cleared'}])assert.equal(canAutoAdvanceRound({...ended,...change}),false);
 });
 
 test('skip unlocks only after the entire wave has spawned and been defeated',()=>{
@@ -35,5 +36,5 @@ test('final-stage time can be skipped only after the boss and every other enemy 
 test('time skips use the same clear reward as waiting for the timer',()=>{
   assert.equal(stageClearGold(1),85);
   assert.equal(stageClearGold(7),175);
-  assert.equal(stageClearGold(8),0);
+  assert.equal(stageClearGold(10),0);
 });

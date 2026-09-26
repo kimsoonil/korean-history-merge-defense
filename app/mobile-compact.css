@@ -1,0 +1,27 @@
+/* Both desktop and mobile expose upgrades in the footer. */
+.game-actions .action-upgrade{display:flex;min-width:0}
+.game-header .player-profile{margin-left:0}
+.battle-destinations{display:flex;gap:5px}
+.battle-destinations button{min-height:34px;padding:5px 9px;border:1px solid #9fa276;border-radius:4px;background:#3d5434;color:#e5e5c4;font-size:11px;white-space:nowrap}
+@media(max-width:760px){.game-header .header-tools{flex:1;min-width:0;flex-wrap:wrap;justify-content:flex-end}.game-header:has(.battle-destinations){height:auto;min-height:48px;padding-block:6px;gap:5px;flex-wrap:wrap}.battle-destinations button{min-height:36px;font-size:10px;padding:5px 7px}}
+@media(max-width:760px){
+ .game-header .game-brand-logo{display:none}
+ .game-header .upgrade-open{display:none}
+ .game-status .status-gold{display:none}
+ .game-status{height:62px;grid-template-columns:82px minmax(0,1fr) 148px;grid-template-rows:60px}
+ .game-status .status-speed{grid-column:auto;flex-direction:column;gap:4px;border-top:0;padding:4px;margin:0;align-items:flex-end}
+ .game-status .status-speed>small{margin:0;align-self:flex-start}
+ .game-status .status-speed>div{gap:4px}
+ .game-status .status-speed button{width:42px;height:30px}
+ .game-status .status-enemy{display:flex!important;min-width:0;border-right:0}
+ .game-status .status-enemy b{font-size:18px}
+ .game-status small{letter-spacing:0}
+ .game-actions .action-sell{display:none}
+ .game-actions .action-upgrade{display:flex;min-width:0}
+ .arena-heading small{display:none}
+ .arena-heading{height:32px}
+ .arena-heading h1{font-size:14px}
+ .arena-board{width:min(100%,calc(100dvh - 288px))}
+ .game-header .player-profile{margin-left:0}
+ .game-actions .action-gold{min-width:54px;max-width:80px}
+}

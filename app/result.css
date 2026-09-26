@@ -4,6 +4,11 @@
 .boss-banner{position:absolute;z-index:7;top:1%;left:50%;transform:translateX(-50%);width:min(220px,62%);padding:4px 8px 6px;background:#513226ee;border:1px solid #e7c16f;box-shadow:0 2px 8px #211b12aa;color:#ffe9ad;display:flex;align-items:center;justify-content:space-between;gap:5px;flex-wrap:wrap;font-size:10px;pointer-events:none}
 .boss-banner b{font-size:12px}.boss-banner>i{height:5px;flex:0 0 100%;background:#2f201a;overflow:hidden;border-radius:3px}.boss-banner>i>span{display:block;height:100%;background:linear-gradient(90deg,#e96a4f,#f0c96e)}
 .result-shade{z-index:50}
+.boss-countdown{flex:0 0 100%;color:#ffe39b;font-variant-numeric:tabular-nums;font-size:12px}
+.result-shade.victory-layout{display:flex;flex-wrap:wrap;gap:20px;align-content:center;align-items:center;justify-content:center;overflow:auto;padding:20px}
+.victory-dialogue{width:min(300px,100%);box-sizing:border-box;padding:18px;border-left:2px solid #e4c57f;background:#15291bef;color:#fff1cb;text-align:left;animation:merge-success-in .25s ease-out}
+.victory-dialogue strong{color:#eacb85;font-size:18px}.victory-dialogue p{margin:8px 0 0;font-size:15px;line-height:1.8;word-break:keep-all}
+@media(max-width:760px){.result-shade.victory-layout{flex-wrap:nowrap;flex-direction:column;justify-content:flex-start;gap:12px}.victory-dialogue{width:min(430px,100%);padding:12px}.victory-dialogue p{font-size:12px;line-height:1.6}.victory-layout .result-modal{flex:none;padding:16px}}
 .result-modal{width:min(430px,100%);padding:26px 25px 23px;text-align:center;background:linear-gradient(145deg,#4a6038,#2b3c2b);border:2px solid #d2b471;box-shadow:0 18px 60px #101b11dd,inset 0 0 0 4px #33482e;color:#fff0c6}
 .result-modal.lost{background:linear-gradient(145deg,#603d32,#342b28);border-color:#cf9278;box-shadow:0 18px 60px #1e1010dd,inset 0 0 0 4px #49332e}
 .result-emblem{width:59px;height:59px;margin:0 auto 12px;display:grid;place-items:center;border:2px solid #f5d98d;border-radius:50%;background:#647b44;color:#fff3ba;font:700 31px 'Noto Serif KR',serif}

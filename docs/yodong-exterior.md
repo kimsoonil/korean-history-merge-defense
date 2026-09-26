@@ -1,0 +1,10 @@
+# 요동성 외곽 맵
+
+Asset: `public/terrain/front-yodong-exterior.png`
+Built-in imagegen edit of `public/terrain/front-yodong.png`; original retained.
+Scope: stages 1–3 only. The image includes courtyard, fortress and exterior patrol trail in one scene. Other fronts retain their own maps. Existing enemy path, deployment coordinates and combat rules are unchanged.
+
+Visual reference: [Kingdom Rush screenshots](https://www.pocketgamer.com/kingdom-rush/ironhide-game-studio-updates-the-original-kingdom-rush-with-a-new-campaign-and-h/) and [Ironhide game overview](https://www.ironhidegames.com/Games/kingdom-rush). Referenced terrain/road integration only; no third-party artwork copied into the game.
+
+## Generation prompt
+Use case: precise-object-edit. Asset: square top-down Korean historical tower defense game map. Edit the supplied Yodong fortress map by zooming out: preserve the existing grassy empty courtyard and Korean stone fortress style, now fit the entire existing fortress within the central 80 percent square (walls at x/y approximately 11 and 89 percent). Add a continuous OUTSIDE terrain ring on all four sides: a naturally worn light brown dirt patrol trail bordered by short grass, tiny weeds, scattered pebbles, gentle earth color variation, pine shrubs only in extreme outer corners. Precise gameplay constraint: enemy path center follows a rounded square at x=5%, x=95%, y=5%, y=95%, with turns centered at (13%,13%), (87%,13%), (87%,87%), (13%,87%) and radius 8%. The path must remain open, obvious and free of walls or trees. No flat uniform geometric tan band, no outlines, no borders: irregular grassy margins blend naturally with the fortress foundation. The entire outer 10% strip must be landscape outside the fortress, not more courtyard. Keep the large inner lawn uncluttered for player units; no characters, units, text, UI or labels. Match the reference's painterly textures, soft daylight, green grass and grey Korean stone walls. This is a complete seamless coherent scene, not a framed image.

@@ -26,15 +26,15 @@ test('saving during a cinematic freezes the clock and overtime stays at zero',()
 test('cleared stages retain their reward latch and final results are not resumable',()=>{
  const cleared=makeGameSave({...progress(),enemies:[],spawned:10,remainingMs:0,phase:'cleared'});
  assert.ok(roundTrip(cleared));assert.equal(restoredCounters(cleared).completedStage,201);
- const won=makeGameSave({...progress(),enemies:[],stage:8,round:55,spawned:10,remainingMs:0,phase:'won'});
+ const won=makeGameSave({...progress(),enemies:[],stage:10,round:65,spawned:10,remainingMs:0,phase:'won'});
  assert.ok(roundTrip(won));assert.equal(canContinue(won),false);
  const lost=makeGameSave({...progress(),wall:0,phase:'lost',remainingMs:0});
  assert.ok(roundTrip(lost));assert.equal(canContinue(lost),false);
  assert.equal(canContinue(null),false);
 });
 test('boss HP, sprite identity, location and spawn count survive a reload',()=>{
- const boss={...createInvader(8,0,20),hp:1240,progress:.84};
- const save=makeGameSave({...progress(),stage:8,round:55,enemies:[boss],spawned:10,remainingMs:0});
+ const boss={...createInvader(10,0,20),hp:1240,progress:.84};
+ const save=makeGameSave({...progress(),stage:10,round:65,enemies:[boss],spawned:10,remainingMs:0});
  const loaded=roundTrip(save);
  assert.deepEqual(loaded.enemies,[boss]);assert.equal(loaded.spawned,10);
  assert.equal(restoredCounters(loaded).nextId,21);
@@ -43,8 +43,8 @@ test('invalid, incompatible and inconsistent saves are safely rejected',()=>{
  assert.equal(readGameSave(null),null);assert.equal(readGameSave('{broken'),null);
  const save=makeGameSave(progress());
  for(const changes of [
-  {version:5},{phase:'unknown'},{stage:9},{wall:-1},{wall:0},{gold:-5},{speed:'2'},
-  {remainingMs:40000},{spawned:11},{roster:[{id:1,name:'없는 영웅',slot:0}]},
+  {version:6},{phase:'unknown'},{stage:11},{wall:-1},{wall:0},{gold:-5},{speed:'2'},
+  {remainingMs:40000},{spawned:21},{roster:[{id:1,name:'없는 영웅',slot:0}]},
   {roster:[{id:1,name:'constructor',slot:0}]},{roster:[{id:1,name:'유생',slot:40}]},
   {roster:[{id:1,name:'유생',slot:0},{id:2,name:'창병',slot:0}]},
   {enemies:[{...save.enemies[0],id:1}]},{enemies:[{...save.enemies[0],hp:0}]},
@@ -63,18 +63,18 @@ test('a selected 1-8 preparation is a valid resumable save',()=>{
 });
 test('legacy ten-wave saves migrate without losing units or resources',()=>{
  const early={...makeGameSave(progress()),version:1};
- assert.equal(roundTrip(early).version,4);assert.deepEqual(roundTrip(early).roster,early.roster);
+ assert.equal(roundTrip(early).version,5);assert.deepEqual(roundTrip(early).roster,early.roster);
  for(const stage of [8,9]){
   const legacy={...early,stage,spawned:5,enemies:[{...createInvader(7,0,8),originStage:stage}]};
   const migrated=roundTrip(legacy);
   assert.equal(migrated.stage,8);assert.equal(migrated.phase,'ready');assert.equal(migrated.gold,early.gold);
   assert.equal(migrated.spawned,0);assert.deepEqual(migrated.enemies,[]);assert.deepEqual(migrated.roster,early.roster);
  }
- const boss={...createInvader(8,0,80),originStage:10,hp:1200,progress:.6};
+ const boss={...createInvader(10,0,80),originStage:10,hp:1200,progress:.6};
  const legacyFinal={...early,stage:10,enemies:[boss],spawned:23};
  const migratedFinal=roundTrip(legacyFinal);
- assert.equal(migratedFinal.stage,8);assert.equal(migratedFinal.phase,'battle');
- assert.deepEqual(migratedFinal.enemies,[{...boss,originStage:8}]);assert.equal(migratedFinal.remainingMs,early.remainingMs);
+ assert.equal(migratedFinal.stage,10);assert.equal(migratedFinal.phase,'battle');
+ assert.deepEqual(migratedFinal.enemies,[{...boss,originStage:10}]);assert.equal(migratedFinal.remainingMs,early.remainingMs);
  const legacyWon={...legacyFinal,phase:'won',enemies:[],remainingMs:0};
- assert.equal(roundTrip(legacyWon).phase,'won');assert.equal(roundTrip(legacyWon).stage,8);
+ assert.equal(roundTrip(legacyWon).phase,'won');assert.equal(roundTrip(legacyWon).stage,10);
 });

@@ -1,1 +1,10 @@
 .battle-road{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+/* The battlefield illustration sits inside the outer enemy lane, not under it. */
+.battle-world{background:#c9ac76;border-radius:0;overflow:hidden}
+.battle-world .board-surface{inset:10%;background-size:100% 100%;background-repeat:no-repeat;border:0;border-radius:0;box-shadow:none;mask-image:none}
+.arena-stage,.arena-board{border:0;border-radius:0;box-shadow:none}
+.arena-board{border-radius:0;background:transparent}
+.arena-stage{padding:0;background:transparent}
+.battle-world .invader{width:5.5%;height:6%}
+.battle-world .invader.boss{width:8%;height:8.5%}
+.battle-world .board-surface.integrated-terrain{inset:0;border-radius:0;background-size:100% 100%;background-color:#677d3b}

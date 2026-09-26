@@ -12,11 +12,11 @@ test('last round clears immediately, not intermediate rounds or while enemies re
 });
 test('stage endings stop automatic progression and unlock only the next choice',()=>{
  let cleared=0;
- for(let stage=1;stage<=8;stage++){
+ for(let stage=1;stage<=10;stage++){
   assert.equal(nextRound(stage,stageRoundCount(stage)),null);
   cleared=recordWaveClear(cleared,stage);
-  if(stage<8)assert.equal(isWaveUnlocked(stage+1,cleared),true);
-  if(stage<7)assert.equal(isWaveUnlocked(stage+2,cleared),false);
+  if(stage<10)assert.equal(isWaveUnlocked(stage+1,cleared),true);
+  if(stage<9)assert.equal(isWaveUnlocked(stage+2,cleared),false);
  }
 });
 test('completed stage save cannot resume into next stage; newly selected stage begins at round one',()=>{

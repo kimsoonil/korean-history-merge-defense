@@ -26,8 +26,8 @@ test('legendary cinematics preserve remaining stage time, even in overtime',()=>
 });
 
 test('the final-stage boss arrives first and has ten times the strongest regular invader HP',()=>{
-  const boss=createInvader(8,0,1);
-  const regular=Array.from({length:22},(_,index)=>createInvader(8,index+1,index+2));
+  const boss=createInvader(10,0,1);
+  const regular=Array.from({length:22},(_,index)=>createInvader(10,index+1,index+2));
   assert.equal(boss.name,'수양제');
   assert.equal(boss.boss,true);
   assert.equal(regular.some(enemy=>enemy.boss),false);

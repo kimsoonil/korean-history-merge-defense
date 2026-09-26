@@ -14,6 +14,8 @@ export function stageClearGold(stage:number){
   return stage<FINAL_WAVE?70+stage*15:0;
 }
 
-export function canAutoAdvanceRound({phase,timeLeft,spawned,maxSpawn,enemyCount,paused}:StageProgress){
-  return phase==='battle'&&!paused&&timeLeft<=0&&maxSpawn>0&&spawned>=maxSpawn&&enemyCount===0;
+export const ENEMY_LIMIT=100;
+export const isOverrun=(enemyCount:number)=>enemyCount>=ENEMY_LIMIT;
+export function canAutoAdvanceRound({phase,timeLeft,spawned,maxSpawn,paused}:StageProgress){
+  return phase==='battle'&&!paused&&timeLeft<=0&&maxSpawn>0&&spawned>=maxSpawn;
 }

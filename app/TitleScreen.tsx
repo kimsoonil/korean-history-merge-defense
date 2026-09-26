@@ -1,41 +1,34 @@
 'use client';
-import LoadingImage,{LoadingBackground,useImageStatus,ImageLoadingIndicator} from './LoadingImage';
-
-import {useEffect,useRef} from 'react';
-import {ArrowRight,BookOpen,ChevronRight,Coins,Heart,Images,Play,Sparkles,X} from 'lucide-react';
-import {byName} from '@/lib/game';
+import {LoadingBackground} from './LoadingImage';
+import {useEffect,useRef,useState} from 'react';
+import {ArrowRight,BookOpen,Images,Play,Sparkles,X,Settings,ScrollText,UserRound} from 'lucide-react';
 import {canContinue,type GameSave} from '@/lib/save';
 
-type Props={onStory:()=>void;onPrologue:()=>void;save:GameSave|null;ready:boolean;storageError:boolean;inert:boolean;onNew:()=>void;onContinue:()=>void;onCodex:()=>void;onBook:()=>void};
-export default function TitleScreen({onStory,onPrologue,save,ready,storageError,inert,onNew,onContinue,onCodex,onBook}:Props){
-  const resumable=canContinue(save);
-  return <main className="title-screen" inert={inert}>
-    <LoadingBackground className="title-landscape" src="/cinematics/jeongjo.png"/>
-    <div className="title-grain" aria-hidden="true"/>
-    <section className="title-content" aria-labelledby="game-title">
-      <div className="title-eyebrow"><span/> 역사를 잇는 작은 영웅들</div>
-      <h1 id="game-title">한국사<span>조합 디펜스</span></h1>
-      <p className="title-intro">과거로 이끌린 당신, 지워지는 역사를 되찾아라.<br/>시대를 넘어 영웅들과 함께 미래를 지켜내세요.</p>
-      <div className="title-start-actions">
-        <button className="title-new" onClick={onNew} disabled={!ready}><Sparkles size={21}/><span>새로하기<small>지도에서 도전할 스테이지를 선택합니다</small></span><ArrowRight size={23}/></button>
-        <button className="title-continue" onClick={onContinue} disabled={!ready||!resumable}><Play size={20}/><span>이어하기<small>{!ready?'저장된 기록 확인 중':resumable?`1-${save.stage} · ${save.round}라운드`:(save?.phase==='won'||save?.phase==='cleared')?'클리어 완료 · 새로운 도전을 시작하세요':save?.phase==='lost'?'방어전 종료 · 다시 도전하세요':'아직 저장된 방어전이 없습니다'}</small></span><ChevronRight size={23}/></button>
-      </div>
-      {resumable&&<div className="title-save-summary"><span><Heart size={12}/> {save.wall}/10</span><span><Coins size={12}/> {save.gold.toLocaleString()} G</span><span>배치 {save.roster.length}명</span><span>자동 저장됨</span></div>}
-      <div className="title-story-actions"><button className="prologue-replay" onClick={onPrologue}>프롤로그 다시 보기</button><button className="prologue-replay" onClick={onStory}>요동성 이야기 · 모집과 조합 배우기</button></div>
-      <nav className="title-archives" aria-label="게임 자료">
-        <button onClick={onCodex}><Images size={23}/><span><b>영웅 도감</b><small>전설의 영웅 8인의 기록</small></span><ChevronRight size={17}/></button>
-        <button onClick={onBook}><BookOpen size={23}/><span><b>조합서</b><small>2–5단계 영웅의 계보</small></span><ChevronRight size={17}/></button>
-      </nav>
-      <p className={`title-save-note ${storageError?'warning':''}`} role="status">{storageError?'브라우저 저장 공간을 사용할 수 없습니다. 현재 창에서만 이어할 수 있습니다.':'진행 상황은 이 브라우저에 자동 저장됩니다.'}</p>
-    </section>
-    <aside className="title-heroes" aria-label="시대를 넘어 모인 전설의 영웅들">
-      <div className="title-hero-heading"><span>시대를 넘어, 하나의 전장으로</span><b>전설을 조합하다</b></div>
-      <div className="title-hero-lineup">{['세종대왕','이순신','광개토대왕'].map((name,index)=>{const sprite=byName[name].atlas!;return <div key={name} className={`title-hero hero-${index}`}><div className="title-hero-sprite"><LoadingImage src={sprite.src} alt={name} style={{left:`-${sprite.col*100}%`,top:`-${sprite.row*100}%`}}/></div><span>{name}</span></div>})}</div>
-      <div className="title-hero-ground" aria-hidden="true"/>
-      <p>일곱 병종의 만남이, 새로운 역사가 됩니다.</p>
-    </aside>
-    <footer className="title-footer"><span>39종의 유닛 <i/> 5단계 조합 <i/> 10개의 스테이지</span><small>한국사에서 영감을 얻은 판타지 디펜스</small></footer>
-  </main>;
+type Props={onProfile:()=>void;onPrologue:()=>void;save:GameSave|null;ready:boolean;storageError:boolean;inert:boolean;onNew:()=>void;onContinue:()=>void;onCodex:()=>void;onBook:()=>void};
+let splashSeen=false;
+export default function TitleScreen({onProfile,onPrologue,save,ready,storageError,inert,onNew,onContinue,onCodex,onBook}:Props){
+ const [splash,setSplash]=useState(true);
+ const [settings,setSettings]=useState(false);
+ const resumable=canContinue(save);
+ const enter=()=>{splashSeen=true;setSplash(false);};
+ useEffect(()=>{if(splashSeen)setSplash(false);},[]);
+ const enterRef=useRef<HTMLButtonElement>(null);
+ useEffect(()=>{if(!splash)enterRef.current?.focus();},[splash]);
+ return <main className={`mobile-home ${splash?'is-splash':''}`} inert={inert}>
+  <LoadingBackground className="home-keyart" src="/cinematics/home-splash.png"/>
+  <div className="home-vignette" aria-hidden="true"/>
+  <h1 className="home-title">한국사<span>조합 디펜스</span><i aria-hidden="true">✦</i></h1>
+  {splash?<div className="splash-entry"><button onClick={enter} disabled={!ready}>{ready?'화면을 터치하여 시작':'준비 중…'}<ArrowRight size={18}/></button></div>:<>
+   <button className="home-settings-toggle" aria-label="설정" aria-expanded={settings} onClick={()=>setSettings(v=>!v)}><Settings size={22}/></button>
+   {settings&&<section className="home-settings-panel" aria-label="설정 메뉴"><button onClick={onPrologue}><ScrollText size={18}/> 프롤로그</button><button onClick={()=>{setSettings(false);onProfile();}}><UserRound size={18}/> 프로필 설정하기</button><button onClick={()=>setSettings(false)}>닫기</button></section>}
+   <section className="home-menu" aria-label="게임 시작">
+    <button ref={enterRef} className="home-primary" onClick={resumable?onContinue:onNew} disabled={!ready}><Play size={22} fill="currentColor"/>{resumable?'이어하기':'게임 시작'}</button>
+    {resumable&&<button className="home-secondary" onClick={onNew} disabled={!ready}>새로하기</button>}
+    <nav className="home-shortcuts" aria-label="게임 자료"><button onClick={onCodex}><Images size={25}/><span>영웅 도감</span></button><button onClick={onBook}><BookOpen size={25}/><span>조합서</span></button></nav>
+    {storageError&&<p className="home-storage-warning" role="status">저장이 불가능합니다. 창을 닫으면 진행 기록이 사라질 수 있습니다.</p>}
+   </section>
+  </>}
+ </main>;
 }
 
 export function NewGameConfirm({onConfirm,onCancel}:{onConfirm:()=>void;onCancel:()=>void}){

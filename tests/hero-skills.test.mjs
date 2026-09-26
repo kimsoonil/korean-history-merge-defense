@@ -45,7 +45,7 @@ test('every unique hero trait has a combat effect',()=>{
  close(heroSkillDamage('을지문덕',normal,[],1),byName['을지문덕'].damage*2);
  close(heroSkillDamage('이성계',{...normal,hp:50000},[],1),base('이성계',normal)*2);
  close(heroSkillDamage('척준경',boss,[],1),base('척준경',boss)*2);
- const ally=unit('창병');close(attackRate(ally,[ally,unit('정조',2,39),unit('정조',3,38)]),byName['창병'].rate*1.15);
+ const ally=unit('창병');close(attackRate(ally,[ally,unit('정조',2,39),unit('정조',3,38)]),byName['창병'].rate*1.30);
  const resources=heroSkillStep([unit('세종대왕'),unit('김유신',2)],[normal],10,1,new Map());
  assert.equal(resources.gold,20);assert.equal(resources.hearts,1);
 });
