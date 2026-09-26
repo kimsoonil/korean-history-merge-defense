@@ -6,8 +6,8 @@ import {ArrowRight,BookOpen,ChevronRight,Coins,Heart,Images,Play,Sparkles,X} fro
 import {byName} from '@/lib/game';
 import {canContinue,type GameSave} from '@/lib/save';
 
-type Props={save:GameSave|null;ready:boolean;storageError:boolean;inert:boolean;onNew:()=>void;onContinue:()=>void;onCodex:()=>void;onBook:()=>void};
-export default function TitleScreen({save,ready,storageError,inert,onNew,onContinue,onCodex,onBook}:Props){
+type Props={onStory:()=>void;onPrologue:()=>void;save:GameSave|null;ready:boolean;storageError:boolean;inert:boolean;onNew:()=>void;onContinue:()=>void;onCodex:()=>void;onBook:()=>void};
+export default function TitleScreen({onStory,onPrologue,save,ready,storageError,inert,onNew,onContinue,onCodex,onBook}:Props){
   const resumable=canContinue(save);
   return <main className="title-screen" inert={inert}>
     <LoadingBackground className="title-landscape" src="/cinematics/jeongjo.png"/>
@@ -15,12 +15,13 @@ export default function TitleScreen({save,ready,storageError,inert,onNew,onConti
     <section className="title-content" aria-labelledby="game-title">
       <div className="title-eyebrow"><span/> 역사를 잇는 작은 영웅들</div>
       <h1 id="game-title">한국사<span>조합 디펜스</span></h1>
-      <p className="title-intro">작은 병사에서 전설의 영웅으로.<br/>시대를 넘어 모인 영웅들과 우리의 역사를 지켜내세요.</p>
+      <p className="title-intro">과거로 이끌린 당신, 지워지는 역사를 되찾아라.<br/>시대를 넘어 영웅들과 함께 미래를 지켜내세요.</p>
       <div className="title-start-actions">
         <button className="title-new" onClick={onNew} disabled={!ready}><Sparkles size={21}/><span>새로하기<small>지도에서 도전할 스테이지를 선택합니다</small></span><ArrowRight size={23}/></button>
         <button className="title-continue" onClick={onContinue} disabled={!ready||!resumable}><Play size={20}/><span>이어하기<small>{!ready?'저장된 기록 확인 중':resumable?`1-${save.stage} · ${save.round}라운드`:(save?.phase==='won'||save?.phase==='cleared')?'클리어 완료 · 새로운 도전을 시작하세요':save?.phase==='lost'?'방어전 종료 · 다시 도전하세요':'아직 저장된 방어전이 없습니다'}</small></span><ChevronRight size={23}/></button>
       </div>
       {resumable&&<div className="title-save-summary"><span><Heart size={12}/> {save.wall}/10</span><span><Coins size={12}/> {save.gold.toLocaleString()} G</span><span>배치 {save.roster.length}명</span><span>자동 저장됨</span></div>}
+      <div className="title-story-actions"><button className="prologue-replay" onClick={onPrologue}>프롤로그 다시 보기</button><button className="prologue-replay" onClick={onStory}>요동성 이야기 · 모집과 조합 배우기</button></div>
       <nav className="title-archives" aria-label="게임 자료">
         <button onClick={onCodex}><Images size={23}/><span><b>영웅 도감</b><small>전설의 영웅 8인의 기록</small></span><ChevronRight size={17}/></button>
         <button onClick={onBook}><BookOpen size={23}/><span><b>조합서</b><small>2–5단계 영웅의 계보</small></span><ChevronRight size={17}/></button>

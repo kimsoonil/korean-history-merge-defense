@@ -2,11 +2,12 @@ import {byName,enemyPortraits,type Enemy,type Soldier} from './game.ts';
 import {FINAL_WAVE} from './campaign.ts';
 import {stageRoundCount,roundBossName,roundEnemyCount,roundKey,isCampaignComplete,isStageComplete} from './rounds.ts';
 
+import {readUpgrades,type Upgrades} from './upgrades.ts';
 export const SAVE_KEY='salsu-progress-v1';
 export type GamePhase='ready'|'battle'|'cleared'|'lost'|'won';
 export type GameProgress={
   roster:Soldier[]; enemies:Enemy[]; gold:number; wall:number; stage:number; round:number;
-  phase:GamePhase; spawned:number; speed:number; remainingMs:number; heroCooldowns?:[number,number][];
+  phase:GamePhase; spawned:number; speed:number; remainingMs:number; heroCooldowns?:[number,number][]; upgrades?:Upgrades;
 };
 export type GameSave=GameProgress&{version:4;savedAt:number};
 
@@ -21,7 +22,7 @@ export function remainingStageMs(deadline:number|null,phase:GamePhase,now:number
   return Math.max(0,Math.min(30000,deadline-(pausedAt??now)));
 }
 export function makeGameSave(progress:GameProgress,now=Date.now()):GameSave{
-  return {...progress,roster:progress.roster.map(unit=>({...unit})),enemies:progress.enemies.map(enemy=>({...enemy})),version:4,savedAt:now};
+  return {...progress,...(progress.upgrades?{upgrades:readUpgrades(progress.upgrades)}:{}),roster:progress.roster.map(unit=>({...unit})),enemies:progress.enemies.map(enemy=>({...enemy})),version:4,savedAt:now};
 }
 export function canContinue(save:GameSave|null):save is GameSave&{phase:'ready'|'battle'|'cleared'}{
   return !!save&&save.phase!=='lost'&&save.phase!=='won'&&!(save.phase==='cleared'&&isStageComplete(save.stage,save.round));
@@ -120,6 +121,7 @@ export function readGameSave(raw:string|null):GameSave|null{
         seen.add(entry[0]);
       }
     }
+    if(value.upgrades!==undefined)value.upgrades=readUpgrades(value.upgrades);
     if(value.version===3){
       // Preserve progression/resources and bosses while adopting the ten-enemy cap.
       const enemies=[...value.enemies].sort((a,b)=>Number(b.boss)-Number(a.boss)).slice(0,10);
