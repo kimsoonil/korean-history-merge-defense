@@ -2,7 +2,7 @@
 import LoadingImage,{LoadingBackground,useImageStatus,ImageLoadingIndicator} from './LoadingImage';
 
 import {useEffect,useRef} from 'react';
-import {ChevronLeft,ChevronRight,Images,X} from 'lucide-react';
+import {Images,X} from 'lucide-react';
 import {byName} from '@/lib/game';
 import {legendaryScenes,type LegendaryScene} from '@/lib/legendary';
 import LegendaryReveal from './LegendaryReveal';
@@ -31,7 +31,7 @@ export default function HeroCodex({scene,onSelect,onClose}:Props){
     }}>
       <header className="hero-codex-header">
         <div><small><Images size={13}/> 전설의 영웅 · 5단계</small><h2 id="hero-codex-title">영웅 도감</h2></div>
-        <button ref={closeRef} className="hero-codex-close" onClick={onClose} aria-label="영웅 도감 닫기"><X size={18}/> 닫기</button>
+        <button ref={closeRef} className="hero-codex-close close-icon-button" onClick={onClose} aria-label="영웅 도감 닫기"><X size={20}/></button>
       </header>
       <p id="hero-codex-description">{heroSkillDescription(scene.name)}<br/>발동 배경: 불투명도 80% · 2초. 도감을 열면 전투가 일시 정지됩니다.</p>
       <div className="hero-codex-body">
@@ -49,9 +49,9 @@ export default function HeroCodex({scene,onSelect,onClose}:Props){
         </div></div>
       </div>
       <footer className="hero-codex-footer">
-        <button onClick={()=>step(-1)} aria-label="이전 영웅 이미지"><ChevronLeft size={17}/> 이전</button>
+        <button onClick={()=>step(-1)} aria-label="이전 영웅 이미지">이전</button>
         <span aria-live="polite"><b>{index+1} / {legendaryScenes.length} · {scene.name}</b><small>상징 · {scene.symbol}</small></span>
-        <button onClick={()=>step(1)} aria-label="다음 영웅 이미지">다음 <ChevronRight size={17}/></button>
+        <button onClick={()=>step(1)} aria-label="다음 영웅 이미지">다음</button>
       </footer>
     </section>
   </div>;

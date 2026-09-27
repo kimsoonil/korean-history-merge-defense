@@ -1,8 +1,14 @@
+import {gwijuYear} from './gwiju.ts';
 import {nadangYear,nadangGuide} from './nadang.ts';
 import type {ChapterId} from './ansi.ts';
 import {frontForStage} from './campaign.ts';
 export function frontIntro(stage:number,chapter:ChapterId=1){
  const front=frontForStage(stage,chapter);
+ if(chapter===10)return {title:'1598년'+' · '+front.name,lines:[front.intro],speaker:'이순신',text:front.dialogue};
+ if(chapter===8)return {title:'1593년 · '+front.name,lines:[front.intro],speaker:'권율',text:front.dialogue};
+ if(chapter===7)return {title:'1592년 · '+front.name,lines:[front.intro],speaker:'이순신',text:front.dialogue};
+ if(chapter===6)return {title:'1232년 · '+front.name,lines:[front.intro],speaker:'김윤후',text:front.dialogue};
+ if(chapter===5)return {title:gwijuYear(stage)+' · '+front.name,lines:[front.intro],speaker:'강감찬',text:front.dialogue};
  if(chapter===4)return {title:nadangYear(stage)+' · '+front.name,lines:[front.intro],speaker:nadangGuide(stage),text:front.dialogue};
  if(chapter===3)return {title:'660년 · '+front.name,lines:[front.intro],speaker:'김유신',text:front.dialogue};
  if(chapter===2)return {title:'645년 · '+front.name,lines:[front.intro],speaker:'안시성주',text:front.dialogue};

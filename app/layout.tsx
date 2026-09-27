@@ -37,6 +37,7 @@ import './open-story-book.css';
 import './battle-settings.css';
 import './unit-bag.css';
 import './battle-intro.css';
+import './ui-alignment.css';
 import AdPlaceholder from './AdPlaceholder';
 export const metadata: Metadata = { title: '한국사 조합 디펜스', description: '병사를 모집하고 한국사의 영웅을 조합하여 다양한 전장에 도전하세요.' };
 export default function RootLayout({ children }: Readonly<{children: React.ReactNode}>) { return <html lang="ko"><body><div className="ad-layout"><AdPlaceholder side="left"/>{children}<AdPlaceholder side="right"/></div></body></html>; }

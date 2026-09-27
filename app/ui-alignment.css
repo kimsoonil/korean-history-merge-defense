@@ -1,0 +1,82 @@
+/* Shared control alignment. Keep narrative text and label/value rows readable. */
+.game-root button.close-icon-button{
+ display:inline-flex;align-items:center;justify-content:center;flex:none;
+ width:36px;height:36px;min-width:36px;min-height:36px;padding:0;line-height:1;
+}
+.game-root .close-icon-button svg{width:20px;height:20px}
+.home-settings-panel .close-icon-button{margin-left:auto}
+button{ text-align:center; }
+.story-arrival>header{flex-wrap:wrap}
+.story-arrival header>div:last-child{margin-left:auto;align-items:center;flex-shrink:0}
+.story-arrival header .story-skip{min-height:36px;white-space:nowrap}
+button svg{flex-shrink:0;vertical-align:middle}
+/* Icon-only controls must not inherit native button padding. */
+.open-library .book-turn,.story-library>header>button,
+.region-heading>button,.region-navigation>button{
+ display:flex;align-items:center;justify-content:center;padding:0;line-height:1;
+}
+.open-library .book-turn svg,.story-library>header>button svg,
+.region-heading>button svg,.region-navigation>button svg{display:block;margin:0}
+.game-root .arena-foot{height:auto;flex-shrink:0}
+.game-root .arena-message{height:auto;min-height:30px;padding:6px 8px 10px;line-height:1.4}
+.status-speed button,.hud-speed button{
+ display:flex;align-items:center;justify-content:center;padding:0;
+ font-family:Arial,'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;
+ line-height:1;font-variant-numeric:tabular-nums;letter-spacing:0;
+}
+.speed-value{display:inline-flex;align-items:center;justify-content:center;gap:2px;line-height:1}
+.speed-value>span{display:block;font:inherit;line-height:1;letter-spacing:0}
+.hud-speed>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.hud-speed button{width:100%;height:34px}
+.hud-speed>small{text-align:center}
+.game-status .status-speed>small{align-self:center;text-align:center}
+.game-status .status-speed>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}
+.game-status .status-speed button{width:100%;font-size:13px}
+
+.settings-links button,.home-settings-panel button,
+.bag-tabs button,.bag-selection button,.upgrade-tabs button,
+.profile-settings footer button,.book-tabs button,.book-card>button{
+ display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.35;
+}
+.settings-links{grid-auto-rows:1fr}
+.settings-links button{gap:7px;min-width:0;min-height:46px;word-break:keep-all}
+.bag-grid b,.bag-grid>button>span:last-child,.profile-options small{text-align:center;line-height:1.4}
+.bag-selection button{min-width:0;white-space:normal;word-break:keep-all}
+.bag-tabs button,.upgrade-tabs button,.profile-settings footer button{min-height:40px;flex:1 1 0}
+.upgrade-list button{display:flex;align-items:center;justify-content:center;min-height:40px;width:132px;text-align:center;line-height:1.4}
+.upgrade-list article>div{min-width:0}
+.upgrade-list h3 small{display:inline-block}
+.book-tabs button{gap:4px}
+.book-tabs span{margin-left:0}
+.unit-bag header>button,.profile-settings header>button,
+.battle-settings-dialog>header button{display:grid;place-items:center;flex:none;width:36px;height:36px;padding:0}
+.result-modal>button,.help-done,.chapter-start{display:flex;align-items:center;justify-content:center;text-align:center;gap:8px;line-height:1.4}
+.map-battle-code,.map-battle-kind{text-align:center}
+.map-battle-row>b{min-width:0;text-align:center}
+.game-actions button{text-align:center;justify-content:center;line-height:1.3}
+.game-actions button>span{min-width:0}
+.game-actions button b,.game-actions button small{text-align:center;line-height:1.3}
+@media(min-width:761px){
+ .game-actions .action-summon,.game-actions .action-book,.game-actions .action-upgrade{
+  flex:0 1 190px;width:190px;min-width:0;height:48px;padding:6px 12px;gap:8px;
+ }
+}
+@media(max-width:760px){
+ .game-actions .action-summon,.game-actions .action-book,.game-actions .action-upgrade{
+  flex:1 1 0;min-width:0;height:54px;padding:4px;gap:3px;
+ }
+ .game-actions button b{font-size:11px;white-space:normal;word-break:keep-all}
+ .game-actions button small{font-size:9px;white-space:normal;word-break:keep-all;margin-top:2px}
+ .game-status{grid-template-columns:76px minmax(0,1fr) 140px}
+ .game-status .status-stage,.game-status .status-enemy{align-items:center;text-align:center}
+ .game-status .status-enemy b{justify-content:center}
+ .game-status .status-speed{align-items:center}
+ .game-status .status-speed button{height:32px}
+}
+@media(max-width:380px){
+ .game-status{grid-template-columns:70px minmax(0,1fr) 126px;padding-inline:4px}
+ .game-status>div{padding-inline:4px}
+ .game-actions{gap:4px}
+ .game-actions .action-gold{min-width:46px}
+ .upgrade-list button{width:108px;font-size:11px;padding:8px 5px}
+}

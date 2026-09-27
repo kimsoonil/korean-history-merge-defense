@@ -43,7 +43,7 @@ test('Nadang boss dialogues, final balance and victory are chapter-specific',()=
  assert.equal(frontIntro(1,4).speaker,'문무왕');assert.equal(frontIntro(4,4).speaker,'김원술');assert.equal(frontIntro(7,4).speaker,'시득');
 });
 test('book covers are illustrations and Nadang terrain switches at coastal stages',()=>{
- assert.equal(storyChapters.filter(c=>c.available).length,4);
+ assert.equal(storyChapters.filter(c=>c.available).length,9);
  assert.equal(storyChapters[0].image,'/cinematics/eulji.png');
  assert.equal(storyChapters[6].image,'/cinematics/yi-sunsin.png');
  for(const chapter of storyChapters){assert.doesNotMatch(chapter.image,/terrain/);assert.ok(existsSync(new URL('../public'+chapter.image,import.meta.url)));}

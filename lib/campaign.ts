@@ -1,7 +1,12 @@
+import {noryangFronts} from './noryang.ts';
+import {haengjuFronts} from './haengju.ts';
+import {hansandoFronts} from './hansando.ts';
+import {cheoinFronts} from './cheoin.ts';
+import {gwijuFronts} from './gwiju.ts';
 import {nadangFronts} from './nadang.ts';
 import {hwangsanFronts} from './hwangsan.ts';
 import {ansiFronts,type ChapterId} from './ansi.ts';
-export const frontsForChapter=(chapter:ChapterId=1)=>chapter===4?nadangFronts:chapter===3?hwangsanFronts:chapter===2?ansiFronts:battleFronts;
+export const frontsForChapter=(chapter:ChapterId=1)=>chapter===10?noryangFronts:chapter===8?haengjuFronts:chapter===7?hansandoFronts:chapter===6?cheoinFronts:chapter===5?gwijuFronts:chapter===4?nadangFronts:chapter===3?hwangsanFronts:chapter===2?ansiFronts:battleFronts;
 export const FINAL_WAVE=10;
 export const battleFronts=[
  {id:'yodong',name:'요동성',first:1,last:3,image:'/terrain/front-yodong.png',intro:'612년 요동성. 수나라 군사다! 막아라!',dialogue:'성문을 굳게 걸어 잠그고, 적들이 단 한 걸음도 요동 땅을 밟지 못하게 하라!'},
@@ -26,7 +31,7 @@ export const campaignNodes=[
   {id:7,x:1980,y:530,name:'한산도대첩',year:'1592년',terrain:'sea',setting:'섬 앞바다',description:'섬들 사이로 열린 한산도 앞바다의 해전.'},
   {id:8,x:2280,y:280,name:'행주대첩',year:'1593년',terrain:'hill',setting:'강변 언덕 · 산성',description:'한강을 바라보는 언덕과 행주산성의 방어전.'},
   {id:9,x:2590,y:420,name:'명량대첩',year:'1597년',terrain:'strait',setting:'좁은 해협',description:'두 해안 사이의 좁은 울돌목을 상징하는 해협 전장.'},
-  {id:10,x:2850,y:270,name:'남한산성 공성전',year:'1636~1637년',terrain:'mountain',setting:'겨울 산악 · 산성',description:'겨울 산악 지형에 둘러싸인 남한산성의 공성전.'},
+  {id:10,x:2850,y:530,name:'노량해전',year:'1598년',terrain:'strait',setting:'해협 · 관음포',description:'노량 해협과 관음포에서 펼쳐지는 조명 연합함대의 마지막 해전.'},
 ].map(node=>({...node,available:node.id===1}));
 export const isChapterOneWave=(wave:number)=>Number.isInteger(wave)&&wave>=1&&wave<=FINAL_WAVE;
 export const nextUnlockedWave=(cleared:number)=>Math.min(FINAL_WAVE,cleared+1);

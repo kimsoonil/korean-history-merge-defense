@@ -15,10 +15,10 @@ test('all battle fronts have full-map illustrations without an SVG road overlay'
 });
 
 test('historical campaign names follow chronology and retain distinct battle terrain',()=>{
- assert.deepEqual(campaignNodes.map(node=>node.name),['살수대첩','안시성 전투','황산벌 전투','나당전쟁','귀주대첩','처인성 전투','한산도대첩','행주대첩','명량대첩','남한산성 공성전']);
- assert.deepEqual(campaignNodes.map(node=>node.terrain),['river','mountain','plain','coast','plain','hill','sea','hill','strait','mountain']);
+ assert.deepEqual(campaignNodes.map(node=>node.name),['살수대첩','안시성 전투','황산벌 전투','나당전쟁','귀주대첩','처인성 전투','한산도대첩','행주대첩','명량대첩','노량해전']);
+ assert.deepEqual(campaignNodes.map(node=>node.terrain),['river','mountain','plain','coast','plain','hill','sea','hill','strait','strait']);
  assert.equal(campaignNodes[3].year,'670~676년');
- assert.equal(campaignNodes[9].year,'1636~1637년');
+ assert.equal(campaignNodes[9].year,'1598년');
  for(const node of campaignNodes)assert.ok(node.year&&node.setting&&node.description);
 });
 

@@ -8,5 +8,5 @@ export const storyChapters=[
  {title:'한산도대첩',year:'1592년',image:'/cinematics/yi-sunsin.png'},
  {title:'행주대첩',year:'1593년',image:'/story/chapters/haengju.png'},
  {title:'명량대첩',year:'1597년',image:'/story/chapters/myeongnyang.png'},
- {title:'남한산성 공성전',year:'1636~1637년',image:'/story/chapters/namhansan.png'},
-].map((chapter,index)=>({...chapter,id:index+1,available:index<=3}));
+ {title:'노량해전',year:'1598년',image:'/story/chapters/noryang.png'},
+].map((chapter,index)=>({...chapter,id:index+1,available:index<=7||index===9}));
