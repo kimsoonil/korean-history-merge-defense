@@ -1,5 +1,6 @@
+import {hwangsanFronts} from './hwangsan.ts';
 import {ansiFronts,type ChapterId} from './ansi.ts';
-export const frontsForChapter=(chapter:ChapterId=1)=>chapter===2?ansiFronts:battleFronts;
+export const frontsForChapter=(chapter:ChapterId=1)=>chapter===3?hwangsanFronts:chapter===2?ansiFronts:battleFronts;
 export const FINAL_WAVE=10;
 export const battleFronts=[
  {id:'yodong',name:'요동성',first:1,last:3,image:'/terrain/front-yodong.png',intro:'612년 요동성. 수나라 군사다! 막아라!',dialogue:'성문을 굳게 걸어 잠그고, 적들이 단 한 걸음도 요동 땅을 밟지 못하게 하라!'},
