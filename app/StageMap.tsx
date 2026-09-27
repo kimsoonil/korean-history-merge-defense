@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {ChevronLeft,ChevronRight,Lock,Check,X} from 'lucide-react';
-import LoadingImage,{LoadingBackground} from './LoadingImage';
+import {LoadingBackground} from './LoadingImage';
 import type {ChapterId} from '@/lib/ansi';
 import {regionMaps,regionPins,regionCanvasSize} from '@/lib/region-maps';
 import type {Difficulty} from '@/lib/enemy-stats';
@@ -47,7 +47,6 @@ export default function StageMap({onBack,onStart,blocked,onModalChange,highestCl
   </div>
   {front&&<MapDialog title={front.name+' 스테이지 선택'} onClose={close}>
    <header className="map-dialog-header"><div><small>{hard?'하드 · 스테이지 선택':'일반 · 스테이지 선택'}</small><h2>{front.name}</h2></div><button onClick={close} aria-label="스테이지 선택 닫기"><X size={22}/></button></header>
-   <div className="front-dialog-art"><LoadingImage src={front.image} alt={front.name+' 전장'}/></div>
    <div className="map-battle-list">{chapterOneBattles.filter(b=>b.wave>=front.first&&b.wave<=front.last).map(b=>{const unlocked=canPlay&&isWaveUnlocked(b.wave,progress);return <button key={b.wave} className="map-battle-row" disabled={!unlocked} onClick={()=>onStart(b.wave,hard?'hard':'normal')}><span className="map-battle-code">{b.code}</span><b>{b.name}<small className="battle-round-count">1–{stageRoundCount(b.wave)}라운드</small></b><span className="map-battle-kind">{!unlocked?<><Lock size={14}/> 잠김</>:b.wave<=progress?<><Check size={14}/> 클리어</>:'도전'}</span></button>;})}</div>
    <footer className="map-dialog-footer"><p>{hard?'일반 10스테이지 완료 후 1부터 순차 도전합니다. 전투 시작 시 영웅 3명의 조합이 금지됩니다.':'전투를 선택하면 병사 모집부터 새로 시작합니다.'}</p></footer>
   </MapDialog>}
