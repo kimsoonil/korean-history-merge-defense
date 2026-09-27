@@ -1,10 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {progressKey,ansiArrival,ansiBossNames} from '../lib/ansi.ts';
+import {progressKey,ansiArrival,ansiBossNames,chapterUnlocked} from '../lib/ansi.ts';
 import {frontForStage} from '../lib/campaign.ts';
 import {stageRoundCount,roundBossName} from '../lib/rounds.ts';
 import {createRoundInvader} from '../lib/game.ts';
 import {makeGameSave,readGameSave} from '../lib/save.ts';
+
+test('Ansi requires all ten Salsu stages cleared',()=>{
+ for(let cleared=0;cleared<10;cleared++)assert.equal(chapterUnlocked(2,cleared),false);
+ assert.equal(chapterUnlocked(2,10),true);
+ assert.equal(chapterUnlocked(1,0),true);
+ assert.equal(chapterUnlocked(3,10),false);
+});
 
 test('chapters have independent normal and hard progress',()=>{
  assert.equal(new Set([progressKey(1),progressKey(1,true),progressKey(2),progressKey(2,true)]).size,4);

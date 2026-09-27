@@ -58,6 +58,8 @@ function AttackOverlay({effects}:{effects:AttackEffect[]}){return <svg className
 
 export default function Game(){
  const [chapter,setChapter]=useState<ChapterId>(1);
+ const [salsuCleared,setSalsuCleared]=useState(0);
+ const canEnterChapter=(id:ChapterId)=>id===1||salsuCleared>=10;
  const [difficulty,setDifficulty]=useState<Difficulty>('normal'),[pendingDifficulty,setPendingDifficulty]=useState<Difficulty>('normal'),[bannedHeroes,setBannedHeroes]=useState<string[]>([]),[hardCleared,setHardCleared]=useState(0);
  const hardClearedRef=useRef(0);
  const [booksOpen,setBooksOpen]=useState(false);
@@ -83,7 +85,7 @@ export default function Game(){
  const markWaveCleared=(wave:number)=>{
   if(difficulty==='hard'){const next=recordWaveClear(hardClearedRef.current,wave);hardClearedRef.current=next;setHardCleared(next);try{localStorage.setItem(progressKey(chapter,true),JSON.stringify({version:1,highestClearedWave:next}));}catch{setStorageError(true);}return;}
   const next=recordWaveClear(clearedWaveRef.current,wave);if(next===clearedWaveRef.current)return;
-  clearedWaveRef.current=next;setHighestClearedWave(next);
+  clearedWaveRef.current=next;setHighestClearedWave(next);if(chapter===1)setSalsuCleared(next);
   try{window.localStorage.setItem(progressKey(chapter),JSON.stringify({version:1,highestClearedWave:next}));}catch{setStorageError(true);}
  };
  const [roster,setRoster]=useState<Soldier[]>([]),[gold,setGold]=useState(START_GOLD),[wall,setWall]=useState(10),[stage,setStage]=useState(1),[round,setRound]=useState(1),[phase,setPhase]=useState<Phase>('ready'),[timeLeft,setTimeLeft]=useState(STAGE_SECONDS),[enemies,setEnemies]=useState<Enemy[]>([]),[attackFx,setAttackFx]=useState<AttackEffect[]>([]),[selected,setSelected]=useState<number|null>(null),[overlay,setOverlay]=useState<Overlay>(null),[tier,setTier]=useState(2),[speed,setSpeed]=useState(1),[spawned,setSpawned]=useState(0),[notice,setNotice]=useState('병사를 모집하고 전투를 준비하세요.');
@@ -117,6 +119,7 @@ export default function Game(){
  const returnHome=()=>{setBagOpen(false);setUpgradeOpen(false);persistGame();flashQueue.current=[];setSkillFlash(null);homeRef.current=true;legendary.close();deadlineRef.current=null;setHome(true);setMapOpen(false);setMapModalOpen(false);setOverlay(null);setSelected(null);setAttackFx([]);};
  const continueGame=()=>{
   if(!canContinue(saved)||!saveReady)return;
+  if(!canEnterChapter(saved.chapter??1)){setBooksOpen(true);return;}
   selectChapter(saved.chapter??1);
   setDifficulty(saved.difficulty??'normal');setBannedHeroes(saved.bannedHeroes??[]);
   const counters=restoredCounters(saved);heroTimers.current=new Map(saved.heroCooldowns??[]);flashQueue.current=[];setSkillFlash(null);
@@ -129,7 +132,7 @@ export default function Game(){
    const hardRecord=readCampaignProgress(localStorage.getItem(HARD_PROGRESS_KEY));hardClearedRef.current=hardRecord;setHardCleared(hardRecord);
    const recorded=readCampaignProgress(window.localStorage.getItem(CAMPAIGN_STORAGE_KEY));
    const fromSave=restored&&(restored.chapter??1)===1&&restored.difficulty!=='hard'?((restored.phase==='cleared'||restored.phase==='won')&&isStageComplete(restored.stage,restored.round)?restored.stage:restored.stage-1):0;
-   const cleared=Math.max(recorded,fromSave);clearedWaveRef.current=cleared;setHighestClearedWave(cleared);
+   const cleared=Math.max(recorded,fromSave);clearedWaveRef.current=cleared;setHighestClearedWave(cleared);setSalsuCleared(cleared);
    if(cleared>recorded)window.localStorage.setItem(CAMPAIGN_STORAGE_KEY,JSON.stringify({version:1,highestClearedWave:cleared}));
   }catch{setStorageError(true);}setSaveReady(true);
  },[]);
@@ -216,6 +219,7 @@ export default function Game(){
  };
  const skip=()=>{if(skipReady)finishRound(true);};
  const prepareStage=(nextStage:number,mode:Difficulty=difficulty)=>{
+  if(!canEnterChapter(chapter)){setConfirmNew(false);setBooksOpen(true);return;}
   setBossDialogue(null);setBattleIntro(false);
   if(mode==='hard'&&clearedWaveRef.current<10)return;
   if(!isWaveUnlocked(nextStage,mode==='hard'?hardClearedRef.current:clearedWaveRef.current))return;
@@ -232,7 +236,7 @@ export default function Game(){
  const requestStoryBattle=(progress:StoryProgress)=>{if(canContinue(saved)){setStoryBattle(progress);setConfirmNew(true);}else launchStoryBattle(progress);};
  const reset=()=>prepareStage(1);
  const newGame=()=>{if(!saveReady)return;setBooksOpen(true);setMapOpen(false);setMapModalOpen(false);};
- const chooseBattle=(wave:number,mode:Difficulty='normal')=>{if(mode==='hard'&&clearedWaveRef.current<10)return;if(!isWaveUnlocked(wave,mode==='hard'?hardClearedRef.current:clearedWaveRef.current))return;setPendingDifficulty(mode);setPendingStage(wave);if(chapter===1&&mode==='normal'&&wave===1&&!player?.tutorialComplete){setBooksOpen(true);setMapOpen(false);setMapModalOpen(false);return;}if(canContinue(saved))setConfirmNew(true);else prepareStage(wave,mode);};
+ const chooseBattle=(wave:number,mode:Difficulty='normal')=>{if(!canEnterChapter(chapter))return;if(mode==='hard'&&clearedWaveRef.current<10)return;if(!isWaveUnlocked(wave,mode==='hard'?hardClearedRef.current:clearedWaveRef.current))return;setPendingDifficulty(mode);setPendingStage(wave);if(chapter===1&&mode==='normal'&&wave===1&&!player?.tutorialComplete){setBooksOpen(true);setMapOpen(false);setMapModalOpen(false);return;}if(canContinue(saved))setConfirmNew(true);else prepareStage(wave,mode);};
  useEffect(()=>{const onKey=(e:KeyboardEvent)=>{if(e.key==='Escape'){setOverlay(null);setSelected(null);}};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)},[]);
  useEffect(()=>{
   if(!overlay)return;
@@ -299,14 +303,14 @@ export default function Game(){
  const phaseText={ready:'전투 준비',battle:'전투 중',cleared:'방어 성공',lost:'게임 오버',won:'최종 승리'}[phase],timeLabel=`00:${String(timeLeft).padStart(2,'0')}`;
  if(!playerReady)return <div className="game-root prologue"><p role="status">서책을 펼치는 중입니다…</p></div>;
  if(!player||!player.prologueComplete||replayPrologue)return <div className="game-root on-prologue"><Prologue profile={player} storageError={playerStorageError} onCreate={nickname=>savePlayer({version:1,nickname,prologueComplete:false})} onComplete={()=>{if(player)savePlayer({...player,prologueComplete:true});setReplayPrologue(false);setBooksOpen(true);}} onClose={replayPrologue?()=>setReplayPrologue(false):undefined}/></div>;
- if(booksOpen&&home)return <div className="game-root"><StoryBooks onBack={()=>setBooksOpen(false)} onSelect={next=>{selectChapter(next);setBooksOpen(false);setStoryOpen(true);}}/></div>;
+ if(booksOpen&&home)return <div className="game-root"><StoryBooks salsuCleared={salsuCleared} onBack={()=>setBooksOpen(false)} onSelect={next=>{if(!canEnterChapter(next))return;selectChapter(next);setBooksOpen(false);setStoryOpen(true);}}/></div>;
  if(storyOpen&&home)return <div className="game-root"><StoryArrival chapter={chapter} nickname={player.nickname} onClose={()=>{setStoryOpen(false);setBooksOpen(true);}} onComplete={()=>{savePlayer({...player,tutorialComplete:true});setStoryOpen(false);setBooksOpen(false);setMapOpen(true);setMapModalOpen(false);}}/></div>;
  return <div className={`game-root ${home?'on-title':''} ${legendary.active?'cinematic-active':''}`}>
   {bagOpen&&!home&&<UnitBag bag={bag} roster={roster} autoStoreBasic={autoStoreBasic} onAutoStoreBasic={toggleAutoStoreBasic} onClose={()=>setBagOpen(false)} onStore={t=>changeBag('store',t)} onDeploy={(t,name)=>changeBag('deploy',t,name)} onSell={(name,all)=>changeBag('sell',0,name,all)} portrait={u=><Portrait u={u}/>}/>}
   {upgradeOpen&&!home&&<UpgradeDialog state={upgrades} gold={gold} difficulty={difficulty} disabled={phase==='lost'||phase==='won'||stageCleared} onBuy={buyUpgrade} onClose={()=>setUpgradeOpen(false)}/>}
   <header className="game-header" inert={stageCleared||!!legendary.active||confirmNew||mapModalOpen||(home&&!!overlay)}><div className="player-profile" title={`플레이어: ${player.nickname} · 이 브라우저에 저장된 프로필`}><ProfileAvatar avatar={player.avatar} frame={player.frame}/><span><small className={player.title==='salsu'?'reward-title':undefined}>{player.title==='salsu'?HARD_CLEAR_TITLE:'천명을 이을 자'}</small><b>{player.nickname}</b></span></div><div className="header-tools"><BattleSettings mood={home?'silent':getMusicMood(phase,enemies)} blocked={stageCleared||!!legendary.active||confirmNew||mapModalOpen||!!overlay||upgradeOpen} onStage={openStageSelection} onStory={openStorySelection} onCodex={()=>openCodex()} onHelp={()=>setOverlay('help')} onHome={returnHome} onProfile={()=>setProfileOpen(true)}/></div></header>
   {profileOpen&&<ProfileSettings profile={player} onSave={savePlayer} onClose={()=>setProfileOpen(false)}/>}
-  {home&&!mapOpen&&<TitleScreen onProfile={()=>setProfileOpen(true)} onPrologue={()=>setReplayPrologue(true)} save={saved} ready={saveReady} storageError={storageError} inert={stageCleared||!!legendary.active||!!overlay||confirmNew} onNew={newGame} onContinue={continueGame} onCodex={()=>openCodex()} onBook={()=>{setTier(2);setOverlay('book');}}/>}
+  {home&&!mapOpen&&<TitleScreen onProfile={()=>setProfileOpen(true)} onPrologue={()=>setReplayPrologue(true)} save={saved&&canEnterChapter(saved.chapter??1)?saved:null} ready={saveReady} storageError={storageError} inert={stageCleared||!!legendary.active||!!overlay||confirmNew} onNew={newGame} onContinue={continueGame} onCodex={()=>openCodex()} onBook={()=>{setTier(2);setOverlay('book');}}/>}
   {home&&mapOpen&&<StageMap key={chapter} chapter={chapter} hardCleared={hardCleared} highestClearedWave={highestClearedWave} blocked={confirmNew||!!legendary.active||!!overlay} onModalChange={setMapModalOpen} onBack={()=>{setMapOpen(false);setMapModalOpen(false);}} onStart={chooseBattle}/>}
   {!home&&<>
   <div className="game-status" inert={stageCleared||!!legendary.active}><div className="status-stage"><small>STAGE</small><b>{chapter}-{String(stage).padStart(2,'0')}</b><span>라운드 {round} / {totalRounds}</span></div><div className="status-enemy"><small>남은 적</small><b>{enemies.length}<span>/100</span></b></div><div className="status-gold"><small>보유 골드</small><b><Coins size={18}/>{gold}</b></div><div className="status-speed"><small>속도</small><div>{[1,2,3].map(n=><button className={speed===n?'on':''} key={n} aria-label={`전투 속도 ${n}배`} aria-pressed={speed===n} onClick={()=>setSpeed(n)}>{n}×</button>)}</div></div></div>

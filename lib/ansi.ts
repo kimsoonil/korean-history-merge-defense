@@ -1,4 +1,5 @@
 export type ChapterId=1|2;
+export const chapterUnlocked=(chapter:number,salsuCleared:number)=>chapter===1||(chapter===2&&salsuCleared>=10);
 export const ANSI_IMAGE='/terrain/ansi-battlefield.png';
 export const ansiFronts=[
  {id:'ansi-gate',name:'안시성 성문',first:1,last:3,image:ANSI_IMAGE,intro:'645년 안시성. 당나라 선봉이 성문에 도달했다!',dialogue:'성문을 굳게 지켜라. 백성과 병사가 함께 이 성을 지킬 것이다!'},
