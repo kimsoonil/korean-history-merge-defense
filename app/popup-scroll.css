@@ -1,0 +1,30 @@
+/* Only the content viewport scrolls; dialog chrome stays reachable. */
+.upgrade-dialog[open],.unit-bag[open],.profile-settings[open],.battle-settings-dialog[open]{
+ display:flex;flex-direction:column;overflow:hidden;min-height:0;
+}
+.upgrade-dialog>*,.unit-bag>*,.profile-settings>header,.battle-settings-dialog>*{flex-shrink:0}
+.upgrade-dialog .upgrade-list,.unit-bag .bag-grid,.battle-settings-dialog .settings-links{
+ flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
+ overscroll-behavior:contain;scrollbar-width:thin;scrollbar-gutter:stable;
+ padding:3px 6px 3px 3px;align-content:start;
+}
+.upgrade-list{grid-auto-rows:max-content}
+.unit-bag .bag-grid{grid-auto-rows:max-content}
+.profile-settings form{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.profile-settings .profile-scroll-content{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:3px 6px 3px 3px}
+.profile-settings footer{flex:none;padding-top:12px}
+.front-selection .stage-map-dialog{overflow:hidden}
+.stage-map-dialog .map-battle-list{flex:1 1 auto;min-height:0}
+.stage-map-dialog .map-dialog-footer{flex:none}
+@media(max-height:600px){
+ .upgrade-dialog,.unit-bag,.profile-settings,.battle-settings-dialog{padding:10px}
+ .upgrade-dialog>p{font-size:11px;line-height:1.3;margin:6px 0}
+ .upgrade-heading h2{font-size:19px;margin-bottom:2px}
+ .upgrade-tabs,.bag-tabs{margin:6px 0}
+ .upgrade-status{margin:6px 0;font-size:11px}
+ .upgrade-dialog>small{font-size:10px}
+ .bag-auto-store{margin-top:6px;padding:5px}
+ .bag-transfer{margin-bottom:6px}
+ .bag-selection{margin-top:6px;padding-top:6px}
+ .unit-bag>p{margin-top:6px;line-height:1.3;font-size:10px}
+}
