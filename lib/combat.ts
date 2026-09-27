@@ -20,7 +20,7 @@ export function movementSpeed(enemy:Enemy,roster:Soldier[]){return enemy.speed*(
 export function hitDamage(name:string,enemy:Enemy,reduction:number|boolean,stage:number,upgrades?:Upgrades,support=0){
  const u=byName[name],stats=roleStats(u.tier),armor=Math.max(0,(enemy.armor??20)-(typeof reduction==='boolean'?(reduction?20:0):reduction));
  return upgradedAttack(u,upgrades)*(1+support)*(u.role==='전열'||u.role==='화포'?1+stats.damage:1)*(u.role==='군주'&&enemy.boss?1+stats.boss:1)
-  *(enemy.boss&&['이순신','을지문덕','척준경'].includes(name)?1.6:1)*(stage===8&&name==='을지문덕'?1.5:1)*100/(100+armor);
+  *(enemy.boss&&['이순신','을지문덕','척준경'].includes(name)?1.6:1)*(enemy.chapter!==2&&stage===8&&name==='을지문덕'?1.5:1)*100/(100+armor);
 }
 export function combatStep(roster:Soldier[],enemies:Enemy[],dt:number,stage:number,cooldowns:Map<number,number>,upgrades?:Upgrades,random:()=>number=Math.random,buffs:HeroBuffs=emptyHeroBuffs()){
  const hits=new Map<number,number>(),stuns=new Map<number,number>(),shots:{from:{x:number;y:number};to:{x:number;y:number};color:string}[]=[];

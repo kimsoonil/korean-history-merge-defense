@@ -1,3 +1,5 @@
+import {ansiFronts,type ChapterId} from './ansi.ts';
+export const frontsForChapter=(chapter:ChapterId=1)=>chapter===2?ansiFronts:battleFronts;
 export const FINAL_WAVE=10;
 export const battleFronts=[
  {id:'yodong',name:'요동성',first:1,last:3,image:'/terrain/front-yodong.png',intro:'612년 요동성. 수나라 군사다! 막아라!',dialogue:'성문을 굳게 걸어 잠그고, 적들이 단 한 걸음도 요동 땅을 밟지 못하게 하라!'},
@@ -5,7 +7,7 @@ export const battleFronts=[
  {id:'salsu',name:'살수',first:7,last:9,image:'/terrain/front-salsu.png',intro:'적들이 살수를 건너 도망친다! 추격을 개시하라!',dialogue:'하늘이 주신 기회다! 살수를 적들의 무덤으로 만들어라! 전 군, 돌격!'},
  {id:'emperor',name:'수양제 최종전',first:10,last:10,image:'/terrain/front-emperor.png',intro:'수양제의 본대가 나타났다! 마지막 전투를 준비하라!',dialogue:'이제 마지막 싸움이다. 끝까지 방어선을 지켜 수나라의 침공을 막아라!'},
 ] as const;
-export const frontForStage=(stage:number)=>battleFronts.find(front=>stage>=front.first&&stage<=front.last)??battleFronts[0];
+export const frontForStage=(stage:number,chapter:ChapterId=1)=>frontsForChapter(chapter).find(front=>stage>=front.first&&stage<=front.last)??frontsForChapter(chapter)[0];
 export const CAMPAIGN_STORAGE_KEY='salsu-campaign-v1';
 export const MAP_WIDTH=3000;
 export const MAP_HEIGHT=720;

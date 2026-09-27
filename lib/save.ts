@@ -4,12 +4,13 @@ import {stageRoundCount,roundBossName,roundEnemyCount,roundKey,isCampaignComplet
 
 import {readUpgrades,type Upgrades} from './upgrades.ts';
 import {validBag,type Bag} from './inventory.ts';
+import {ansiEnemyNames,type ChapterId} from './ansi.ts';
 import {validBannedHeroes} from './hard-mode.ts';
 import type {Difficulty} from './enemy-stats.ts';
 export const SAVE_KEY='salsu-progress-v1';
 export type GamePhase='ready'|'battle'|'cleared'|'lost'|'won';
 export type GameProgress={
-  difficulty?:Difficulty; bannedHeroes?:string[];
+  chapter?:ChapterId; difficulty?:Difficulty; bannedHeroes?:string[];
   roster:Soldier[]; bag?:Bag; enemies:Enemy[]; gold:number; wall:number; stage:number; round:number;
   phase:GamePhase; spawned:number; speed:number; remainingMs:number; heroCooldowns?:[number,number][]; upgrades?:Upgrades;
 };
@@ -87,8 +88,9 @@ export function readGameSave(raw:string|null):GameSave|null{
   try{
     const value:unknown=JSON.parse(raw);
     if(record(value)){
+      if(value.chapter!==undefined&&value.chapter!==1&&value.chapter!==2)return null;
       if(value.difficulty!==undefined&&!['normal','hard'].includes(String(value.difficulty)))return null;
-      if(value.difficulty==='hard'&&!validBannedHeroes(value.bannedHeroes))return null;
+      if(value.difficulty==='hard'&&!validBannedHeroes(value.bannedHeroes,value.chapter===2?2:1))return null;
       if(value.difficulty!=='hard'&&value.bannedHeroes!==undefined&&(!Array.isArray(value.bannedHeroes)||value.bannedHeroes.length))return null;
     }
     if(record(value)&&(value.version===1||value.version===2)){
@@ -132,7 +134,7 @@ export function readGameSave(raw:string|null):GameSave|null{
     for(const enemy of value.enemies){
       if(!record(enemy)||!integer(enemy.id,1,Number.MAX_SAFE_INTEGER-1)||ids.has(enemy.id)||typeof enemy.name!=='string'||!Object.hasOwn(enemyPortraits,enemy.name))return null;
       if(!number(enemy.maxHp,1,1000000)||!number(enemy.hp,Number.MIN_VALUE,enemy.maxHp)||!number(enemy.progress,0,1-Number.EPSILON)||!number(enemy.speed,0.001,1)||!integer(enemy.reward,0,10000)||enemy.originStage!==value.stage||typeof enemy.boss!=='boolean')return null;
-      if(enemy.boss!==(!['수나라 보병','수나라 창병','수나라 궁병','수나라 기병','수나라 공성병','수나라 정예군'].includes(enemy.name))||enemy.boss&&!Array.from({length:value.round},(_,i)=>roundBossName(Number(value.stage),i+1)).includes(enemy.name))return null;
+      if(enemy.boss!==(!['수나라 보병','수나라 창병','수나라 궁병','수나라 기병','수나라 공성병','수나라 정예군',...ansiEnemyNames].includes(enemy.name))||enemy.boss&&!Array.from({length:value.round},(_,i)=>roundBossName(Number(value.stage),i+1,value.chapter===2?2:1)).includes(enemy.name))return null;
       if(enemy.boss)bosses++;
       ids.add(enemy.id);
     }
