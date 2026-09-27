@@ -4,9 +4,9 @@ import {ArrowLeft,ArrowRight,BookOpen,Lock} from 'lucide-react';
 import LoadingImage from './LoadingImage';
 import {chapterUnlocked,type ChapterId} from '@/lib/ansi';
 import {storyChapters} from '@/lib/story-chapters';
-export default function StoryBooks({onBack,onSelect,salsuCleared,ansiCleared}:{onBack:()=>void;onSelect:(chapter:ChapterId)=>void;salsuCleared:number;ansiCleared:number}){
+export default function StoryBooks({onBack,onSelect,salsuCleared,ansiCleared,hwangsanCleared}:{onBack:()=>void;onSelect:(chapter:ChapterId)=>void;salsuCleared:number;ansiCleared:number;hwangsanCleared:number}){
  const [page,setPage]=useState(0),[direction,setDirection]=useState('forward');
- const chapter=storyChapters[page],unlocked=chapter.available&&chapterUnlocked(chapter.id,salsuCleared,ansiCleared);
+ const chapter=storyChapters[page],unlocked=chapter.available&&chapterUnlocked(chapter.id,salsuCleared,ansiCleared,hwangsanCleared);
  const turn=(step:number)=>{const next=page+step;if(next<0||next>=storyChapters.length)return;setDirection(step>0?'forward':'backward');setPage(next);};
  return <main className="story-library open-library">
   <header><button onClick={onBack} aria-label="홈으로"><ArrowLeft size={22}/></button><div><small>천명도첩</small><h1>이야기 선택</h1></div><BookOpen size={28}/></header>
@@ -15,7 +15,7 @@ export default function StoryBooks({onBack,onSelect,salsuCleared,ansiCleared}:{o
    <section className="open-story-book" aria-label="펼쳐진 이야기 책">
     <div key={page} className={`book-spread ${direction}`}>
      <div className="story-leaf illustrated-leaf"><span className="leaf-heading">역사의 기록</span><div className="leaf-art"><LoadingImage src={chapter.image} alt={chapter.title+' 이야기 삽화'}/></div><span className="leaf-caption">{chapter.year}</span><small className="leaf-number">{page*2+1}</small></div>
-     <div className="story-leaf chapter-leaf"><small>제 {String(chapter.id).padStart(2,'0')} 장</small><span className="chapter-ornament" aria-hidden="true">✦</span><h2>{chapter.title}</h2><p>{chapter.year}</p><div className="chapter-rule" aria-hidden="true"/><button className="chapter-start" disabled={!unlocked} onClick={()=>onSelect(chapter.id as ChapterId)}>{unlocked?<><BookOpen size={19}/><span>이야기 시작</span></>:<><Lock size={19}/><span>{chapter.id===2?'살수대첩 전체 클리어 후 개방':chapter.id===3?'안시성 전투 전체 클리어 후 개방':'준비 중'}</span></>}</button><small className="leaf-number">{page*2+2}</small></div>
+     <div className="story-leaf chapter-leaf"><small>제 {String(chapter.id).padStart(2,'0')} 장</small><span className="chapter-ornament" aria-hidden="true">✦</span><h2>{chapter.title}</h2><p>{chapter.year}</p><div className="chapter-rule" aria-hidden="true"/><button className="chapter-start" disabled={!unlocked} onClick={()=>onSelect(chapter.id as ChapterId)}>{unlocked?<><BookOpen size={19}/><span>이야기 시작</span></>:<><Lock size={19}/><span>{chapter.id===2?'살수대첩 전체 클리어 후 개방':chapter.id===3?'안시성 전투 전체 클리어 후 개방' :chapter.id===4?'황산벌 전투 전체 클리어 후 개방':'준비 중'}</span></>}</button><small className="leaf-number">{page*2+2}</small></div>
     </div>
     <div className="book-center-fold" aria-hidden="true"/>
    </section>

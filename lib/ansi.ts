@@ -1,5 +1,5 @@
-export type ChapterId=1|2|3;
-export const chapterUnlocked=(chapter:number,salsuCleared:number,ansiCleared=0)=>chapter===1||(chapter===2&&salsuCleared>=10)||(chapter===3&&salsuCleared>=10&&ansiCleared>=10);
+export type ChapterId=1|2|3|4;
+export const chapterUnlocked=(chapter:number,salsuCleared:number,ansiCleared=0,hwangsanCleared=0)=>chapter===1||(chapter===2&&salsuCleared>=10)||(chapter===3&&salsuCleared>=10&&ansiCleared>=10)||(chapter===4&&salsuCleared>=10&&ansiCleared>=10&&hwangsanCleared>=10);
 export const ANSI_IMAGE='/terrain/ansi-battlefield.png';
 export const ansiFronts=[
  {id:'ansi-gate',name:'안시성 성문',first:1,last:3,image:ANSI_IMAGE,intro:'645년 안시성. 당나라 선봉이 성문에 도달했다!',dialogue:'성문을 굳게 지켜라. 백성과 병사가 함께 이 성을 지킬 것이다!'},
@@ -30,4 +30,4 @@ export function ansiArrival(step:number,name:string){
  {speaker:'책의 정령',text:'성문 방어, 공성전, 토산 쟁탈을 넘어 마지막 공세를 막아라. 전선 지도에서 전투를 선택하자.'},
  ][step];
 }
-export const progressKey=(chapter:ChapterId,hard=false)=>chapter===1?(hard?'salsu-hard-campaign-v1':'salsu-campaign-v1'):chapter===2?(hard?'ansi-hard-campaign-v1':'ansi-campaign-v1'):(hard?'hwangsan-hard-campaign-v1':'hwangsan-campaign-v1');
+export const progressKey=(chapter:ChapterId,hard=false)=>chapter===1?(hard?'salsu-hard-campaign-v1':'salsu-campaign-v1'):chapter===2?(hard?'ansi-hard-campaign-v1':'ansi-campaign-v1') :chapter===4?(hard?'nadang-hard-campaign-v1':'nadang-campaign-v1'):(hard?'hwangsan-hard-campaign-v1':'hwangsan-campaign-v1');
