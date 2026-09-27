@@ -10,8 +10,8 @@
 .region-mode button:disabled{color:#b1baba;border-color:#677777;cursor:not-allowed}
 .region-mode small{padding:7px 10px;background:#153337cf;color:#e4dec9;border-radius:4px;font-size:11px}
 .region-viewport{flex:1;min-height:0;overflow-x:auto;overflow-y:hidden;touch-action:pan-x;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#c3ae79 #1b383b;outline-offset:-3px}
-.region-world{position:relative;width:max(1900px,180%);height:100%;min-height:250px;isolation:isolate}
-.region-world-art{position:absolute;inset:0;z-index:-2;background-size:100% 100%;background-repeat:no-repeat;background-color:#3f6760}
+.region-world{position:relative;margin-inline:auto;isolation:isolate}
+.region-world-art{position:absolute;inset:0;z-index:-2;background-size:contain;background-position:center;background-repeat:no-repeat;background-color:#3f6760}
 .region-route{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.8}
 .region-route path{fill:none;stroke:#fff0b9;stroke-width:2;stroke-dasharray:5 7;filter:drop-shadow(0 2px 1px #253f35)}
 .region-pin{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:0;padding:10px;color:#fff0cb;cursor:pointer;min-width:140px;text-shadow:0 2px 4px #10262a}
@@ -32,5 +32,5 @@
 .region-navigation{display:flex;align-items:center;justify-content:center;gap:20px;min-height:52px;background:#152e32;color:#d4d5be;font-size:12px;flex:none}
 .region-navigation button{width:38px;height:34px}
 @media(min-width:1000px){.front-selection .stage-map-shade{justify-items:end;padding:24px;background:linear-gradient(90deg,#0e262510,#0e262585);backdrop-filter:none}.front-selection .stage-map-dialog{width:360px;max-height:calc(100dvh - 48px);background:#1a353cef;border-color:#b4a278}}
-@media(max-width:760px){.region-heading{height:52px;padding:6px 12px}.region-heading h1{font-size:18px}.region-mode{top:64px;left:12px;right:12px}.region-mode small{flex-basis:auto;font-size:10px}.region-world{width:1700px}.region-navigation{font-size:11px;gap:10px}.region-pin strong{font-size:17px}.region-mode button{padding:5px 15px}}
+@media(max-width:760px){.region-heading{height:52px;padding:6px 12px}.region-heading h1{font-size:18px}.region-mode{top:64px;left:12px;right:12px}.region-mode small{flex-basis:auto;font-size:10px}.region-navigation{font-size:11px;gap:10px}.region-pin strong{font-size:17px}.region-mode button{padding:5px 15px}}
 @media(prefers-reduced-motion:reduce){.region-viewport{scroll-behavior:auto}}

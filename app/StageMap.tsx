@@ -2,8 +2,8 @@
 import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {ChevronLeft,ChevronRight,Lock,Check,X} from 'lucide-react';
 import LoadingImage,{LoadingBackground} from './LoadingImage';
-import {HWANGSAN_IMAGE} from '@/lib/hwangsan';
-import {ANSI_IMAGE,type ChapterId} from '@/lib/ansi';
+import type {ChapterId} from '@/lib/ansi';
+import {regionMaps,regionPins,regionCanvasSize} from '@/lib/region-maps';
 import type {Difficulty} from '@/lib/enemy-stats';
 import {stageRoundCount} from '@/lib/rounds';
 import {frontsForChapter,frontForStage,isWaveUnlocked,horizontalWheelDelta} from '@/lib/campaign';
@@ -23,6 +23,9 @@ export default function StageMap({onBack,onStart,blocked,onModalChange,highestCl
  const [hard,setHard]=useState(false);
  const progress=hard?hardCleared:highestClearedWave,canPlay=!hard||highestClearedWave>=10;
  const view=useRef<HTMLDivElement>(null);
+ const [canvas,setCanvas]=useState(regionCanvasSize(500));
+ useEffect(()=>{const el=view.current;if(!el)return;const resize=()=>setCanvas(regionCanvasSize(el.clientHeight));resize();const observer=new ResizeObserver(resize);observer.observe(el);return()=>observer.disconnect();},[]);
+ useEffect(()=>{if(view.current)view.current.scrollLeft=0;},[chapter]);
  const close=()=>{setSelected(null);onModalChange(false);};
  useEffect(()=>{const el=view.current;if(!el)return;const wheel=(e:WheelEvent)=>{if(e.ctrlKey||el.scrollWidth<=el.clientWidth)return;e.preventDefault();el.scrollLeft+=horizontalWheelDelta(e.deltaX,e.deltaY,e.deltaMode,el.clientWidth);};el.addEventListener('wheel',wheel,{passive:false});return()=>el.removeEventListener('wheel',wheel);},[]);
  const front=selected===null?null:battleFronts[selected];
@@ -31,10 +34,10 @@ export default function StageMap({onBack,onStart,blocked,onModalChange,highestCl
    <header className="region-heading"><button onClick={onBack} aria-label="초기 화면으로"><ChevronLeft size={22}/></button><h1>{chapter===10?'노량해전':chapter===8?'행주대첩':chapter===7?'한산도대첩':chapter===6?'처인성 전투':chapter===5?'귀주대첩':chapter===4?'나당전쟁':chapter===3?'황산벌 전투':chapter===2?'안시성 전투':'살수대첩'} · 지역 선택</h1><span>{progress} / 10</span></header>
    <div className="region-mode" aria-label="난이도"><button className={!hard?'active':''} aria-pressed={!hard} onClick={()=>setHard(false)}>일반</button><button className={hard?'active':''} aria-pressed={hard} onClick={()=>setHard(true)} aria-describedby="hard-status"><Lock size={14}/> 하드</button><small id="hard-status">{highestClearedWave>=10?'하드 · 무작위 5단계 영웅 3명 조합 금지':'하드 미리보기 · 일반 10스테이지 클리어 후 개방 예정'}</small></div>
    <div className="region-viewport" ref={view} tabIndex={0} aria-label="좌우로 스크롤하여 지역 선택" onKeyDown={e=>{if(e.target!==e.currentTarget)return;if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();e.currentTarget.scrollBy({left:e.key==='ArrowRight'?320:-320,behavior:'smooth'});}}}>
-    <div className="region-world">
-     <LoadingBackground className="region-world-art" src={chapter===10?'/story/chapters/noryang.png':chapter===8?'/story/chapters/haengju.png':chapter===7?'/cinematics/yi-sunsin.png':chapter===6?'/story/chapters/cheoin.png':chapter===5?'/story/chapters/gwiju.png':chapter===4?'/story/chapters/nadang.png':chapter===3?HWANGSAN_IMAGE:chapter===2?ANSI_IMAGE:'/terrain/campaign-panorama.png'}/>
+    <div className="region-world" style={canvas}>
+     <LoadingBackground className="region-world-art" src={regionMaps[chapter]}/>
      <svg className="region-route" viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true"><path d="M140 208 Q260 120 380 256 T640 184 Q760 300 880 232"/></svg>
-     {battleFronts.map((f,i)=>{const unlocked=canPlay&&isWaveUnlocked(f.first,progress),complete=progress>=f.last;return <button key={f.id} className={`region-pin ${unlocked?'available':'locked'} ${complete?'complete':''}`} style={{left:`${[14,38,64,88][i]}%`,top:`${[52,64,46,58][i]}%`}} onClick={()=>{setSelected(i);onModalChange(true);}} aria-label={f.name+' 스테이지 선택'}>
+     {battleFronts.map((f,i)=>{const unlocked=canPlay&&isWaveUnlocked(f.first,progress),complete=progress>=f.last;return <button key={f.id} className={`region-pin ${unlocked?'available':'locked'} ${complete?'complete':''}`} style={{left:`${regionPins[i].x}%`,top:`${regionPins[i].y}%`}} onClick={()=>{setSelected(i);onModalChange(true);}} aria-label={f.name+' 스테이지 선택'}>
       <span className="region-seal">{complete?<Check size={25}/>:unlocked?<span>{String(i+1).padStart(2,'0')}</span>:<Lock size={22}/>}</span>
       <strong>{i===3?'최종전':f.name}</strong><small>{complete?'클리어':unlocked?'도전 가능':'잠김'}</small>
      </button>;})}
