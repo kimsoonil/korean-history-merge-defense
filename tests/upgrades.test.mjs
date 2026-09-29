@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {emptyUpgrades,purchaseUpgrade,upgradeCost,upgradedAttack,readUpgrades,tierUpgradeTotalCosts,TIER_MAX_UPGRADE_LEVEL} from '../lib/upgrades.ts';
 import {byName,createInvader} from '../lib/game.ts';
 import {hitDamage} from '../lib/combat.ts';
@@ -77,4 +78,10 @@ test('hard tier and role costs double; individual heroes cost five hundred per l
  }
  assert.equal(upgradeCost('hero','이순신',{tier:{},role:{},hero:{이순신:10}},'hard'),null);
  assert.equal(upgradeCost('tier','1',{tier:{1:20},role:{},hero:{}},'hard'),null);
+});
+test('upgrade dialog keeps only actionable upgrade content',()=>{
+ const dialog=readFileSync(new URL('../app/UpgradeDialog.tsx',import.meta.url),'utf8');
+ for(const copy of ['단계 강화:','단계·직업·영웅 강화는 합산됩니다.','보유 골드','공격속도·사거리·특수 효과는 변하지 않습니다.','새 게임·새 스테이지 시작 시 초기화']){
+  assert.doesNotMatch(dialog,new RegExp(copy.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
+ }
 });
