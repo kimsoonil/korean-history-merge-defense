@@ -14,12 +14,13 @@ import {hwangsanEnemyNames} from './hwangsan.ts';
 import {ansiEnemyNames,type ChapterId} from './ansi.ts';
 import {validBannedHeroes} from './hard-mode.ts';
 import type {Difficulty} from './enemy-stats.ts';
+import {readUnitGambleUsage,type UnitGambleUsage} from './gambling.ts';
 export const SAVE_KEY='salsu-progress-v1';
 export type GamePhase='ready'|'battle'|'cleared'|'lost'|'won';
 export type GameProgress={
   chapter?:ChapterId; difficulty?:Difficulty; bannedHeroes?:string[];
   roster:Soldier[]; bag?:Bag; enemies:Enemy[]; gold:number; troopCards?:number; wall:number; stage:number; round:number;
-  phase:GamePhase; spawned:number; speed:number; remainingMs:number; heroCooldowns?:[number,number][]; upgrades?:Upgrades;
+  phase:GamePhase; spawned:number; speed:number; remainingMs:number; heroCooldowns?:[number,number][]; upgrades?:Upgrades; unitGambleUsage?:UnitGambleUsage;
 };
 export type GameSave=GameProgress&{version:5;roundRules?:2;chapterScenario?:'noryang';savedAt:number};
 
@@ -168,6 +169,7 @@ export function readGameSave(raw:string|null):GameSave|null{
     if(value.enemies.some(enemy=>enemy.stunSeconds!==undefined&&!number(enemy.stunSeconds,0,.5)))return null;
     if(value.enemies.some(enemy=>enemy.bossSeconds!==undefined&&(!enemy.boss||!number(enemy.bossSeconds,0,90))))return null;
     if(value.upgrades!==undefined)value.upgrades=readUpgrades(value.upgrades);
+    if(value.unitGambleUsage!==undefined)value.unitGambleUsage=readUnitGambleUsage(value.unitGambleUsage,Number(value.round));
     return value as GameSave;
   }catch{return null;}
 }

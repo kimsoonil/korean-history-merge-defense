@@ -7,7 +7,7 @@ const progress=()=>({roster:[{id:1,name:'유생',slot:7},{id:3,name:'창병',slo
 const roundTrip=value=>readGameSave(JSON.stringify(value));
 
 test('save restores exact units, enemies, resources and remaining time',()=>{
- const state=progress(),save=makeGameSave(state,123);
+ const state={...progress(),unitGambleUsage:{block:0,successes:{1:3,2:1,3:0}}},save=makeGameSave(state,123);
  assert.deepEqual(roundTrip(save),save);
  assert.ok(canContinue(save));
  state.roster[0].slot=0;state.enemies[0].hp=1;

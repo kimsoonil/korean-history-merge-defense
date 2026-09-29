@@ -22,7 +22,7 @@ import {STORY_KEY,storyRoster,storyGold,type StoryProgress} from '@/lib/story';
 import {PLAYER_KEY,readPlayer,awardHardClear,HARD_CLEAR_TITLE,type PlayerProfile} from '@/lib/player';
 import UpgradeDialog from './UpgradeDialog';
 import GamblingDialog from './GamblingDialog';
-import {gambleUnlocked,goldGambles,playGoldGamble,playUnitGamble,unitGambles} from '@/lib/gambling';
+import {emptyUnitGambleUsage,gambleUnlocked,goldGambles,playGoldGamble,playUnitGamble,readUnitGambleUsage,recordUnitGambleSuccess,unitGambles,unitGamblesRemaining} from '@/lib/gambling';
 import {emptyUpgrades,readUpgrades,purchaseUpgrade,upgradedAttack,type UpgradeKind} from '@/lib/upgrades';
 import {getMusicMood} from '@/lib/music';
 import {BOSS_TROOP_CARDS,RECRUIT_TROOP_COST,ROUND_TROOP_CARDS,START_TROOP_CARDS,bossUnitRewardTier,randomName} from '@/lib/troop-cards';
@@ -91,7 +91,7 @@ export default function Game(){
   try{localStorage.setItem('defense-auto-store-basic',String(enabled));}catch{setStorageError(true);}
   if(enabled)changeBag('store',1);
  };
- const [upgrades,setUpgrades]=useState(emptyUpgrades),[upgradeOpen,setUpgradeOpen]=useState(false),[gambleOpen,setGambleOpen]=useState(false);
+ const [upgrades,setUpgrades]=useState(emptyUpgrades),[upgradeOpen,setUpgradeOpen]=useState(false),[gambleOpen,setGambleOpen]=useState(false),[unitGambleUsage,setUnitGambleUsage]=useState(()=>emptyUnitGambleUsage(1));
  const [home,setHome]=useState(true),[saved,setSaved]=useState<GameSave|null>(null),[saveReady,setSaveReady]=useState(false),[storageError,setStorageError]=useState(false),[confirmNew,setConfirmNew]=useState(false);
  const [mapOpen,setMapOpen]=useState(false),[mapModalOpen,setMapModalOpen]=useState(false),[pendingStage,setPendingStage]=useState(1),[highestClearedWave,setHighestClearedWave]=useState(0);
  useEffect(()=>{if(!player||!saveReady||chapter!==1)return;const next=awardHardClear(player,hardCleared);if(next!==player)savePlayer(next);},[player,hardCleared,saveReady,chapter]);
@@ -123,8 +123,8 @@ export default function Game(){
  const previewLegendary=(name:string)=>{if(home){openCodex(name);return;}setOverlay(null);setSelected(null);setAttackFx([]);legendary.show(name,'preview')};
  const codexHeroRef=useRef(legendaryScenes[0].name);
  const openCodex=(name=codexHeroRef.current)=>{codexHeroRef.current=name;setOverlay(null);setAttackFx([]);legendary.show(name,'codex')};
- const progressRef=useRef({roster,bag,enemies,gold,troopCards,wall,stage,round,phase,spawned,speed,upgrades,difficulty,bannedHeroes,chapter});
- progressRef.current={roster,bag,enemies,gold,troopCards,wall,stage,round,phase,spawned,speed,upgrades,difficulty,bannedHeroes,chapter};
+ const progressRef=useRef({roster,bag,enemies,gold,troopCards,wall,stage,round,phase,spawned,speed,upgrades,unitGambleUsage,difficulty,bannedHeroes,chapter});
+ progressRef.current={roster,bag,enemies,gold,troopCards,wall,stage,round,phase,spawned,speed,upgrades,unitGambleUsage,difficulty,bannedHeroes,chapter};
  const persistGame=()=>{
   if(homeRef.current)return;
   const current=progressRef.current;
@@ -141,7 +141,7 @@ export default function Game(){
   setDifficulty(saved.difficulty??'normal');setBannedHeroes(saved.bannedHeroes??[]);
   const counters=restoredCounters(saved);heroTimers.current=new Map(saved.heroCooldowns??[]);flashQueue.current=[];setSkillFlash(null);
   idRef.current=counters.nextId;completedStageRef.current=counters.completedStage;deadlineRef.current=counters.deadline;
-  rewardedBossesRef.current.clear();setUpgrades(readUpgrades(saved.upgrades));setUpgradeOpen(false);const inventory=migrateDeployment(saved.roster,saved.bag??{});setRoster(inventory.roster);setBag(inventory.bag);setEnemies(saved.enemies);setGold(saved.gold);setTroopCards(saved.troopCards??START_TROOP_CARDS);setWall(saved.wall);setStage(saved.stage);setRound(saved.round);setPhase(saved.phase);setSpawned(saved.spawned);setSpeed(saved.speed);setTimeLeft(Math.ceil(saved.remainingMs/1000));setAttackFx([]);setSelected(null);setOverlay(null);setNotice('저장된 방어전을 이어갑니다.');homeRef.current=false;setHome(false);
+  rewardedBossesRef.current.clear();setUpgrades(readUpgrades(saved.upgrades));setUnitGambleUsage(readUnitGambleUsage(saved.unitGambleUsage,saved.round));setUpgradeOpen(false);const inventory=migrateDeployment(saved.roster,saved.bag??{});setRoster(inventory.roster);setBag(inventory.bag);setEnemies(saved.enemies);setGold(saved.gold);setTroopCards(saved.troopCards??START_TROOP_CARDS);setWall(saved.wall);setStage(saved.stage);setRound(saved.round);setPhase(saved.phase);setSpawned(saved.spawned);setSpeed(saved.speed);setTimeLeft(Math.ceil(saved.remainingMs/1000));setAttackFx([]);setSelected(null);setOverlay(null);setNotice('저장된 방어전을 이어갑니다.');homeRef.current=false;setHome(false);
  };
  useEffect(()=>{
   try{
@@ -189,7 +189,7 @@ export default function Game(){
   const onHide=()=>{if(document.visibilityState==='hidden')persistGame();};
   window.addEventListener('pagehide',persistGame);document.addEventListener('visibilitychange',onHide);
   return()=>{window.clearInterval(timer);window.removeEventListener('pagehide',persistGame);document.removeEventListener('visibilitychange',onHide);};
- },[home,roster,bag,gold,troopCards,wall,stage,round,phase,spawned,speed,upgrades]);
+ },[home,roster,bag,gold,troopCards,wall,stage,round,phase,spawned,speed,upgrades,unitGambleUsage]);
  const front=frontForStage(stage,chapter),intro=frontIntro(stage,chapter);
  const totalRounds=stageRoundCount(stage),finalRound=isCampaignComplete(stage,round),stageEnd=isStageComplete(stage,round),maxSpawn=roundEnemyCount(stage,round,difficulty),bossEnemy=enemies.find(e=>e.boss),sel=roster.find(s=>s.id===selected),selDef=sel?byName[sel.name]:null,available=recipes.filter(u=>!bannedHeroes.includes(u.name)&&inventoryRecipeStatus(u.recipe!,roster,bag).every(Boolean));
  const stageCleared=phase==='cleared'&&stageEnd;
@@ -206,12 +206,13 @@ export default function Game(){
  };
  const gambleGold=(id:string)=>{
   const option=goldGambles.find(item=>item.id===id),current=progressRef.current;if(!option||!gambleUnlocked(current.round,option.unlockRound))return;
-  const result=playGoldGamble(option,current.gold);if(!result)return;progressRef.current={...current,gold:result.gold};setGold(result.gold);setNotice(`골드 도박 결과 · ${result.reward.toLocaleString()}G 획득`);
+  const result=playGoldGamble(option,current.gold);if(!result)return;const net=result.reward-option.cost;progressRef.current={...current,gold:result.gold};setGold(result.gold);setNotice(`골드 도박 결과 · ${net>=0?'+':''}${net.toLocaleString()}G`);
  };
  const gambleUnit=(tier:1|2|3)=>{
   const option=unitGambles.find(item=>item.tier===tier),current=progressRef.current;if(!option||!gambleUnlocked(current.round,option.unlockRound))return;
+  if(unitGamblesRemaining(tier,current.round,current.unitGambleUsage)<=0)return;
   const names=Object.values(byName).filter(unit=>unit.tier===tier&&unit.name!=='시민').map(unit=>unit.name),result=playUnitGamble(option,current.gold,names);if(!result)return;
-  setGambleOpen(false);progressRef.current={...current,gold:result.gold};setGold(result.gold);if(!result.success){setNotice(`${tier}단계 유닛 도박 실패 · ${result.refund}G 환급`);return;}receiveUnit(result.name,'유닛 도박 성공');
+  setGambleOpen(false);progressRef.current={...current,gold:result.gold};setGold(result.gold);if(!result.success){setNotice(`${tier}단계 유닛 도박 실패 · ${result.refund}G 환급 · 성공 횟수 차감 없음`);return;}const nextUsage=recordUnitGambleSuccess(tier,current.round,current.unitGambleUsage);progressRef.current={...progressRef.current,unitGambleUsage:nextUsage};setUnitGambleUsage(nextUsage);receiveUnit(result.name,'유닛 도박 성공');
  };
  const changeBag=(action:'store'|'deploy'|'sell',tier:number,name?:string,all=false)=>{
   if(homeRef.current||phase==='lost'||phase==='won'||stageCleared||legendary.active)return;
@@ -290,7 +291,7 @@ export default function Game(){
   setDifficulty(mode);setBannedHeroes(mode==='hard'?drawBannedHeroes(Math.random,chapter):[]);
   const starterName=randomName(Object.values(byName).filter(unit=>unit.tier===2).map(unit=>unit.name))!;
   const starter=[{id:1,name:starterName,slot:0}];
-  setUpgrades(emptyUpgrades());setUpgradeOpen(false);legendary.close();heroTimers.current.clear();flashQueue.current=[];setSkillFlash(null);deadlineRef.current=null;completedStageRef.current=0;rewardedBossesRef.current.clear();idRef.current=2;setConfirmNew(false);homeRef.current=false;setHome(false);setMapOpen(false);setMapModalOpen(false);setRoster(starter);setBag({});setBagOpen(false);setGold(START_GOLD);setTroopCards(START_TROOP_CARDS);setWall(10);setStage(nextStage);setRound(1);setTimeLeft(STAGE_SECONDS);setPhase('ready');setEnemies([]);setAttackFx([]);setSelected(null);setSpawned(0);setSpeed(1);setOverlay(null);setNotice(`${chapter}-${nextStage} · ${starterName} 합류 · 병력패 ${START_TROOP_CARDS}개 지급`);
+  setUpgrades(emptyUpgrades());setUnitGambleUsage(emptyUnitGambleUsage(1));setUpgradeOpen(false);legendary.close();heroTimers.current.clear();flashQueue.current=[];setSkillFlash(null);deadlineRef.current=null;completedStageRef.current=0;rewardedBossesRef.current.clear();idRef.current=2;setConfirmNew(false);homeRef.current=false;setHome(false);setMapOpen(false);setMapModalOpen(false);setRoster(starter);setBag({});setBagOpen(false);setGold(START_GOLD);setTroopCards(START_TROOP_CARDS);setWall(10);setStage(nextStage);setRound(1);setTimeLeft(STAGE_SECONDS);setPhase('ready');setEnemies([]);setAttackFx([]);setSelected(null);setSpawned(0);setSpeed(1);setOverlay(null);setNotice(`${chapter}-${nextStage} · ${starterName} 합류 · 병력패 ${START_TROOP_CARDS}개 지급`);
  };
  const launchStoryBattle=(progress:StoryProgress)=>{
   if(progress.step!==12||!progress.merged||progress.summoned!==4)return;
@@ -382,7 +383,7 @@ export default function Game(){
  return <div className={`game-root ${home?'on-title':''} ${legendary.active?'cinematic-active':''}`}>
   {bagOpen&&!home&&<UnitBag bag={bag} roster={roster} autoStoreBasic={autoStoreBasic} onAutoStoreBasic={toggleAutoStoreBasic} onClose={()=>setBagOpen(false)} onStore={t=>changeBag('store',t)} onDeploy={(t,name)=>changeBag('deploy',t,name)} onSell={(name,all)=>changeBag('sell',0,name,all)} portrait={u=><Portrait u={u}/>}/>}
   {upgradeOpen&&!home&&<UpgradeDialog state={upgrades} gold={gold} difficulty={difficulty} disabled={phase==='lost'||phase==='won'||stageCleared} onBuy={buyUpgrade} onClose={()=>setUpgradeOpen(false)}/>}
-  {gambleOpen&&!home&&<GamblingDialog gold={gold} round={round} disabled={phase==='lost'||phase==='won'||stageCleared} onGold={gambleGold} onUnit={gambleUnit} onClose={()=>setGambleOpen(false)}/>}
+  {gambleOpen&&!home&&<GamblingDialog gold={gold} round={round} unitUsage={unitGambleUsage} disabled={phase==='lost'||phase==='won'||stageCleared} onGold={gambleGold} onUnit={gambleUnit} onClose={()=>setGambleOpen(false)}/>}
   <header className="game-header" inert={stageCleared||!!legendary.active||confirmNew||mapModalOpen||gambleOpen||(home&&!!overlay)}><div className="player-profile" title={`플레이어: ${player.nickname} · 이 브라우저에 저장된 프로필`}><ProfileAvatar avatar={player.avatar} frame={player.frame}/><span><small className={player.title==='salsu'?'reward-title':undefined}>{player.title==='salsu'?HARD_CLEAR_TITLE:'천명을 이을 자'}</small><b>{player.nickname}</b></span></div><div className="header-tools"><BattleSettings mood={home?'silent':getMusicMood(phase,enemies)} blocked={stageCleared||!!legendary.active||confirmNew||mapModalOpen||!!overlay||upgradeOpen||gambleOpen} onStage={openStageSelection} onStory={openStorySelection} onCodex={()=>openCodex()} onHelp={()=>setOverlay('help')} onHome={returnHome} onProfile={()=>setProfileOpen(true)}/></div></header>
   {profileOpen&&<ProfileSettings profile={player} onSave={savePlayer} onClose={()=>setProfileOpen(false)}/>}
   {home&&!mapOpen&&<TitleScreen onProfile={()=>setProfileOpen(true)} onPrologue={()=>setReplayPrologue(true)} save={saved&&canEnterChapter(saved.chapter??1)?saved:null} ready={saveReady} storageError={storageError} inert={stageCleared||!!legendary.active||!!overlay||confirmNew} onNew={newGame} onContinue={continueGame} onCodex={()=>openCodex()} onBook={()=>{setTier(2);setOverlay('book');}}/>}
