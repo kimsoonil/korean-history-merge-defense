@@ -15,5 +15,7 @@ test('traditional ink, wood, paper, dancheong and brass palette is loaded last',
  assert.match(css,/\.book-modal/);
  assert.match(css,/\.story-library/);
  assert.match(css,/\.stage-map-screen/);
+ assert.match(css,/\.region-mode button\.active\{background:var\(--trad-jade\)/);
+ assert.match(css,/\.hard-preview \.region-mode button\.active\{background:var\(--trad-red\)/);
  assert.ok(layout.lastIndexOf("import './traditional-theme.css'")>layout.lastIndexOf("import './bottom-sheets.css'"));
 });
