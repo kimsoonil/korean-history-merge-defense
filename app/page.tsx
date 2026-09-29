@@ -207,13 +207,13 @@ export default function Game(){
  };
  const gambleGold=(id:string)=>{
   const option=goldGambles.find(item=>item.id===id),current=progressRef.current;if(!option||!gambleUnlocked(current.round,option.unlockRound))return;
-  const result=playGoldGamble(option,current.gold);if(!result)return;const summary=goldGambleResult(option,result.reward),success=summary.net>=0,sign=summary.net>0?'+':'';setGambleOpen(false);setUnitReward(null);setGambleResult({id:Date.now(),outcome:success?'success':'failure',title:`${option.cost.toLocaleString()}G 도박 ${success?'성공':'실패'}`,detail:`${sign}${summary.net.toLocaleString()}G`});progressRef.current={...current,gold:result.gold};setGold(result.gold);setNotice(`골드 도박 ${success?'성공':'실패'} · ${sign}${summary.net.toLocaleString()}G`);
+  const result=playGoldGamble(option,current.gold);if(!result)return;const summary=goldGambleResult(option,result.reward),success=summary.net>=0,sign=summary.net>0?'+':'';setUnitReward(null);setGambleResult({id:Date.now(),outcome:success?'success':'failure',title:`${option.cost.toLocaleString()}G 도박 ${success?'성공':'실패'}`,detail:`${sign}${summary.net.toLocaleString()}G`});progressRef.current={...current,gold:result.gold};setGold(result.gold);setNotice(`골드 도박 ${success?'성공':'실패'} · ${sign}${summary.net.toLocaleString()}G`);
  };
  const gambleUnit=(tier:1|2|3)=>{
   const option=unitGambles.find(item=>item.tier===tier),current=progressRef.current;if(!option||!gambleUnlocked(current.round,option.unlockRound))return;
   if(unitGamblesRemaining(tier,current.round,current.unitGambleUsage)<=0)return;
   const names=Object.values(byName).filter(unit=>unit.tier===tier&&unit.name!=='시민').map(unit=>unit.name),result=playUnitGamble(option,current.gold,names);if(!result)return;
-  setGambleOpen(false);progressRef.current={...current,gold:result.gold};setGold(result.gold);if(!result.success){setUnitReward(null);setGambleResult({id:Date.now(),outcome:'failure',title:`${tier}단계 유닛 도박 실패`,detail:`${result.refund.toLocaleString()}G 환급 · 성공 횟수 차감 없음`});setNotice(`${tier}단계 유닛 도박 실패 · ${result.refund}G 환급 · 성공 횟수 차감 없음`);return;}setGambleResult(null);const nextUsage=recordUnitGambleSuccess(tier,current.round,current.unitGambleUsage);progressRef.current={...progressRef.current,unitGambleUsage:nextUsage};setUnitGambleUsage(nextUsage);receiveUnit(result.name,'유닛 도박 성공');
+  progressRef.current={...current,gold:result.gold};setGold(result.gold);if(!result.success){setUnitReward(null);setGambleResult({id:Date.now(),outcome:'failure',title:`${tier}단계 유닛 도박 실패`,detail:`${result.refund.toLocaleString()}G 환급 · 성공 횟수 차감 없음`});setNotice(`${tier}단계 유닛 도박 실패 · ${result.refund}G 환급 · 성공 횟수 차감 없음`);return;}setGambleResult(null);const nextUsage=recordUnitGambleSuccess(tier,current.round,current.unitGambleUsage);progressRef.current={...progressRef.current,unitGambleUsage:nextUsage};setUnitGambleUsage(nextUsage);receiveUnit(result.name,'유닛 도박 성공');
  };
  const changeBag=(action:'store'|'deploy'|'sell',tier:number,name?:string,all=false)=>{
   if(homeRef.current||phase==='lost'||phase==='won'||stageCleared||legendary.active)return;
@@ -234,7 +234,7 @@ export default function Game(){
   if(!result.ok){setNotice(result.reason==='capacity'?'5단계 영웅을 배치할 자리가 필요합니다. 전장 유닛을 가방에 넣어 주세요.':'조합 재료가 부족합니다.');return;}
   idRef.current++;
   progressRef.current={...current,roster:result.roster,bag:result.bag};stateRef.current={...stateRef.current,roster:result.roster};
-  setRoster(result.roster);setBag(result.bag);setSelected(result.stored?null:id);setOverlay(null);setMergeSuccess({id,unit:u,stored:result.stored});
+  setRoster(result.roster);setBag(result.bag);setSelected(result.stored?null:id);setMergeSuccess({id,unit:u,stored:result.stored});
   setNotice(`${u.name} 조합 성공! ${result.stored?'가방에 보관했습니다.':'전장에 배치했습니다.'}`);
   if(u.tier===5){setAttackFx([]);legendary.show(u.name)}
  };

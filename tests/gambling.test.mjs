@@ -49,10 +49,14 @@ test('unit gamble success limits reset every ten rounds and failures do not cons
 test('battle gambling UI exposes only success and failure result labels',()=>{
  const page=readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8');
  const dialog=readFileSync(new URL('../app/GamblingDialog.tsx',import.meta.url),'utf8');
+ const goldHandler=page.slice(page.indexOf('const gambleGold='),page.indexOf('const gambleUnit='));
+ const unitHandler=page.slice(page.indexOf('const gambleUnit='),page.indexOf('const changeBag='));
  assert.match(dialog,/도박 결과는 성공 또는 실패로 표시됩니다/);
  assert.doesNotMatch(dialog,/대실패|소실패|본전|중박|대박/);
  assert.doesNotMatch(page,/summary\.category/);
  assert.match(page,/success=summary\.net>=0/);
+ assert.doesNotMatch(goldHandler,/setGambleOpen\(false\)/);
+ assert.doesNotMatch(unitHandler,/setGambleOpen\(false\)/);
 });
 test('battle utility popups use a bottom sheet while keeping the field visible',()=>{
  const css=readFileSync(new URL('../app/bottom-sheets.css',import.meta.url),'utf8');
