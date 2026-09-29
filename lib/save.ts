@@ -18,7 +18,7 @@ export const SAVE_KEY='salsu-progress-v1';
 export type GamePhase='ready'|'battle'|'cleared'|'lost'|'won';
 export type GameProgress={
   chapter?:ChapterId; difficulty?:Difficulty; bannedHeroes?:string[];
-  roster:Soldier[]; bag?:Bag; enemies:Enemy[]; gold:number; wall:number; stage:number; round:number;
+  roster:Soldier[]; bag?:Bag; enemies:Enemy[]; gold:number; troopCards?:number; wall:number; stage:number; round:number;
   phase:GamePhase; spawned:number; speed:number; remainingMs:number; heroCooldowns?:[number,number][]; upgrades?:Upgrades;
 };
 export type GameSave=GameProgress&{version:5;roundRules?:2;chapterScenario?:'noryang';savedAt:number};
@@ -129,6 +129,7 @@ export function readGameSave(raw:string|null):GameSave|null{
     }
     const lastWave=FINAL_WAVE;
     if(!integer(value.stage,1,lastWave)||!integer(value.gold,0,Number.MAX_SAFE_INTEGER)||!integer(value.wall,0,10))return null;
+    if(value.troopCards!==undefined&&!integer(value.troopCards,0,Number.MAX_SAFE_INTEGER))return null;
     if(!['ready','battle','cleared','lost','won'].includes(String(value.phase))||![1,2,3].includes(Number(value.speed))||typeof value.speed!=='number')return null;
     if(!integer(value.round,1,stageRoundCount(value.stage)))return null;
     const limit=value.version===3?Math.min(40,5+value.stage*2+Math.floor((value.round-1)/5)*2):roundEnemyCount(value.stage,value.round);
@@ -163,6 +164,7 @@ export function readGameSave(raw:string|null):GameSave|null{
     }
     if(value.bag!==undefined&&!validBag(value.bag))return null;
     if(value.enemies.some(enemy=>enemy.armor!==undefined&&!number(enemy.armor,0,1000000)))return null;
+    if(value.enemies.some(enemy=>enemy.originRound!==undefined&&!integer(enemy.originRound,1,stageRoundCount(Number(value.stage)))))return null;
     if(value.enemies.some(enemy=>enemy.stunSeconds!==undefined&&!number(enemy.stunSeconds,0,.5)))return null;
     if(value.enemies.some(enemy=>enemy.bossSeconds!==undefined&&(!enemy.boss||!number(enemy.bossSeconds,0,90))))return null;
     if(value.upgrades!==undefined)value.upgrades=readUpgrades(value.upgrades);

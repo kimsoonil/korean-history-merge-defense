@@ -36,7 +36,7 @@ export const byName=Object.fromEntries(units.map(u=>[u.name,u])) as Record<strin
 export const basics=units.filter(u=>u.tier===1);
 export const recipes=units.filter(u=>!!u.recipe);
 export type Soldier={id:number; name:string; slot:number};
-export type Enemy={id:number; name:string; hp:number; maxHp:number; progress:number; speed:number; boss:boolean; reward:number; originStage:number;chapter?:ChapterId;bossSeconds?:number;armor?:number;stunSeconds?:number};
+export type Enemy={id:number; name:string; hp:number; maxHp:number; progress:number; speed:number; boss:boolean; reward:number; originStage:number;originRound?:number;chapter?:ChapterId;bossSeconds?:number;armor?:number;stunSeconds?:number};
 export const waveNames=chapterOneBattles.map(battle=>battle.name);
 export const enemyNames=['수나라 보병','수나라 창병','수나라 궁병','수나라 기병','수나라 공성병','수나라 정예군'];
 export const enemyPortraits=Object.fromEntries([...enemyNames,'수양제'].map((name,index)=>[name,{src:'/portraits/sui-enemies-atlas.png',col:index%4,row:Math.floor(index/4)}])) as Record<string,{src:string;col:number;row:number;standalone?:boolean}>;
@@ -63,7 +63,7 @@ export function createRoundInvader(stage:number,round:number,index:number,id:num
  const bossName=index===0?roundBossName(stage,round,chapter):null;
  const level=Math.ceil(globalRound(stage,round)/5);
  const {hp,armor}=enemyStats(round,index,!!bossName,(bossName==='수양제'||bossName==='당 태종'||bossName==='계백'||bossName==='설인귀'||bossName==='소배압'||bossName==='살리타'||bossName==='와키자카 야스하루'||bossName==='우키타 히데이에'||bossName==='시마즈 요시히로'),difficulty);
- return {id,chapter,name:bossName??(chapter===10?noryangEnemyNames:chapter===8?haengjuEnemyNames:chapter===7?hansandoEnemyNames:chapter===6?cheoinEnemyNames:chapter===5?gwijuEnemyNames:chapter===4?nadangEnemyNames:chapter===3?hwangsanEnemyNames:chapter===2?ansiEnemyNames:enemyNames)[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))],hp,maxHp:hp,armor,progress:0,speed:bossName?.025:.043+(index%4)*.003,reward:bossName?30*round:difficulty==='hard'?15:20,boss:!!bossName,originStage:stage};
+ return {id,chapter,name:bossName??(chapter===10?noryangEnemyNames:chapter===8?haengjuEnemyNames:chapter===7?hansandoEnemyNames:chapter===6?cheoinEnemyNames:chapter===5?gwijuEnemyNames:chapter===4?nadangEnemyNames:chapter===3?hwangsanEnemyNames:chapter===2?ansiEnemyNames:enemyNames)[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))],hp,maxHp:hp,armor,progress:0,speed:bossName?.025:.043+(index%4)*.003,reward:bossName?30*round:difficulty==='hard'?15:20,boss:!!bossName,originStage:stage,originRound:round};
 }
 // The invaders make one complete lap around the square unit field.
 export const pathAt=roadPosition;

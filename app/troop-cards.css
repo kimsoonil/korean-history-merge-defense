@@ -1,0 +1,4 @@
+.battle-resources{display:flex;align-items:stretch;gap:6px;flex:none}
+.battle-resource{height:32px;min-width:92px;padding:4px 9px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid #9d9665;background:#465a38;color:#f8e6aa;font-variant-numeric:tabular-nums}
+.battle-resource svg{width:16px;height:16px}.battle-resource span{display:flex;flex-direction:column;line-height:1.05}.battle-resource small{font-size:7px;letter-spacing:.09em;color:#cfd9b9}.battle-resource b{font-size:12px}
+@media(max-width:760px){.battle-resources{gap:3px}.battle-resource{height:28px;min-width:68px;padding:3px 5px;gap:4px}.battle-resource svg{width:13px;height:13px}.battle-resource small{font-size:6px}.battle-resource b{font-size:10px}}

@@ -57,12 +57,12 @@ button svg{flex-shrink:0;vertical-align:middle}
 .game-actions button>span{min-width:0}
 .game-actions button b,.game-actions button small{text-align:center;line-height:1.3}
 @media(min-width:761px){
- .game-actions .action-summon,.game-actions .action-book,.game-actions .action-upgrade{
+ .game-actions .action-summon,.game-actions .action-book,.game-actions .action-upgrade,.game-actions .action-gamble{
   flex:0 1 190px;width:190px;min-width:0;height:48px;padding:6px 12px;gap:8px;
  }
 }
 @media(max-width:760px){
- .game-actions .action-summon,.game-actions .action-book,.game-actions .action-upgrade{
+ .game-actions .action-summon,.game-actions .action-book,.game-actions .action-upgrade,.game-actions .action-gamble{
   flex:1 1 0;min-width:0;height:54px;padding:4px;gap:3px;
  }
  .game-actions button b{font-size:11px;white-space:normal;word-break:keep-all}
