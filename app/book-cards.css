@@ -23,6 +23,7 @@
 .selected-skill strong,.mobile-unit-info p strong{color:#ffe2a1;font-weight:500}
 @media(max-width:760px){
  .book-modal{height:calc(100dvh - 20px);padding:8px}
+ .book-grid{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
  .book-card{padding:5px;gap:3px;grid-template-rows:minmax(48px,1fr) auto auto}
  .book-card-art .unit-portrait.normal{width:58px;max-height:78px;font-size:42px}
  .book-card .book-card-head h3{font-size:11px;margin:1px 0}

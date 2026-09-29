@@ -12,5 +12,6 @@ test('recipe cards merge from the whole highlighted card without effect copy or 
  assert.doesNotMatch(page,/>조합하기</);
  assert.match(styles,/\.book-card\.ready\{[^}]*border:2px solid #f4d88d/);
  assert.match(styles,/grid-template-rows:minmax\(74px,1fr\) auto auto/);
+ assert.match(styles,/@media\(max-width:760px\)\{[\s\S]*?\.book-grid\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\);grid-template-rows:repeat\(2,minmax\(0,1fr\)\)\}/);
  assert.doesNotMatch(mergeHandler,/setOverlay\(null\)/);
 });
