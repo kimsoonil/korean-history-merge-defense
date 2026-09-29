@@ -30,6 +30,10 @@ html,body{background:var(--trad-ink);color:var(--trad-text)}
 .arena-heading{color:var(--trad-text)}.arena-heading small{color:var(--trad-muted)}
 .arena-stage{background:#171714;border-color:#6f5c3d}
 .arena-foot{background:var(--trad-panel);border-color:#756246}.arena-message{color:#decfb1;border-color:#655239}
+.wave-action button{background:linear-gradient(180deg,var(--trad-red-hover),var(--trad-red));border-color:#d27a6c;color:#fff4e5;box-shadow:inset 0 1px #e69a8d}
+.wave-action button:hover:not(:disabled){background:linear-gradient(180deg,#c96655,var(--trad-red-hover));border-color:#e09284}
+.wave-action button:disabled{background:var(--trad-disabled);border-color:#81786a;color:#d4cabb;box-shadow:none}
+.wave-skip:not(:disabled){box-shadow:inset 0 1px #e69a8d,0 0 0 2px #c5a45b38}
 .phase-label{background:var(--trad-wood);border-color:#806947;color:var(--trad-paper)}
 .phase-label.battle{background:#4a2923;border-color:var(--trad-red)}
 .game-actions{background:linear-gradient(180deg,#342b22,var(--trad-ink));border-color:#816b45}
@@ -38,6 +42,12 @@ html,body{background:var(--trad-ink);color:var(--trad-text)}
 .game-actions .action-summon{background:linear-gradient(180deg,var(--trad-red-hover),var(--trad-red));border-color:#d48172;color:#fff4e5;box-shadow:inset 0 1px #eaa195}
 .game-actions .action-summon small{color:#f0cec7}
 .game-actions button:hover:not(:disabled),.side-book:hover,.side-sell:hover{border-color:var(--trad-brass);background:#4a3929}
+.battle-resource{background:linear-gradient(180deg,#493a2c,var(--trad-wood));border-color:var(--trad-brass);color:var(--trad-paper);box-shadow:inset 0 1px #66513a}
+.battle-resource svg{color:var(--trad-brass)}
+.battle-resource small{color:var(--trad-muted)}
+.board-bag{background:linear-gradient(180deg,#493a2cf2,#2d251ff2);border-color:var(--trad-brass);color:var(--trad-paper);box-shadow:0 3px 9px #0008,inset 0 1px #70583c}
+.board-bag:hover{background:linear-gradient(180deg,#5a422f,#3c2d23);border-color:#dfc377}
+.board-bag span{min-width:16px;height:16px;padding:0 4px;border-radius:8px;display:grid;place-items:center;background:var(--trad-red);color:#fff4e5;font-weight:800}
 
 /* Shared parchment-and-wood dialogs. */
 .book-modal,.help-modal,.gamble-modal,.upgrade-dialog,.unit-bag,.battle-settings-dialog,.profile-settings,.stage-map-dialog,.new-game-dialog{
