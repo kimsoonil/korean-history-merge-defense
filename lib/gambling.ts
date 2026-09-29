@@ -37,6 +37,10 @@ export function playGoldGamble(option:GoldGamble,gold:number,rng=Math.random){
  const reward=Math.floor(sample(rng)*(option.maxReward+1));
  return {gold:gold-option.cost+reward,reward};
 }
+export function goldGambleResult(option:GoldGamble,reward:number){
+ const net=reward-option.cost;
+ return {net,outcome:net>0?'success' as const:net<0?'failure' as const:'draw' as const};
+}
 export function playUnitGamble(option:UnitGamble,gold:number,names:string[],rng=Math.random){
  if(gold<option.cost||names.length===0)return null;
  if(sample(rng)<option.failureChance)return {gold:gold-option.cost+option.refund,success:false as const,refund:option.refund,name:null};

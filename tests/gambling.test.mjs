@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {emptyUnitGambleUsage,gambleUnlocked,goldGambles,recordUnitGambleSuccess,readUnitGambleUsage,unitGambles,unitGamblesRemaining,playGoldGamble,playUnitGamble} from '../lib/gambling.ts';
+import {emptyUnitGambleUsage,gambleUnlocked,goldGambles,goldGambleResult,recordUnitGambleSuccess,readUnitGambleUsage,unitGambles,unitGamblesRemaining,playGoldGamble,playUnitGamble} from '../lib/gambling.ts';
 
 test('gold gamble tiers unlock at rounds 1, 10 and 20',()=>{
  assert.deepEqual(goldGambles.map(x=>x.unlockRound),[1,10,20]);
@@ -11,6 +11,11 @@ test('gold gamble charges entry and includes both payout bounds',()=>{
  assert.deepEqual(playGoldGamble(goldGambles[0],100,()=>0),{gold:0,reward:0});
  assert.deepEqual(playGoldGamble(goldGambles[0],100,()=>1),{gold:400,reward:400});
  assert.equal(playGoldGamble(goldGambles[0],99,()=>0),null);
+});
+test('gold gamble result reports the exact success, failure and draw amount',()=>{
+ assert.deepEqual(goldGambleResult(goldGambles[0],400),{net:300,outcome:'success'});
+ assert.deepEqual(goldGambleResult(goldGambles[1],0),{net:-500,outcome:'failure'});
+ assert.deepEqual(goldGambleResult(goldGambles[2],1000),{net:0,outcome:'draw'});
 });
 test('unit gamble observes failure refunds and random success',()=>{
  assert.deepEqual(unitGambles.map(x=>[x.cost,x.failureChance,x.refund,x.unlockRound]),[[500,.1,100,1],[1000,.3,200,10],[3000,.5,500,20]]);

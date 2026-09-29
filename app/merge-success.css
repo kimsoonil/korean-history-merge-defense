@@ -6,5 +6,6 @@
 .merge-success span{font-size:14px;font-weight:700}
 .merge-success small{font-size:13px;color:#e0e7d6}
 .merge-success button{align-self:flex-start;display:grid;place-items:center;min-width:32px;min-height:32px;border:0;background:transparent;color:#fff4cc;cursor:pointer;pointer-events:auto}
+.gamble-result-alert>svg{flex:0 0 auto;color:#f8da83}.gamble-result-alert.failure{border-color:#d77b69;background:#482b29f5}.gamble-result-alert.failure strong{color:#ffad9d}.gamble-result-alert.draw{border-color:#aeb892}
 @keyframes merge-success-in{from{opacity:0;transform:translate(-50%,-8px)}to{opacity:1;transform:translate(-50%,0)}}
 @media(prefers-reduced-motion:reduce){.merge-success{animation:none}}

@@ -22,7 +22,7 @@ import {STORY_KEY,storyRoster,storyGold,type StoryProgress} from '@/lib/story';
 import {PLAYER_KEY,readPlayer,awardHardClear,HARD_CLEAR_TITLE,type PlayerProfile} from '@/lib/player';
 import UpgradeDialog from './UpgradeDialog';
 import GamblingDialog from './GamblingDialog';
-import {emptyUnitGambleUsage,gambleUnlocked,goldGambles,playGoldGamble,playUnitGamble,readUnitGambleUsage,recordUnitGambleSuccess,unitGambles,unitGamblesRemaining} from '@/lib/gambling';
+import {emptyUnitGambleUsage,gambleUnlocked,goldGambles,goldGambleResult,playGoldGamble,playUnitGamble,readUnitGambleUsage,recordUnitGambleSuccess,unitGambles,unitGamblesRemaining} from '@/lib/gambling';
 import {emptyUpgrades,readUpgrades,purchaseUpgrade,upgradedAttack,type UpgradeKind} from '@/lib/upgrades';
 import {getMusicMood} from '@/lib/music';
 import {BOSS_TROOP_CARDS,RECRUIT_TROOP_COST,ROUND_TROOP_CARDS,START_TROOP_CARDS,bossUnitRewardTier,randomName} from '@/lib/troop-cards';
@@ -117,6 +117,9 @@ export default function Game(){
  const [unitReward,setUnitReward]=useState<{id:number;unit:UnitDef;source:string;stored:boolean}|null>(null);
  useEffect(()=>{if(!unitReward)return;const timer=window.setTimeout(()=>setUnitReward(null),5000);return()=>window.clearTimeout(timer);},[unitReward]);
  useEffect(()=>{if(home)setUnitReward(null);},[home]);
+ const [gambleResult,setGambleResult]=useState<{id:number;outcome:'success'|'failure'|'draw';title:string;detail:string}|null>(null);
+ useEffect(()=>{if(!gambleResult)return;const timer=window.setTimeout(()=>setGambleResult(null),5000);return()=>window.clearTimeout(timer);},[gambleResult]);
+ useEffect(()=>{if(home)setGambleResult(null);},[home]);
  useEffect(()=>{if(!skillFlash)return;const timer=window.setTimeout(()=>setSkillFlash(null),Math.max(0,skillFlash.expiresAt-Date.now()));return()=>window.clearTimeout(timer);},[skillFlash]);
  const idRef=useRef(1),deadlineRef=useRef<number|null>(null),completedStageRef=useRef(0),rewardedBossesRef=useRef(new Set<number>()),stateRef=useRef({roster,enemies,stage,round,spawned,phase,speed,upgrades,difficulty,chapter});stateRef.current={roster,enemies,stage,round,spawned,phase,speed,upgrades,difficulty,chapter};
  const legendary=useLegendaryReveal((pausedAt,now)=>{if(!homeRef.current&&stateRef.current.phase==='battle')deadlineRef.current=resumeStageDeadline(deadlineRef.current,pausedAt,now)});
@@ -206,13 +209,13 @@ export default function Game(){
  };
  const gambleGold=(id:string)=>{
   const option=goldGambles.find(item=>item.id===id),current=progressRef.current;if(!option||!gambleUnlocked(current.round,option.unlockRound))return;
-  const result=playGoldGamble(option,current.gold);if(!result)return;const net=result.reward-option.cost;progressRef.current={...current,gold:result.gold};setGold(result.gold);setNotice(`골드 도박 결과 · ${net>=0?'+':''}${net.toLocaleString()}G`);
+  const result=playGoldGamble(option,current.gold);if(!result)return;const summary=goldGambleResult(option,result.reward),sign=summary.net>0?'+':'';setGambleOpen(false);setUnitReward(null);setGambleResult({id:Date.now(),outcome:summary.outcome,title:`${option.cost.toLocaleString()}G 도박 ${summary.outcome==='success'?'성공':summary.outcome==='failure'?'실패':'본전'}`,detail:`${sign}${summary.net.toLocaleString()}G`});progressRef.current={...current,gold:result.gold};setGold(result.gold);setNotice(`골드 도박 결과 · ${sign}${summary.net.toLocaleString()}G`);
  };
  const gambleUnit=(tier:1|2|3)=>{
   const option=unitGambles.find(item=>item.tier===tier),current=progressRef.current;if(!option||!gambleUnlocked(current.round,option.unlockRound))return;
   if(unitGamblesRemaining(tier,current.round,current.unitGambleUsage)<=0)return;
   const names=Object.values(byName).filter(unit=>unit.tier===tier&&unit.name!=='시민').map(unit=>unit.name),result=playUnitGamble(option,current.gold,names);if(!result)return;
-  setGambleOpen(false);progressRef.current={...current,gold:result.gold};setGold(result.gold);if(!result.success){setNotice(`${tier}단계 유닛 도박 실패 · ${result.refund}G 환급 · 성공 횟수 차감 없음`);return;}const nextUsage=recordUnitGambleSuccess(tier,current.round,current.unitGambleUsage);progressRef.current={...progressRef.current,unitGambleUsage:nextUsage};setUnitGambleUsage(nextUsage);receiveUnit(result.name,'유닛 도박 성공');
+  setGambleOpen(false);progressRef.current={...current,gold:result.gold};setGold(result.gold);if(!result.success){setUnitReward(null);setGambleResult({id:Date.now(),outcome:'failure',title:`${tier}단계 유닛 도박 실패`,detail:`${result.refund.toLocaleString()}G 환급 · 성공 횟수 차감 없음`});setNotice(`${tier}단계 유닛 도박 실패 · ${result.refund}G 환급 · 성공 횟수 차감 없음`);return;}setGambleResult(null);const nextUsage=recordUnitGambleSuccess(tier,current.round,current.unitGambleUsage);progressRef.current={...progressRef.current,unitGambleUsage:nextUsage};setUnitGambleUsage(nextUsage);receiveUnit(result.name,'유닛 도박 성공');
  };
  const changeBag=(action:'store'|'deploy'|'sell',tier:number,name?:string,all=false)=>{
   if(homeRef.current||phase==='lost'||phase==='won'||stageCleared||legendary.active)return;
@@ -402,6 +405,7 @@ export default function Game(){
   {!home&&selDef&&<div className="mobile-unit-info"><button className="mobile-unit-close" onClick={()=>setSelected(null)} aria-label="유닛 정보 닫기"><X size={15}/></button><div className="mobile-unit-head"><Portrait u={selDef} size="normal"/><div><b>{selDef.name}</b><span>{'★'.repeat(selDef.tier)} · {selDef.role}</span></div></div><p>{selDef.skill}<br/><strong>{roleDescription(selDef)}</strong>{selDef.tier===5&&<span className="hero-extra-skill">{heroSkillDescription(selDef.name)}</span>}</p><div className="mobile-unit-bottom"><span>공격 {Number(upgradedAttack(selDef,upgrades).toFixed(1))} · 사거리 {selDef.range} · 속도 {sel?attackRate(sel,roster).toFixed(2):selDef.rate}</span><button onClick={sell} disabled={salePrice(selDef)===null}>{salePrice(selDef)===null?'최상위 · 판매 불가':`판매 +${salePrice(selDef)}G`}</button></div></div>}
   {!home&&mergeSuccess&&<div key={mergeSuccess.id} className="merge-success" role="status" aria-live="polite" aria-atomic="true"><Portrait u={mergeSuccess.unit} size="normal"/><div><strong>✓ 조합 성공!</strong><span>{mergeSuccess.unit.tier}단계 · {mergeSuccess.unit.name}</span></div><button onClick={()=>setMergeSuccess(null)} aria-label="조합 완료 알림 닫기"><X size={18}/></button></div>}
   {!home&&unitReward&&<div key={unitReward.id} className="merge-success unit-reward-alert" role="status" aria-live="assertive" aria-atomic="true"><Portrait u={unitReward.unit} size="normal"/><div><strong>✦ {unitReward.source}</strong><span>{unitReward.unit.tier}단계 · {unitReward.unit.name} 획득!</span><small>{unitReward.stored?'가방에 보관되었습니다.':'전장에 배치되었습니다.'}</small></div><button onClick={()=>setUnitReward(null)} aria-label="유닛 획득 알림 닫기"><X size={18}/></button></div>}
+  {!home&&gambleResult&&<div key={gambleResult.id} className={`merge-success gamble-result-alert ${gambleResult.outcome}`} role="alert" aria-live="assertive" aria-atomic="true"><Dices size={34}/><div><strong>{gambleResult.title}</strong><span>{gambleResult.detail}</span></div><button onClick={()=>setGambleResult(null)} aria-label="도박 결과 알림 닫기"><X size={18}/></button></div>}
   {confirmNew&&<NewGameConfirm onConfirm={()=>prepareStage(pendingStage,pendingDifficulty)} onCancel={()=>setConfirmNew(false)}/>}
   {legendary.active?.mode==='codex'&&<HeroCodex scene={legendary.active.scene} onSelect={openCodex} onClose={legendary.close}/>}
  </div>;
