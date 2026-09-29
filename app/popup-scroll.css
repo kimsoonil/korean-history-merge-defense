@@ -3,6 +3,7 @@
  display:flex;flex-direction:column;overflow:hidden;min-height:0;
 }
 .upgrade-dialog>*,.unit-bag>*,.profile-settings>header,.battle-settings-dialog>*{flex-shrink:0}
+.upgrade-dialog>.upgrade-content{flex:1 1 auto;min-height:0}
 .upgrade-dialog .upgrade-list,.unit-bag .bag-grid,.battle-settings-dialog .settings-links{
  flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
  overscroll-behavior:contain;scrollbar-width:thin;scrollbar-gutter:stable;
@@ -17,9 +18,9 @@
 .stage-map-dialog .map-battle-list{flex:1 1 auto;min-height:0}
 .stage-map-dialog .map-dialog-footer{flex:none}
 @media(max-height:600px){
- .upgrade-dialog,.unit-bag,.profile-settings,.battle-settings-dialog{padding:10px}
+ .unit-bag,.profile-settings,.battle-settings-dialog{padding:10px}
  .upgrade-dialog>p{font-size:11px;line-height:1.3;margin:6px 0}
- .upgrade-heading h2{font-size:19px;margin-bottom:2px}
+ .upgrade-heading{height:54px;padding:8px 12px}.upgrade-heading b{font-size:17px}
  .upgrade-tabs,.bag-tabs{margin:6px 0}
  .upgrade-status{margin:6px 0;font-size:11px}
  .upgrade-dialog>small{font-size:10px}

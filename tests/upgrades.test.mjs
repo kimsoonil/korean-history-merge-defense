@@ -81,7 +81,12 @@ test('hard tier and role costs double; individual heroes cost five hundred per l
 });
 test('upgrade dialog keeps only actionable upgrade content',()=>{
  const dialog=readFileSync(new URL('../app/UpgradeDialog.tsx',import.meta.url),'utf8');
+ const styles=readFileSync(new URL('../app/upgrades.css',import.meta.url),'utf8');
  for(const copy of ['단계 강화:','단계·직업·영웅 강화는 합산됩니다.','보유 골드','공격속도·사거리·특수 효과는 변하지 않습니다.','새 게임·새 스테이지 시작 시 초기화']){
   assert.doesNotMatch(dialog,new RegExp(copy.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
  }
+ assert.match(dialog,/<header className="upgrade-heading">/);
+ assert.match(dialog,/BATTLE FORGE/);
+ assert.match(styles,/width:min\(980px,100vw\)/);
+ assert.match(styles,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
 });
