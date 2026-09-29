@@ -85,10 +85,8 @@ export default function Game(){
  const [profileOpen,setProfileOpen]=useState(false);
  const [bag,setBag]=useState<Bag>({}),[bagOpen,setBagOpen]=useState(false);
  const [autoStoreBasic,setAutoStoreBasic]=useState(false);
- useEffect(()=>{try{setAutoStoreBasic(localStorage.getItem('defense-auto-store-basic')==='true');}catch{}},[]);
  const toggleAutoStoreBasic=(enabled:boolean)=>{
   setAutoStoreBasic(enabled);
-  try{localStorage.setItem('defense-auto-store-basic',String(enabled));}catch{setStorageError(true);}
   if(enabled)changeBag('store',1);
  };
  const [upgrades,setUpgrades]=useState(emptyUpgrades),[upgradeOpen,setUpgradeOpen]=useState(false),[gambleOpen,setGambleOpen]=useState(false),[unitGambleUsage,setUnitGambleUsage]=useState(()=>emptyUnitGambleUsage(1));
@@ -144,7 +142,7 @@ export default function Game(){
   setDifficulty(saved.difficulty??'normal');setBannedHeroes(saved.bannedHeroes??[]);
   const counters=restoredCounters(saved);heroTimers.current=new Map(saved.heroCooldowns??[]);flashQueue.current=[];setSkillFlash(null);
   idRef.current=counters.nextId;completedStageRef.current=counters.completedStage;deadlineRef.current=counters.deadline;
-  rewardedBossesRef.current.clear();setUpgrades(readUpgrades(saved.upgrades));setUnitGambleUsage(readUnitGambleUsage(saved.unitGambleUsage,saved.round));setUpgradeOpen(false);const inventory=migrateDeployment(saved.roster,saved.bag??{});setRoster(inventory.roster);setBag(inventory.bag);setEnemies(saved.enemies);setGold(saved.gold);setTroopCards(saved.troopCards??START_TROOP_CARDS);setWall(saved.wall);setStage(saved.stage);setRound(saved.round);setPhase(saved.phase);setSpawned(saved.spawned);setSpeed(saved.speed);setTimeLeft(Math.ceil(saved.remainingMs/1000));setAttackFx([]);setSelected(null);setOverlay(null);setNotice('저장된 방어전을 이어갑니다.');homeRef.current=false;setHome(false);
+  rewardedBossesRef.current.clear();setUpgrades(readUpgrades(saved.upgrades));setUnitGambleUsage(readUnitGambleUsage(saved.unitGambleUsage,saved.round));setUpgradeOpen(false);setAutoStoreBasic(false);const inventory=migrateDeployment(saved.roster,saved.bag??{});setRoster(inventory.roster);setBag(inventory.bag);setEnemies(saved.enemies);setGold(saved.gold);setTroopCards(saved.troopCards??START_TROOP_CARDS);setWall(saved.wall);setStage(saved.stage);setRound(saved.round);setPhase(saved.phase);setSpawned(saved.spawned);setSpeed(saved.speed);setTimeLeft(Math.ceil(saved.remainingMs/1000));setAttackFx([]);setSelected(null);setOverlay(null);setNotice('저장된 방어전을 이어갑니다.');homeRef.current=false;setHome(false);
  };
  useEffect(()=>{
   try{
@@ -298,7 +296,7 @@ export default function Game(){
   if(mode==='hard'&&clearedWaveRef.current<10)return;
   if(!isWaveUnlocked(nextStage,mode==='hard'?hardClearedRef.current:clearedWaveRef.current))return;
   setDifficulty(mode);setBannedHeroes(mode==='hard'?drawBannedHeroes(Math.random,chapter):[]);
-  setUpgrades(emptyUpgrades());setUnitGambleUsage(emptyUnitGambleUsage(1));setUpgradeOpen(false);legendary.close();heroTimers.current.clear();flashQueue.current=[];setSkillFlash(null);setUnitReward(null);setGambleResult(null);deadlineRef.current=null;completedStageRef.current=0;rewardedBossesRef.current.clear();idRef.current=1;setConfirmNew(false);homeRef.current=false;setHome(false);setMapOpen(false);setMapModalOpen(false);setRoster([]);setBag({});setBagOpen(false);setGold(START_GOLD);setTroopCards(START_TROOP_CARDS);setWall(10);setStage(nextStage);setRound(1);setTimeLeft(STAGE_SECONDS);setPhase('ready');setEnemies([]);setAttackFx([]);setSelected(null);setSpawned(0);setSpeed(1);setOverlay(null);setNotice(`${chapter}-${nextStage} · 병력을 모집하고 전투를 준비하세요. · 병력패 ${START_TROOP_CARDS}개 지급`);
+  setUpgrades(emptyUpgrades());setUnitGambleUsage(emptyUnitGambleUsage(1));setUpgradeOpen(false);setAutoStoreBasic(false);legendary.close();heroTimers.current.clear();flashQueue.current=[];setSkillFlash(null);setUnitReward(null);setGambleResult(null);deadlineRef.current=null;completedStageRef.current=0;rewardedBossesRef.current.clear();idRef.current=1;setConfirmNew(false);homeRef.current=false;setHome(false);setMapOpen(false);setMapModalOpen(false);setRoster([]);setBag({});setBagOpen(false);setGold(START_GOLD);setTroopCards(START_TROOP_CARDS);setWall(10);setStage(nextStage);setRound(1);setTimeLeft(STAGE_SECONDS);setPhase('ready');setEnemies([]);setAttackFx([]);setSelected(null);setSpawned(0);setSpeed(1);setOverlay(null);setNotice(`${chapter}-${nextStage} · 병력을 모집하고 전투를 준비하세요. · 병력패 ${START_TROOP_CARDS}개 지급`);
  };
  const launchStoryBattle=(progress:StoryProgress)=>{
   if(progress.step!==12||!progress.merged||progress.summoned!==4)return;

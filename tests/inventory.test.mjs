@@ -5,13 +5,13 @@ import {storeUnits,deployUnits,sellStored,migrateDeployment,validBag,inventoryRe
 import {recipes,byName} from '../lib/game.ts';
 import {makeGameSave,readGameSave} from '../lib/save.ts';
 const field=Array.from({length:25},(_,i)=>({id:i+1,name:'창병',slot:i}));
-test('auto-store checkbox is controlled, persisted and routes recruits into the bag',()=>{
+test('auto-store begins disabled for every battle and routes recruits only after activation',()=>{
  const page=readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8');
  const modal=readFileSync(new URL('../app/UnitBag.tsx',import.meta.url),'utf8');
  assert.match(page,/autoStoreBasic\|\|roster.length>=DEPLOY_LIMIT/);
  assert.match(page,/if\(enabled\)changeBag\('store',1\)/);
- assert.match(page,/localStorage.setItem\('defense-auto-store-basic',String\(enabled\)\)/);
- assert.match(page,/localStorage.getItem\('defense-auto-store-basic'\)==='true'/);
+ assert.doesNotMatch(page,/defense-auto-store-basic/);
+ assert.ok((page.match(/setAutoStoreBasic\(false\)/g)??[]).length>=2);
  assert.match(modal,/type="checkbox" checked=\{autoStoreBasic\}/);
  assert.match(modal,/onAutoStoreBasic\(e.target.checked\)/);
 });
