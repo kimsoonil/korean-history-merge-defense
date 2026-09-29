@@ -9,8 +9,12 @@ import {readFileSync} from 'node:fs';
 test('new stages reset to round one and UI does not show campaign-global rounds',()=>{
  const page=readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8');
  const prepare=page.slice(page.indexOf(' const prepareStage='),page.indexOf(' const launchStoryBattle='));
+ const start=page.slice(page.indexOf(' const start='),page.indexOf(' const beginRound='));
  assert.match(prepare,/setRound\(1\)/);assert.match(prepare,/setPhase\('ready'\)/);
  assert.match(prepare,/deadlineRef.current=null/);assert.match(prepare,/setSpawned\(0\)/);
+ assert.match(prepare,/setRoster\(\[\]\)/);assert.doesNotMatch(prepare,/starterName|합류/);
+ assert.match(start,/unit\.tier===2/);assert.match(start,/receiveUnit\(starterName,'전투 시작 지원'\)/);
+ assert.ok(start.indexOf("progressRef.current={...current,phase:'battle'}")<start.indexOf('receiveUnit('),'start must latch battle before awarding the hero');
  for(const file of ['page.tsx','StageMap.tsx','StageClearPopup.tsx']){
   assert.doesNotMatch(readFileSync(new URL(`../app/${file}`,import.meta.url),'utf8'),/globalRound|campaignRound/);
  }
