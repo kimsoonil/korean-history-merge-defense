@@ -88,7 +88,11 @@ html,body{background:var(--trad-ink);color:var(--trad-text)}
 .unit-bag button,.battle-settings-dialog button,.profile-settings button{background:var(--trad-wood);border-color:#806b49;color:var(--trad-text)}
 .bag-grid>button{background:#342a22}.bag-grid>button.selected{outline-color:var(--trad-brass);background:#5a402d}
 .bag-grid>button>span:last-child{background:#1d1915;color:var(--trad-paper)}
-.bag-auto-store,.bag-selection{border-color:#735e40}.unit-bag>p,.battle-settings-dialog>p{color:#c9b997}
+.bag-auto-store{background:linear-gradient(180deg,#493a2c,var(--trad-wood));border-color:#806b49;color:var(--trad-paper)}
+.bag-auto-store .bag-auto-check{background:#28221c;border-color:#8f7955;color:transparent}
+.bag-auto-store input:checked+.bag-auto-check{background:var(--trad-jade);border-color:#9fc5b9;color:#fff}
+.bag-auto-store input:focus-visible+.bag-auto-check{outline-color:var(--trad-brass)}
+.bag-selection{border-color:#735e40}.battle-settings-dialog>p{color:#c9b997}
 
 /* Home, story, archive and map chrome use ink rather than forest green. */
 .title-landscape:after{background:linear-gradient(90deg,#171714fa 0%,#29251ff0 34%,#3b30269c 58%,#17171455),linear-gradient(0deg,#171714f2,transparent 46%)}

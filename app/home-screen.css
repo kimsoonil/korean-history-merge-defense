@@ -12,7 +12,7 @@
 .home-shortcuts{display:flex;justify-content:center;gap:48px;padding-top:10px}
 .home-shortcuts button{border:0;background:none;color:#f6e7bf;display:flex;align-items:center;flex-direction:column;gap:7px;min-width:70px;min-height:58px;font-size:12px;cursor:pointer}
 .home-shortcuts svg{filter:drop-shadow(0 2px 2px #0b2520)}
-.home-settings-toggle{position:absolute;right:16px;top:16px;display:grid;place-items:center;width:42px;height:42px;border:1px solid #e0c99570;border-radius:50%;background:#183b36b3;color:#fff1cc;cursor:pointer}
+.home-settings{display:contents}.home-settings-toggle{position:absolute;right:16px;top:16px;display:grid;place-items:center;width:42px;height:42px;border:1px solid #e0c99570;border-radius:50%;background:#183b36b3;color:#fff1cc;cursor:pointer}
 .home-settings-panel{position:absolute;right:16px;top:66px;z-index:4;border:1px solid #b4a578;background:#17362ff5;padding:10px;border-radius:12px;box-shadow:0 10px 30px #081b2590}
 .home-settings-panel button{display:flex;gap:10px;align-items:center;width:100%;padding:12px;border:0;background:none;color:#fff1cc;cursor:pointer}
 .splash-entry{margin-top:auto;padding:25px 20px max(70px,10dvh)}
