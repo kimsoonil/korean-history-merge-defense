@@ -1,11 +1,12 @@
-export type GoldGamble={id:string;cost:number;maxReward:number;unlockRound:number};
+export type GoldGambleOutcome={category:'대실패'|'소실패'|'본전'|'중박'|'대박';net:number;chance:number};
+export type GoldGamble={id:string;cost:number;maxReward:number;unlockRound:number;outcomes:GoldGambleOutcome[]};
 export type UnitGamble={tier:1|2|3;cost:number;failureChance:number;refund:number;unlockRound:number};
 export type UnitGambleUsage={block:number;successes:Record<1|2|3,number>};
 
 export const goldGambles:GoldGamble[]=[
- {id:'small',cost:100,maxReward:400,unlockRound:1},
- {id:'medium',cost:500,maxReward:1500,unlockRound:10},
- {id:'large',cost:1000,maxReward:4000,unlockRound:20},
+ {id:'small',cost:100,maxReward:600,unlockRound:1,outcomes:[{category:'대실패',net:-100,chance:.2},{category:'소실패',net:-50,chance:.2},{category:'본전',net:0,chance:.35},{category:'중박',net:200,chance:.2},{category:'대박',net:500,chance:.05}]},
+ {id:'medium',cost:500,maxReward:1500,unlockRound:10,outcomes:[{category:'대실패',net:-500,chance:.2},{category:'소실패',net:-250,chance:.2},{category:'본전',net:0,chance:.35},{category:'중박',net:400,chance:.2},{category:'대박',net:1000,chance:.05}]},
+ {id:'large',cost:1000,maxReward:4000,unlockRound:20,outcomes:[{category:'대실패',net:-1000,chance:.2},{category:'소실패',net:-500,chance:.2},{category:'본전',net:0,chance:.35},{category:'중박',net:1200,chance:.2},{category:'대박',net:3000,chance:.05}]},
 ];
 export const unitGambles:UnitGamble[]=[
  {tier:1,cost:500,failureChance:.1,refund:100,unlockRound:1},
@@ -34,12 +35,14 @@ export function recordUnitGambleSuccess(tier:1|2|3,round:number,usage:UnitGamble
 const sample=(rng:()=>number)=>Math.min(.999999999,Math.max(0,rng()));
 export function playGoldGamble(option:GoldGamble,gold:number,rng=Math.random){
  if(gold<option.cost)return null;
- const reward=Math.floor(sample(rng)*(option.maxReward+1));
- return {gold:gold-option.cost+reward,reward};
+ const roll=sample(rng);let cumulative=0,outcome=option.outcomes.at(-1)!;
+ for(const candidate of option.outcomes){cumulative+=candidate.chance;if(roll<cumulative){outcome=candidate;break;}}
+ const reward=option.cost+outcome.net;
+ return {gold:gold+outcome.net,reward,category:outcome.category};
 }
 export function goldGambleResult(option:GoldGamble,reward:number){
  const net=reward-option.cost;
- return {net,outcome:net>0?'success' as const:net<0?'failure' as const:'draw' as const};
+ return {net,outcome:net>0?'success' as const:net<0?'failure' as const:'draw' as const,category:option.outcomes.find(result=>result.net===net)?.category??'본전'};
 }
 export function playUnitGamble(option:UnitGamble,gold:number,names:string[],rng=Math.random){
  if(gold<option.cost||names.length===0)return null;

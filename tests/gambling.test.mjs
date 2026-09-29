@@ -5,17 +5,25 @@ import {emptyUnitGambleUsage,gambleUnlocked,goldGambles,goldGambleResult,recordU
 test('gold gamble tiers unlock at rounds 1, 10 and 20',()=>{
  assert.deepEqual(goldGambles.map(x=>x.unlockRound),[1,10,20]);
  assert.equal(gambleUnlocked(9,10),false);assert.equal(gambleUnlocked(10,10),true);
- assert.deepEqual(goldGambles.map(x=>[x.cost,x.maxReward]),[[100,400],[500,1500],[1000,4000]]);
+ assert.deepEqual(goldGambles.map(x=>[x.cost,x.maxReward]),[[100,600],[500,1500],[1000,4000]]);
+ for(const gamble of goldGambles){
+  assert.deepEqual(gamble.outcomes.map(x=>[x.category,x.chance]),[['대실패',.2],['소실패',.2],['본전',.35],['중박',.2],['대박',.05]]);
+  assert.equal(gamble.outcomes.reduce((sum,x)=>sum+x.chance,0),1);
+  assert.equal(Math.max(...gamble.outcomes.map(x=>x.net)),gamble.maxReward-gamble.cost);
+ }
 });
-test('gold gamble charges entry and includes both payout bounds',()=>{
- assert.deepEqual(playGoldGamble(goldGambles[0],100,()=>0),{gold:0,reward:0});
- assert.deepEqual(playGoldGamble(goldGambles[0],100,()=>1),{gold:400,reward:400});
+test('gold gamble uses the five weighted outcomes including both bounds',()=>{
+ assert.deepEqual(playGoldGamble(goldGambles[0],100,()=>0),{gold:0,reward:0,category:'대실패'});
+ assert.deepEqual(playGoldGamble(goldGambles[0],100,()=>.2),{gold:50,reward:50,category:'소실패'});
+ assert.deepEqual(playGoldGamble(goldGambles[0],100,()=>.4),{gold:100,reward:100,category:'본전'});
+ assert.deepEqual(playGoldGamble(goldGambles[0],100,()=>.75),{gold:300,reward:300,category:'중박'});
+ assert.deepEqual(playGoldGamble(goldGambles[0],100,()=>1),{gold:600,reward:600,category:'대박'});
  assert.equal(playGoldGamble(goldGambles[0],99,()=>0),null);
 });
 test('gold gamble result reports the exact success, failure and draw amount',()=>{
- assert.deepEqual(goldGambleResult(goldGambles[0],400),{net:300,outcome:'success'});
- assert.deepEqual(goldGambleResult(goldGambles[1],0),{net:-500,outcome:'failure'});
- assert.deepEqual(goldGambleResult(goldGambles[2],1000),{net:0,outcome:'draw'});
+ assert.deepEqual(goldGambleResult(goldGambles[0],600),{net:500,outcome:'success',category:'대박'});
+ assert.deepEqual(goldGambleResult(goldGambles[1],0),{net:-500,outcome:'failure',category:'대실패'});
+ assert.deepEqual(goldGambleResult(goldGambles[2],1000),{net:0,outcome:'draw',category:'본전'});
 });
 test('unit gamble observes failure refunds and random success',()=>{
  assert.deepEqual(unitGambles.map(x=>[x.cost,x.failureChance,x.refund,x.unlockRound]),[[500,.1,100,1],[1000,.3,200,10],[3000,.5,500,20]]);

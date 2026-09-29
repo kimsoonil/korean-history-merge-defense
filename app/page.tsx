@@ -209,7 +209,7 @@ export default function Game(){
  };
  const gambleGold=(id:string)=>{
   const option=goldGambles.find(item=>item.id===id),current=progressRef.current;if(!option||!gambleUnlocked(current.round,option.unlockRound))return;
-  const result=playGoldGamble(option,current.gold);if(!result)return;const summary=goldGambleResult(option,result.reward),sign=summary.net>0?'+':'';setGambleOpen(false);setUnitReward(null);setGambleResult({id:Date.now(),outcome:summary.outcome,title:`${option.cost.toLocaleString()}G 도박 ${summary.outcome==='success'?'성공':summary.outcome==='failure'?'실패':'본전'}`,detail:`${sign}${summary.net.toLocaleString()}G`});progressRef.current={...current,gold:result.gold};setGold(result.gold);setNotice(`골드 도박 결과 · ${sign}${summary.net.toLocaleString()}G`);
+  const result=playGoldGamble(option,current.gold);if(!result)return;const summary=goldGambleResult(option,result.reward),sign=summary.net>0?'+':'';setGambleOpen(false);setUnitReward(null);setGambleResult({id:Date.now(),outcome:summary.outcome,title:`${option.cost.toLocaleString()}G 도박 ${summary.outcome==='success'?'성공':summary.outcome==='failure'?'실패':'본전'} · ${summary.category}`,detail:`${sign}${summary.net.toLocaleString()}G`});progressRef.current={...current,gold:result.gold};setGold(result.gold);setNotice(`골드 도박 결과 · ${summary.category} · ${sign}${summary.net.toLocaleString()}G`);
  };
  const gambleUnit=(tier:1|2|3)=>{
   const option=unitGambles.find(item=>item.tier===tier),current=progressRef.current;if(!option||!gambleUnlocked(current.round,option.unlockRound))return;
