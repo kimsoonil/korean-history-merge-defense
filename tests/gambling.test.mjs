@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {emptyUnitGambleUsage,gambleUnlocked,goldGambles,goldGambleResult,recordUnitGambleSuccess,readUnitGambleUsage,unitGambles,unitGamblesRemaining,playGoldGamble,playUnitGamble} from '../lib/gambling.ts';
 
 test('gold gamble tiers unlock at rounds 1, 10 and 20',()=>{
@@ -44,4 +45,20 @@ test('unit gamble success limits reset every ten rounds and failures do not cons
  assert.equal(unitGamblesRemaining(3,21,usage),1);
  assert.deepEqual(readUnitGambleUsage(usage,21),usage);
  assert.deepEqual(readUnitGambleUsage({block:2,successes:{1:11,2:0,3:0}},21),emptyUnitGambleUsage(21));
+});
+test('battle gambling UI exposes only success and failure result labels',()=>{
+ const page=readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8');
+ const dialog=readFileSync(new URL('../app/GamblingDialog.tsx',import.meta.url),'utf8');
+ assert.match(dialog,/도박 결과는 성공 또는 실패로 표시됩니다/);
+ assert.doesNotMatch(dialog,/대실패|소실패|본전|중박|대박/);
+ assert.doesNotMatch(page,/summary\.category/);
+ assert.match(page,/success=summary\.net>=0/);
+});
+test('battle utility popups use a bottom sheet while keeping the field visible',()=>{
+ const css=readFileSync(new URL('../app/bottom-sheets.css',import.meta.url),'utf8');
+ const page=readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8');
+ assert.match(css,/\.unit-bag\[open\],\.upgrade-dialog\[open\]/);
+ assert.match(css,/place-items:end center/);
+ assert.match(css,/background:#07161045/);
+ assert.match(page,/battle-bottom-sheet/);
 });

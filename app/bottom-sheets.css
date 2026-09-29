@@ -1,0 +1,31 @@
+/* Battle utility dialogs stay low so the battlefield remains visible behind them. */
+.unit-bag[open],.upgrade-dialog[open]{
+ position:fixed;inset:auto 0 0;margin:0 auto;width:min(980px,100vw);
+ max-height:min(58dvh,620px);border-radius:18px 18px 0 0;border-bottom:0;
+ animation:battle-sheet-in .22s ease-out;
+}
+.unit-bag::backdrop,.upgrade-dialog::backdrop{
+ background:#07161045;backdrop-filter:none;
+}
+.gamble-shade,.overlay-shade.battle-bottom-sheet{
+ place-items:end center;padding:0;background:#07161045;backdrop-filter:none;
+}
+.gamble-modal,.battle-bottom-sheet .book-modal,.battle-bottom-sheet .help-modal{
+ width:min(980px,100vw);max-width:100%;max-height:min(58dvh,620px);
+ border-radius:18px 18px 0 0;border-bottom:0;
+ animation:battle-sheet-in .22s ease-out;
+}
+.battle-bottom-sheet .book-modal{height:min(58dvh,620px)}
+.battle-bottom-sheet .help-modal{overflow-y:auto}
+@keyframes battle-sheet-in{from{transform:translateY(100%);opacity:.75}to{transform:translateY(0);opacity:1}}
+@media(max-width:760px){
+ .unit-bag[open],.upgrade-dialog[open],.gamble-modal,
+ .battle-bottom-sheet .book-modal,.battle-bottom-sheet .help-modal{
+  max-height:68dvh;border-radius:15px 15px 0 0;
+ }
+ .battle-bottom-sheet .book-modal{height:68dvh}
+}
+@media(prefers-reduced-motion:reduce){
+ .unit-bag[open],.upgrade-dialog[open],.gamble-modal,
+ .battle-bottom-sheet .book-modal,.battle-bottom-sheet .help-modal{animation:none}
+}
