@@ -1,27 +1,40 @@
-/* Full-card portraits stay clipped to their atlas cell; overlays retain real controls. */
+/* Inventory-like recipe cards: the whole card becomes the merge control. */
 .book-modal{width:min(1060px,100%);height:min(760px,calc(100dvh - 24px))}
-.book-card{position:relative;isolation:isolate;padding:10px;gap:6px;background:radial-gradient(ellipse at 50% 35%,#8d9e64,#30462f 75%);border-radius:7px}
-.book-card-art{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
-.book-card-art .unit-portrait.normal{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;font-size:80px}
-.book-card-art .atlas-viewport{inset:0 0;}
-.book-card:after{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,#0d211be8,transparent 32%,transparent 44%,#0b201bab 70%,#0b201bf5)}
-.book-card .book-card-head{flex:none;align-items:flex-start;gap:6px;text-shadow:0 1px 3px #000}
-.book-card .book-card-head h3{font-size:17px;color:#fff2cf;margin:3px 0;line-height:1.35}
-.book-card .book-card-head small{font-size:10px;color:#ffe3a2;line-height:1.5}
-.book-card .book-ingredients{flex:none;margin:auto 0 0;gap:4px;overflow:visible}
-.book-card .book-ingredients span{font-size:10px;line-height:1.4;padding:3px 5px;background:#122c23e8;border-color:#c1cba575;color:#f3edda;border-radius:3px;text-shadow:0 1px 2px #000}
-.book-card .book-ingredients span.have{background:#52723bed;border-color:#e7d191;color:#fff4b9}
-.book-card>button{height:30px;border-radius:3px;font-size:11px}
-.book-card>button:disabled{background:#263d30ed;color:#d6dfc8;border-color:#9caa7b80}
-.book-card.ready{box-shadow:inset 0 0 0 2px #f4d88d,0 0 12px #e3c37035}
+.book-card{
+ position:relative;min-height:0;overflow:hidden;padding:8px;gap:5px;
+ display:grid;grid-template-rows:minmax(74px,1fr) auto auto;
+ background:#405737;border:1px solid #879769;border-radius:7px;
+ color:#f5eccf;cursor:default;transition:border-color .16s,box-shadow .16s,background .16s;
+}
+.book-card-art{min-height:0;display:grid;place-items:center;overflow:hidden;pointer-events:none;background:#263e30;border-radius:5px}
+.book-card-art .unit-portrait.normal{position:relative;width:82px;height:100%;max-height:112px;border:0;background:transparent;font-size:64px}
+.book-card-art .atlas-viewport{inset:0}
+.book-card .book-card-head{display:flex;align-items:flex-start;gap:6px;min-width:0;text-shadow:none}
+.book-card .book-card-head>div{min-width:0;flex:1}
+.book-card .book-card-head h3{font-size:15px;color:#fff2cf;margin:2px 0 0;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.book-card .book-card-head small{display:block;font-size:9px;color:#ffe3a2;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.book-card .book-ingredients{display:flex;flex-wrap:wrap;align-content:flex-start;gap:3px;margin:0;overflow:hidden}
+.book-card .book-ingredients span{font-size:9px;line-height:1.35;padding:2px 4px;background:#2c4234;border:1px solid #718362;color:#d9dfc6;border-radius:3px;white-space:nowrap}
+.book-card .book-ingredients span.have{background:#647c48;border-color:#e7d191;color:#fff4b9}
+.book-card.ready{cursor:pointer;background:#546b3f;border:2px solid #f4d88d;box-shadow:0 0 0 2px #725f2d,0 0 16px #f0cf6766}
+.book-card.ready:hover{background:#607847;box-shadow:0 0 0 2px #806b31,0 0 20px #f0cf6788}
+.book-card.ready:focus-visible{outline:3px solid #fff2b4;outline-offset:2px}
+.book-preview{position:absolute;right:8px;top:8px;z-index:2;width:27px;height:27px!important;min-height:0!important;padding:0!important;border-radius:50%!important;background:#1b3028dd!important;border:1px solid #d8c17d!important;color:#ffe4a0!important;display:grid;place-items:center}
+.selected-skill strong,.mobile-unit-info p strong{color:#ffe2a1;font-weight:500}
 @media(max-width:760px){
  .book-modal{height:calc(100dvh - 20px);padding:8px}
- .book-card{padding:6px;gap:4px}
- .book-card .book-card-head h3{font-size:13px;margin:1px 0}
- .book-card .book-card-head small{font-size:8px;line-height:1.3}
+ .book-card{padding:5px;gap:3px;grid-template-rows:minmax(48px,1fr) auto auto}
+ .book-card-art .unit-portrait.normal{width:58px;max-height:78px;font-size:42px}
+ .book-card .book-card-head h3{font-size:11px;margin:1px 0}
+ .book-card .book-card-head small{font-size:7px;line-height:1.3}
  .book-card .book-ingredients{gap:2px}
- .book-card .book-ingredients span{font-size:8px;padding:1px 3px;line-height:1.35}
- .book-card>button{height:23px;font-size:9px}
+ .book-card .book-ingredients span{font-size:7px;padding:1px 2px;line-height:1.3}
+ .book-preview{right:4px;top:4px;width:23px;height:23px!important}
 }
-@media(max-height:540px) and (min-width:600px){.book-grid{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}.book-card{padding:5px;gap:3px}.book-card .book-card-head h3{font-size:12px}.book-card .book-card-head small{font-size:8px}.book-card .book-ingredients{gap:2px}.book-card .book-ingredients span{font-size:8px;padding:1px 3px}.book-card>button{height:22px;font-size:9px}}
-.book-role-effect{display:block;font-size:9px;line-height:1.4;color:#f5e7bf;max-width:190px;text-shadow:0 1px 3px #000}.selected-skill strong,.mobile-unit-info p strong{color:#ffe2a1;font-weight:500}@media(max-width:760px){.book-role-effect{font-size:8px;line-height:1.25}}
+@media(max-height:540px) and (min-width:600px){
+ .book-grid{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
+ .book-card{padding:5px;gap:3px;grid-template-rows:minmax(45px,1fr) auto auto}
+ .book-card-art .unit-portrait.normal{width:54px;max-height:68px}
+ .book-card .book-card-head h3{font-size:11px}.book-card .book-card-head small{font-size:7px}
+ .book-card .book-ingredients{gap:2px}.book-card .book-ingredients span{font-size:7px;padding:1px 2px}
+}
