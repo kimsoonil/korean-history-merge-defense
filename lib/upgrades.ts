@@ -10,7 +10,7 @@ export const maxUpgradeLevel=(kind:UpgradeKind)=>kind==='tier'?TIER_MAX_UPGRADE_
 export const emptyUpgrades=():Upgrades=>({tier:{},role:{},hero:{}});
 export const upgradeOptions={
  tier:[1,2,3,4,5].map(t=>({key:String(t),label:`${t}단계`,baseCost:tierUpgradeTotalCosts[t]/TIER_MAX_UPGRADE_LEVEL})),
- role:[...new Set(units.map(u=>u.role))].map(role=>({key:role,label:role,baseCost:100})),
+ role:[...new Set(units.filter(u=>u.name!=='시민').map(u=>u.role))].map(role=>({key:role,label:role,baseCost:100})),
  hero:units.filter(u=>u.tier===5).map(u=>({key:u.name,label:u.name,baseCost:300})),
 };
 export function readUpgrades(raw:unknown):Upgrades{

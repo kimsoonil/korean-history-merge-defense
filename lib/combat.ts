@@ -3,7 +3,7 @@ import {emptyHeroBuffs,buffDamageMultiplier,type HeroBuffs} from './hero-buffs.t
 import {upgradedAttack,type Upgrades} from './upgrades.ts';
 import {fieldPosition,LANE_RANGE_ALLOWANCE} from './battlefield.ts';
 export function roleStats(tier:number){const t=Math.max(1,Math.min(5,tier));return {support:(5+5*t)/100,mobility:(10+10*t)/100,tactics:(15+5*t)/100,damage:5*t/100,boss:(5+5*t)/100,armorReduction:20*t,stun:t/10,stunChance:(5+5*t)/100,mobilityAura:(10+10*t)/100*.3};}
-export function roleDescription(u:UnitDef){const s=roleStats(u.tier),pct=(n:number)=>Math.round(n*100),armor=`사거리 내 적 방어도 -${s.armorReduction} · 중첩 적용`;return (({지원:`주변 공격속도·공격력 +${pct(s.support)}% · 중첩 적용`,책략:`적 이동속도 -${pct(s.tactics)}% · ${armor}`,전열:`공격 피해 +${pct(s.damage)}% · 공격 시 ${pct(s.stunChance)}% 확률로 ${s.stun}초 스턴`,화포:`공격 피해 +${pct(s.damage)}%`,기동:`자신 공격속도 +${pct(s.mobility)}% · 주변 공격속도 +${pct(s.mobilityAura)}% · 중첩 적용`,수성:`${armor} · 공격 시 ${pct(s.stunChance)}% 확률로 ${s.stun}초 스턴`,수군:`단일 공격 · ${armor}`,군주:`보스 공격 피해 +${pct(s.boss)}%`} as Record<string,string>)[u.role]??'')+(u.tier===5&&['군주','기동'].includes(u.role)?` · ${armor}`:'');}
+export function roleDescription(u:UnitDef){const s=roleStats(u.tier),pct=(n:number)=>Math.round(n*100),armor=`사거리 내 적 방어도 -${s.armorReduction} · 중첩 적용`;return (({만능:'공격하지 않음 · 모든 1단계 조합 재료 대체',지원:`주변 공격속도·공격력 +${pct(s.support)}% · 중첩 적용`,책략:`적 이동속도 -${pct(s.tactics)}% · ${armor}`,전열:`공격 피해 +${pct(s.damage)}% · 공격 시 ${pct(s.stunChance)}% 확률로 ${s.stun}초 스턴`,화포:`공격 피해 +${pct(s.damage)}%`,기동:`자신 공격속도 +${pct(s.mobility)}% · 주변 공격속도 +${pct(s.mobilityAura)}% · 중첩 적용`,수성:`${armor} · 공격 시 ${pct(s.stunChance)}% 확률로 ${s.stun}초 스턴`,수군:`단일 공격 · ${armor}`,군주:`보스 공격 피해 +${pct(s.boss)}%`} as Record<string,string>)[u.role]??'')+(u.tier===5&&['군주','기동'].includes(u.role)?` · ${armor}`:'');}
 export const unitPosition=fieldPosition;
 export const attackRadius=(unit:UnitDef)=>unit.range*8.8+LANE_RANGE_ALLOWANCE;
 const distance=(a:{x:number;y:number},b:{x:number;y:number})=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -26,7 +26,9 @@ export function combatStep(roster:Soldier[],enemies:Enemy[],dt:number,stage:numb
  const hits=new Map<number,number>(),stuns=new Map<number,number>(),shots:{from:{x:number;y:number};to:{x:number;y:number};color:string}[]=[];
  const aliveIds=new Set(roster.map(s=>s.id));for(const id of cooldowns.keys())if(!aliveIds.has(id))cooldowns.delete(id);
  for(const soldier of roster){
-  const u=byName[soldier.name],from=unitPosition(soldier.slot),targets=enemies.filter(e=>distance(from,pathAt(e.progress))<attackRadius(u)).sort((a,b)=>b.progress-a.progress);
+  const u=byName[soldier.name];
+  if(u.damage<=0){cooldowns.set(soldier.id,0);continue;}
+  const from=unitPosition(soldier.slot),targets=enemies.filter(e=>distance(from,pathAt(e.progress))<attackRadius(u)).sort((a,b)=>b.progress-a.progress);
   let cooldown=(cooldowns.get(soldier.id)??0)-dt;
   if(!targets.length){cooldowns.set(soldier.id,Math.max(0,cooldown));continue;}
   const target=targets[0];

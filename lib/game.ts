@@ -11,7 +11,7 @@ import {globalRound,roundBossName} from './rounds.ts';
 import {roadPosition} from './battlefield.ts';
 import {enemyStats,type Difficulty} from './enemy-stats.ts';
 export type UnitDef = { name:string; tier:number; icon:string; role:string; skill:string; damage:number; range:number; rate:number; color:string; recipe?:string[]; portrait?:string; atlas?:{src:string;col:number;row:number} };
-const portraitSlugs:Record<string,string>={창병:'spearman',활병:'archer',수병:'sailor',포수:'gunner',의병:'militia',기병:'cavalry',유생:'scholar'};
+const portraitSlugs:Record<string,string>={창병:'spearman',활병:'archer',수병:'sailor',포수:'gunner',의병:'militia',기병:'cavalry',유생:'scholar',시민:'citizen'};
 const heroSheets=[
  ['서희','온달','최무선','신숭겸','곽재우','김시민','허준','황희'],
  ['선덕여왕','문무왕','최영','정몽주','정약용','사명대사','윤관','태종 이방원'],
@@ -21,7 +21,7 @@ const heroSheets=[
 const heroAtlas=Object.fromEntries(heroSheets.flatMap((names,tier)=>names.map((name,index)=>[name,{src:`/portraits/tier-${tier+2}-atlas.png`,col:index%4,row:Math.floor(index/4)}]))) as Record<string,{src:string;col:number;row:number;standalone?:boolean}>;
 const make=(name:string,tier:number,icon:string,role:string,skill:string,damage:number,range:number,rate:number,color:string,recipe?:string[]):UnitDef=>({name,tier,icon,role,skill,damage,range,rate,color,recipe,portrait:`/portraits/${portraitSlugs[name]??encodeURIComponent(name)}.png`,atlas:heroAtlas[name]});
 export const units:UnitDef[]=[
-make('창병',1,'⚔','전열','긴 창 · 적에게 안정적인 피해',9,2.1,1.0,'#88a987'),make('활병',1,'🏹','원거리','속사 · 먼 적을 공격',7,3.3,1.45,'#b4c68c'),make('수병',1,'⚓','수군','물길 감시 · 강가에서 피해 증가',10,2.8,1.0,'#83b9c7'),make('포수',1,'💥','화포','화약탄 · 묵직한 한 발',17,2.6,.62,'#e8a978'),make('의병',1,'🚩','지원','결의 · 적을 늦추는 공격',6,2.5,1.1,'#d2a778'),make('기병',1,'♞','기동','돌격 · 빠른 공격',11,2.2,1.25,'#a7a6cf'),make('유생',1,'📜','책략','병법 · 아군의 사기를 돋움',5,2.7,1,'#d4c38b'),
+make('창병',1,'⚔','전열','긴 창 · 적에게 안정적인 피해',9,2.1,1.0,'#88a987'),make('활병',1,'🏹','원거리','속사 · 먼 적을 공격',7,3.3,1.45,'#b4c68c'),make('수병',1,'⚓','수군','물길 감시 · 강가에서 피해 증가',10,2.8,1.0,'#83b9c7'),make('포수',1,'💥','화포','화약탄 · 묵직한 한 발',17,2.6,.62,'#e8a978'),make('의병',1,'🚩','지원','결의 · 적을 늦추는 공격',6,2.5,1.1,'#d2a778'),make('기병',1,'♞','기동','돌격 · 빠른 공격',11,2.2,1.25,'#a7a6cf'),make('유생',1,'📜','책략','병법 · 아군의 사기를 돋움',5,2.7,1,'#d4c38b'),make('시민',1,'✦','만능','조합 지원 · 모든 1단계 재료를 대체',0,0,1,'#c7b58d'),
 make('서희',2,'📜','책략','담판 · 적의 방어를 약화',34,3.5,1.2,'#d4c38b',['유생','수병','활병','기병']),make('온달',2,'⚔','전열','용맹 · 전열 강타',43,2.4,1.2,'#88a987',['창병','창병','기병','포수']),make('최무선',2,'💥','화포','화포 · 광역 포격',58,3.4,.8,'#e8a978',['포수','포수','유생','수병']),make('신숭겸',2,'♞','기동','철기 · 연속 돌격',45,2.6,1.3,'#a7a6cf',['기병','기병','창병','수병']),make('곽재우',2,'🚩','지원','홍의 · 적의 진군을 지연',38,3.1,1.2,'#d2a778',['의병','의병','활병','기병']),make('김시민',2,'🏹','수성','진주 수성 · 집중 사격',42,3.5,1.2,'#b4c68c',['포수','활병','활병','창병']),make('허준',2,'✚','지원','의술 · 성벽 수리 지원',24,3.0,1.1,'#83b9c7',['유생','의병','수병','수병']),make('황희',2,'📜','책략','경세 · 전투 보급',33,3.3,1.15,'#d4c38b',['유생','창병','포수','의병']),
 make('선덕여왕',3,'✦','지원','지혜의 등불 · 아군 강화',108,3.9,1.25,'#d7b47c',['서희','허준','유생','활병']),make('문무왕',3,'⚓','수군','동해의 왕 · 물길 제압',125,3.5,1.2,'#83b9c7',['온달','최무선','수병','수병']),make('최영',3,'⚔','전열','황금 보검 · 중갑 파쇄',136,3.0,1.25,'#88a987',['신숭겸','김시민','기병','창병']),make('정몽주',3,'📜','책략','단심가 · 전체 사기 상승',106,4,1.3,'#d4c38b',['서희','황희','유생','포수']),make('정약용',3,'💥','화포','거중기 · 강력한 화포 지원',144,4.0,1,'#e8a978',['최무선','황희','포수','수병']),make('사명대사',3,'✚','지원','승병 · 적군 둔화',110,3.6,1.25,'#d2a778',['곽재우','허준','의병','창병']),make('윤관',3,'♞','기동','별무반 · 기병 저지',132,3.4,1.3,'#a7a6cf',['신숭겸','온달','기병','활병']),make('태종 이방원',3,'♛','군주','왕권 · 공격 지휘',119,3.7,1.25,'#d7b47c',['곽재우','김시민','의병','포수']),
 make('연개소문',4,'⚔','전열','막리지 · 적진 섬멸',345,3.8,1.35,'#88a987',['문무왕','최영','온달','창병']),make('김춘추',4,'✦','책략','외교전 · 전장 통솔',315,4.3,1.35,'#d7b47c',['선덕여왕','정몽주','서희','유생']),make('대조영',4,'♞','기동','발해의 기상 · 광역 돌격',370,4.1,1.3,'#a7a6cf',['윤관','태종 이방원','신숭겸','기병','활병']),make('왕건',4,'♛','군주','개국 · 전군 사기 상승',325,4.2,1.35,'#d7b47c',['태종 이방원','사명대사','황희','수병']),make('강감찬',4,'✦','책략','귀주 · 대규모 책략 공격',360,4.6,1.2,'#d4c38b',['윤관','정몽주','허준','활병']),make('권율',4,'🚩','수성','행주 · 밀집 적군 제압',385,4.2,1.15,'#d2a778',['최영','사명대사','곽재우','포수']),make('계백',4,'⚔','전열','결사 · 단일 대상 강타',410,3.5,1.2,'#88a987',['선덕여왕','정약용','김시민','창병','의병']),make('장보고',4,'⚓','수군','청해진 · 강가 광역 공격',380,4.3,1.15,'#83b9c7',['문무왕','정약용','최무선','수병','포수']),
@@ -33,7 +33,8 @@ for(const unit of units)if(unit.role==='수군'){
  unit.skill='해상 제압 · 단일 공격과 방어도 감소';
 }
 export const byName=Object.fromEntries(units.map(u=>[u.name,u])) as Record<string,UnitDef>;
-export const basics=units.filter(u=>u.tier===1);
+// Citizens are boss-only wildcard materials and never enter the normal recruit pool.
+export const basics=units.filter(u=>u.tier===1&&u.name!=='시민');
 export const recipes=units.filter(u=>!!u.recipe);
 export type Soldier={id:number; name:string; slot:number};
 export type Enemy={id:number; name:string; hp:number; maxHp:number; progress:number; speed:number; boss:boolean; reward:number; originStage:number;originRound?:number;chapter?:ChapterId;bossSeconds?:number;armor?:number;stunSeconds?:number};
@@ -41,7 +42,7 @@ export const waveNames=chapterOneBattles.map(battle=>battle.name);
 export const enemyNames=['수나라 보병','수나라 창병','수나라 궁병','수나라 기병','수나라 공성병','수나라 정예군'];
 export const enemyPortraits=Object.fromEntries([...enemyNames,'수양제'].map((name,index)=>[name,{src:'/portraits/sui-enemies-atlas.png',col:index%4,row:Math.floor(index/4)}])) as Record<string,{src:string;col:number;row:number;standalone?:boolean}>;
 export function createInvader(stage:number,index:number,id:number):Enemy{const level=waveCombatLevel(stage),boss=stage===FINAL_WAVE&&index===0,regularHp=55+level*38+(index%4)*18,hp=boss?(55+level*38+3*18)*10:regularHp;return {id,name:boss?'수양제':enemyNames[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))],hp,maxHp:hp,progress:0,speed:boss?.025:.043+(index%4)*.003,reward:boss?850:11+level*2,boss,originStage:stage}}
-export function recipeStatus(recipe:string[],owned:Soldier[]){const pool=[...owned]; return recipe.map(n=>{const i=pool.findIndex(s=>s.name===n);if(i<0)return false;pool.splice(i,1);return true})}
+export function recipeStatus(recipe:string[],owned:Soldier[]){const pool=[...owned]; return recipe.map(n=>{let i=pool.findIndex(s=>s.name===n);if(i<0&&byName[n]?.tier===1)i=pool.findIndex(s=>s.name==='시민');if(i<0)return false;pool.splice(i,1);return true})}
 // The general deliberately reuses an enlarged elite soldier, rather than the emperor art.
 enemyPortraits['수나라 장군']=enemyPortraits['수나라 정예군'];
 for(const name of ['수나라 선봉장','수나라 공성대장','우문술','내호아','우중문','우중문 & 우문술'])enemyPortraits[name]=enemyPortraits['수나라 정예군'];

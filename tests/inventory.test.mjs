@@ -48,6 +48,21 @@ test('missing materials do not mutate field or bag',()=>{
  assert.equal(combineInventory(hero,roster,bag,100).ok,false);
  assert.equal(roster.length,1);assert.deepEqual(bag,{});
 });
+test('citizens replace only missing tier-one recipe ingredients',()=>{
+ const hero=byName.온달;
+ const bag={창병:1,시민:1,기병:1,포수:1};
+ assert.deepEqual(inventoryRecipeStatus(hero.recipe,[],bag),[true,true,true,true]);
+ const result=combineInventory(hero,[],bag,100);
+ assert.equal(result.ok,true);assert.equal(result.roster[0].name,'온달');
+ assert.equal(result.bag.시민,0);
+ const tierThree=byName.선덕여왕;
+ assert.equal(inventoryRecipeStatus(tierThree.recipe,[],{시민:1,허준:1,유생:1,활병:1})[0],false);
+ assert.equal(combineInventory(tierThree,[],{시민:1,허준:1,유생:1,활병:1},101).ok,false);
+});
+test('an exact tier-one material is consumed before a citizen wildcard',()=>{
+ const status=inventoryRecipeStatus(['창병','창병'],[],{창병:1,시민:1});
+ assert.deepEqual(status,[true,true]);
+});
 test('deposit by tier preserves legends and groups copies',()=>{
  const result=storeUnits([...field,{id:30,name:'이순신',slot:30}],{},1);
  assert.equal(result.bag.창병,25);assert.equal(result.roster.length,1);
@@ -73,7 +88,7 @@ test('legacy overflow is preserved in bag, keeping legends deployed',()=>{
  assert.equal(Object.values(result.bag).reduce((a,b)=>a+b,0),17);
 });
 test('bag saves round trip and reject invalid quantities and tier five',()=>{
- const state={roster:[],bag:{창병:7},enemies:[],gold:400,wall:10,stage:1,round:1,phase:'ready',spawned:0,speed:1,remainingMs:30000};
+ const state={roster:[],bag:{창병:7,시민:3},enemies:[],gold:400,wall:10,stage:1,round:1,phase:'ready',spawned:0,speed:1,remainingMs:30000};
  const save=makeGameSave(state,1);assert.deepEqual(readGameSave(JSON.stringify(save)),save);
  for(const bag of [{이순신:1},{창병:-1},{창병:1.5},{unknown:1}]){assert.equal(validBag(bag),false);assert.equal(readGameSave(JSON.stringify({...save,bag})),null);}
 });

@@ -4,16 +4,22 @@ export const DEPLOY_LIMIT=25;
 export type Bag=Record<string,number>;
 export function inventoryRecipeStatus(recipe:string[],roster:Soldier[],bag:Bag){
  const counts={...bag};for(const u of roster)counts[u.name]=(counts[u.name]??0)+1;
- return recipe.map(name=>{if(!(counts[name]>0))return false;counts[name]--;return true;});
+ return recipe.map(name=>{
+  if(counts[name]>0){counts[name]--;return true;}
+  if(byName[name]?.tier===1&&counts.시민>0){counts.시민--;return true;}
+  return false;
+ });
 }
 export function combineInventory(unit:UnitDef,roster:Soldier[],bag:Bag,id:number){
  if(!unit.recipe?.length)return {ok:false as const,reason:'materials' as const};
  const field=[...roster],next={...bag};let preferredSlot:number|undefined;
  // Consume deployed ingredients first so their position can hold the new hero.
  for(const name of unit.recipe){
-  const index=field.findIndex(u=>u.name===name);
+  let index=field.findIndex(u=>u.name===name);
   if(index>=0){const [used]=field.splice(index,1);preferredSlot??=used.slot;}
   else if(next[name]>0)next[name]--;
+  else if(byName[name]?.tier===1&&(index=field.findIndex(u=>u.name==='시민'))>=0){const [used]=field.splice(index,1);preferredSlot??=used.slot;}
+  else if(byName[name]?.tier===1&&next.시민>0)next.시민--;
   else return {ok:false as const,reason:'materials' as const};
  }
  if(field.length>=DEPLOY_LIMIT){
