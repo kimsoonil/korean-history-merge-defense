@@ -56,8 +56,9 @@ test('battle gambling UI exposes only success and failure result labels',()=>{
  assert.doesNotMatch(dialog,/대실패|소실패|본전|중박|대박/);
  assert.doesNotMatch(dialog,/도전하기/);
  assert.match(dialog,/도박하기/);
- assert.match(styles,/grid-template-columns:28px minmax\(0,1fr\) 180px/);
- assert.match(styles,/\.gamble-grid article>button\{[^}]*width:180px/);
+ assert.match(styles,/min-height:60px/);
+ assert.match(styles,/grid-template-columns:28px minmax\(0,1fr\) 150px/);
+ assert.match(styles,/\.gamble-grid article>button\{[^}]*width:150px;height:30px;border-radius:8px/);
  assert.doesNotMatch(page,/summary\.category/);
  assert.match(page,/success=summary\.net>=0/);
  assert.doesNotMatch(goldHandler,/setGambleOpen\(false\)/);
