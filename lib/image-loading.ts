@@ -13,5 +13,6 @@ export function createImageCache(loader:ImageLoader){
   entry.listeners.add(listener);
   return()=>{entry.listeners.delete(listener);};
  };
- return {status,subscribe};
+ const preload=(src:string)=>{if(!src||entries.has(src))return;const unsubscribe=subscribe(src,()=>{});unsubscribe();};
+ return {status,subscribe,preload};
 }

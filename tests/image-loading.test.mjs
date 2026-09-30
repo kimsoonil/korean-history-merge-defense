@@ -16,3 +16,10 @@ test('failed images stop spinning instead of showing a substitute character',asy
  const cache=createImageCache(()=>Promise.reject(new Error('404')));let updates=0;
  cache.subscribe('missing',()=>updates++);await tick();assert.equal(cache.status('missing'),'error');assert.equal(updates,1);
 });
+test('preloading starts one shared request before a popup subscribes',async()=>{
+ let requests=0;
+ const cache=createImageCache(()=>{requests++;return Promise.resolve();});
+ cache.preload('hero-atlas');cache.preload('hero-atlas');await tick();
+ assert.equal(requests,1);assert.equal(cache.status('hero-atlas'),'ready');
+ cache.subscribe('hero-atlas',()=>{});await tick();assert.equal(requests,1);
+});

@@ -1,5 +1,5 @@
 'use client';
-import LoadingImage,{LoadingBackground,useImageStatus,ImageLoadingIndicator} from './LoadingImage';
+import LoadingImage,{LoadingBackground,useImageStatus,ImageLoadingIndicator,preloadImages} from './LoadingImage';
 
 import {useEffect,useRef,useState} from 'react';
 import {Backpack,BookOpen,Clock3,Coins,Dices,Heart,Home,Images,RotateCcw,ShoppingBag,SkipForward,Sparkles,Ticket,Play,X} from 'lucide-react';
@@ -64,7 +64,7 @@ type AttackEffect={id:number;fromX:number;fromY:number;toX:number;toY:number;col
 const MAX_UNITS=40, START_GOLD=400, STAGE_SECONDS=30;
 function Portrait({u,size='normal'}:{u:UnitDef;size?:'tiny'|'normal'|'large'}){
  const atlas=u.atlas,src=atlas?.src??u.portrait??'',status=useImageStatus(src);
- return <span className={`unit-portrait ${size} ${status==='ready'?'is-loaded':''}`} style={{'--unit-color':u.color} as React.CSSProperties}>
+ return <span className={`unit-portrait ${size} ${status==='ready'?'is-loaded':status==='error'?'is-error':''}`} style={{'--unit-color':u.color} as React.CSSProperties}>
  {atlas?<svg className="atlas-viewport" viewBox="0 0 384 512" preserveAspectRatio="xMidYMid meet" aria-hidden="true" style={{visibility:status==='ready'?'visible':'hidden'}}><svg width="384" height="512" viewBox={`${atlas.col*384} ${atlas.row*512} 384 512`} overflow="hidden"><image href={src} width="1536" height="1024"/></svg></svg>:<img src={src} alt="" style={{visibility:status==='ready'?'visible':'hidden'}}/>}
  <ImageLoadingIndicator status={status}/></span>;
 }
@@ -79,6 +79,13 @@ export default function Game(){
  const writeStored=(key:string,value:string)=>{if(storageScope)writeAccountItem(localStorage,storageScope,key,value);};
  const removeStored=(key:string)=>{if(storageScope)removeAccountItem(localStorage,storageScope,key);};
  const [chapter,setChapter]=useState<ChapterId>(1);
+ useEffect(()=>{
+  const timer=window.setTimeout(()=>preloadImages([
+   ...Object.values(enemyPortraits).map(image=>image.src),
+   ...Object.values(byName).filter(unit=>unit.tier>=2).map(unit=>unit.atlas?.src??unit.portrait??'').filter(Boolean)
+  ]),500);
+  return()=>window.clearTimeout(timer);
+ },[]);
  const [salsuCleared,setSalsuCleared]=useState(0),[ansiCleared,setAnsiCleared]=useState(0),[hwangsanCleared,setHwangsanCleared]=useState(0),[nadangCleared,setNadangCleared]=useState(0),[gwijuCleared,setGwijuCleared]=useState(0),[cheoinCleared,setCheoinCleared]=useState(0),[hansandoCleared,setHansandoCleared]=useState(0),[haengjuCleared,setHaengjuCleared]=useState(0),[myeongnyangCleared,setMyeongnyangCleared]=useState(0);
  const canEnterChapter=(id:ChapterId)=>chapterUnlocked(id,salsuCleared,ansiCleared,hwangsanCleared,nadangCleared,gwijuCleared,cheoinCleared,hansandoCleared,haengjuCleared,myeongnyangCleared);
  const [difficulty,setDifficulty]=useState<Difficulty>('normal'),[pendingDifficulty,setPendingDifficulty]=useState<Difficulty>('normal'),[bannedHeroes,setBannedHeroes]=useState<string[]>([]),[hardCleared,setHardCleared]=useState(0);
