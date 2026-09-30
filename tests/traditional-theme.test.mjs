@@ -2,12 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
-test('byeok-led ogansaek palette is loaded last across the full interface',()=>{
+test('fortress charcoal, hanji, pine and dancheong palette is loaded last',()=>{
  const css=readFileSync(new URL('../app/traditional-theme.css',import.meta.url),'utf8');
  const layout=readFileSync(new URL('../app/layout.tsx',import.meta.url),'utf8');
- for(const variable of ['--trad-byeok:#68aab8','--trad-byeok-deep:#356f7b','--trad-byeok-pale:#e3f1f1','--trad-jade:#5f806b','--trad-red:#b85f68','--trad-purple:#765574','--trad-yellow:#a8864d'])assert.match(css,new RegExp(variable));
+ for(const variable of ['--trad-ink:#242829','--trad-panel:#323738','--trad-wood:#6b5a43','--trad-paper:#e8deca','--trad-jade:#327b52','--trad-red:#b74938'])assert.match(css,new RegExp(variable));
  assert.match(css,/color-scheme:light/);
- assert.match(css,/Ogansaek skin: byeok blue leads/);
+ assert.match(css,/Fortress skin: roof-tile charcoal/);
  assert.match(css,/\.game-header/);
  assert.match(css,/\.music-controls/);
  assert.match(css,/\.game-actions/);
@@ -19,7 +19,7 @@ test('byeok-led ogansaek palette is loaded last across the full interface',()=>{
  assert.match(css,/\.stage-map-screen/);
  assert.match(css,/\.region-mode button\.active\{background:var\(--trad-jade\)/);
  assert.match(css,/\.hard-preview \.region-mode button\.active\{background:var\(--trad-red\)/);
- assert.match(css,/\.book-tabs button\.active,[^{]+\{background:var\(--trad-byeok-deep\)/);
- assert.match(css,/\.gamble-grid article>button,[^{]+\{background:var\(--trad-purple\)/);
+ assert.match(css,/\.book-tabs button\.active,[^{]+\{background:var\(--trad-jade\)/);
+ assert.match(css,/\.gamble-grid article>button,[^{]+\{background:#655640/);
  assert.ok(layout.lastIndexOf("import './traditional-theme.css'")>layout.lastIndexOf("import './bottom-sheets.css'"));
 });
