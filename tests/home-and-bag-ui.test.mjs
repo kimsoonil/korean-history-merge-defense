@@ -10,6 +10,8 @@ test('battle settings keep profile, codex and account access after the home menu
  assert.match(settings,/프로필 변경/);
  assert.match(settings,/로그아웃/);
  assert.match(settings,/SNS 로그인/);
+ assert.doesNotMatch(settings,/첫 화면으로/);
+ assert.doesNotMatch(settings,/onHome/);
 });
 
 test('unit bag uses a themed auto-store check and omits explanatory copy',()=>{
