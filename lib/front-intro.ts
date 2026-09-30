@@ -5,6 +5,7 @@ import {frontForStage} from './campaign.ts';
 export function frontIntro(stage:number,chapter:ChapterId=1){
  const front=frontForStage(stage,chapter);
  if(chapter===10)return {title:'1598년'+' · '+front.name,lines:[front.intro],speaker:'이순신',text:front.dialogue};
+ if(chapter===9)return {title:'1597년 · '+front.name,lines:[front.intro],speaker:'이순신',text:front.dialogue};
  if(chapter===8)return {title:'1593년 · '+front.name,lines:[front.intro],speaker:'권율',text:front.dialogue};
  if(chapter===7)return {title:'1592년 · '+front.name,lines:[front.intro],speaker:'이순신',text:front.dialogue};
  if(chapter===6)return {title:'1232년 · '+front.name,lines:[front.intro],speaker:'김윤후',text:front.dialogue};

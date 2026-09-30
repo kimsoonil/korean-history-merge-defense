@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useRef} from 'react';
-export default function StageClearPopup({stage,rounds,onMap,onHome,chapter=1}:{chapter?:1|2|3|4|5|6|7|8|10;stage:number;rounds:number;onMap:()=>void;onHome:()=>void}){
+export default function StageClearPopup({stage,rounds,onMap,onHome,chapter=1}:{chapter?:1|2|3|4|5|6|7|8|9|10;stage:number;rounds:number;onMap:()=>void;onHome:()=>void}){
  const root=useRef<HTMLElement>(null);
  useEffect(()=>{root.current?.querySelector('button')?.focus();},[]);
  return <div className="overlay-shade result-shade"><section ref={root} className="result-modal won" role="dialog" aria-modal="true" aria-labelledby="stage-clear-title" onKeyDown={event=>{

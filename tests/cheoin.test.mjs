@@ -16,7 +16,7 @@ test('Cheoin requires previous five normal chapters and has independent progress
  for(let i=0;i<5;i++){const progress=[10,10,10,10,10];progress[i]=9;assert.equal(chapterUnlocked(6,...progress),false);}
  assert.equal(chapterUnlocked(7,10,10,10,10,10),false);
  assert.equal(new Set([1,2,3,4,5,6].flatMap(c=>[progressKey(c),progressKey(c,true)])).size,12);
- assert.ok(storyChapters[5].available);assert.equal(storyChapters[8].available,false);
+ assert.ok(storyChapters[5].available);assert.ok(storyChapters[8].available);
  assert.ok(existsSync(new URL('../public'+CHEOIN_IMAGE,import.meta.url)));
  assert.match(cheoinArrival(0,'홍길동').text,/홍길동/);assert.equal(cheoinArrival(5,'홍길동'),undefined);
 });

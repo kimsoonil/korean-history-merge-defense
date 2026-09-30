@@ -16,7 +16,7 @@ test('Gwiju requires all four earlier normal chapters, independent progress keys
  for(let i=0;i<4;i++){const progress=[10,10,10,10];progress[i]=9;assert.equal(chapterUnlocked(5,...progress),false);}
  assert.equal(chapterUnlocked(6,10,10,10,10),false);
  assert.equal(new Set([1,2,3,4,5].flatMap(c=>[progressKey(c),progressKey(c,true)])).size,10);
- assert.ok(storyChapters[4].available);assert.equal(storyChapters[8].available,false);
+ assert.ok(storyChapters[4].available);assert.ok(storyChapters[8].available);
  assert.ok(existsSync(new URL('../public'+GWIJU_IMAGE,import.meta.url)));
  assert.match(gwijuArrival(0,'홍길동').text,/홍길동/);assert.equal(gwijuArrival(5,'홍길동'),undefined);
 });

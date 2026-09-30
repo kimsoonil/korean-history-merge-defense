@@ -1,4 +1,5 @@
 import {noryangEnemyNames} from './noryang.ts';
+import {myeongnyangEnemyNames} from './myeongnyang.ts';
 import {haengjuEnemyNames} from './haengju.ts';
 import {hansandoEnemyNames} from './hansando.ts';
 import {cheoinEnemyNames} from './cheoin.ts';
@@ -99,9 +100,9 @@ export function readGameSave(raw:string|null):GameSave|null{
       // Do not resume the replaced siege scenario as a naval campaign.
       // Other chapters and the old campaign storage keys are left untouched.
       if(value.chapter===10&&value.chapterScenario!=='noryang')return null;
-      if(value.chapter!==undefined&&value.chapter!==1&&value.chapter!==2&&value.chapter!==3&&value.chapter!==4&&value.chapter!==5&&value.chapter!==6&&value.chapter!==7&&value.chapter!==8&&value.chapter!==10)return null;
+      if(value.chapter!==undefined&&value.chapter!==1&&value.chapter!==2&&value.chapter!==3&&value.chapter!==4&&value.chapter!==5&&value.chapter!==6&&value.chapter!==7&&value.chapter!==8&&value.chapter!==9&&value.chapter!==10)return null;
       if(value.difficulty!==undefined&&!['normal','hard'].includes(String(value.difficulty)))return null;
-      if(value.difficulty==='hard'&&!validBannedHeroes(value.bannedHeroes,value.chapter===10?10:value.chapter===8?8:value.chapter===7?7:value.chapter===6?6:value.chapter===5?5:value.chapter===4?4:value.chapter===3?3:value.chapter===2?2:1))return null;
+      if(value.difficulty==='hard'&&!validBannedHeroes(value.bannedHeroes,value.chapter===10?10:value.chapter===9?9:value.chapter===8?8:value.chapter===7?7:value.chapter===6?6:value.chapter===5?5:value.chapter===4?4:value.chapter===3?3:value.chapter===2?2:1))return null;
       if(value.difficulty!=='hard'&&value.bannedHeroes!==undefined&&(!Array.isArray(value.bannedHeroes)||value.bannedHeroes.length))return null;
     }
     if(record(value)&&(value.version===1||value.version===2)){
@@ -146,7 +147,7 @@ export function readGameSave(raw:string|null):GameSave|null{
     for(const enemy of value.enemies){
       if(!record(enemy)||!integer(enemy.id,1,Number.MAX_SAFE_INTEGER-1)||ids.has(enemy.id)||typeof enemy.name!=='string'||!Object.hasOwn(enemyPortraits,enemy.name))return null;
       if(!number(enemy.maxHp,1,1000000)||!number(enemy.hp,Number.MIN_VALUE,enemy.maxHp)||!number(enemy.progress,0,1-Number.EPSILON)||!number(enemy.speed,0.001,1)||!integer(enemy.reward,0,10000)||enemy.originStage!==value.stage||typeof enemy.boss!=='boolean')return null;
-      if(enemy.boss!==(!['수나라 보병','수나라 창병','수나라 궁병','수나라 기병','수나라 공성병','수나라 정예군',...ansiEnemyNames,...hwangsanEnemyNames,...nadangEnemyNames,...gwijuEnemyNames,...cheoinEnemyNames,...hansandoEnemyNames,...haengjuEnemyNames,...noryangEnemyNames].includes(enemy.name))||enemy.boss&&!Array.from({length:value.round},(_,i)=>roundBossName(Number(value.stage),i+1,value.chapter===10?10:value.chapter===8?8:value.chapter===7?7:value.chapter===6?6:value.chapter===5?5:value.chapter===4?4:value.chapter===3?3:value.chapter===2?2:1)).includes(enemy.name))return null;
+      if(enemy.boss!==(!['수나라 보병','수나라 창병','수나라 궁병','수나라 기병','수나라 공성병','수나라 정예군',...ansiEnemyNames,...hwangsanEnemyNames,...nadangEnemyNames,...gwijuEnemyNames,...cheoinEnemyNames,...hansandoEnemyNames,...haengjuEnemyNames,...myeongnyangEnemyNames,...noryangEnemyNames].includes(enemy.name))||enemy.boss&&!Array.from({length:value.round},(_,i)=>roundBossName(Number(value.stage),i+1,value.chapter===10?10:value.chapter===9?9:value.chapter===8?8:value.chapter===7?7:value.chapter===6?6:value.chapter===5?5:value.chapter===4?4:value.chapter===3?3:value.chapter===2?2:1)).includes(enemy.name))return null;
       if(enemy.boss)bosses++;
       ids.add(enemy.id);
     }

@@ -1,4 +1,5 @@
 import {noryangBossQuotes} from './noryang.ts';
+import {myeongnyangBossQuotes} from './myeongnyang.ts';
 import {haengjuBossQuotes} from './haengju.ts';
 import {hansandoBossQuotes} from './hansando.ts';
 import {cheoinBossQuotes} from './cheoin.ts';
@@ -15,7 +16,7 @@ export const umunsulName='우문술';
 export const naehoaName='내호아';
 export const ujungmunName='우중문';
 export function bossLine(name:string,stage:number,defeated=false,chapter:ChapterId=1):BossLine|null{
- if(chapter!==1){const quotes=(chapter===10?noryangBossQuotes:chapter===8?haengjuBossQuotes:chapter===7?hansandoBossQuotes:chapter===6?cheoinBossQuotes:chapter===5?gwijuBossQuotes:chapter===4?nadangBossQuotes:chapter===3?hwangsanBossQuotes:ansiBossQuotes)[name];return quotes?{title:defeated?name+' 격퇴':name+' 출현',speaker:name,text:quotes[defeated?1:0],defeated}:null;}
+ if(chapter!==1){const quotes=(chapter===10?noryangBossQuotes:chapter===9?myeongnyangBossQuotes:chapter===8?haengjuBossQuotes:chapter===7?hansandoBossQuotes:chapter===6?cheoinBossQuotes:chapter===5?gwijuBossQuotes:chapter===4?nadangBossQuotes:chapter===3?hwangsanBossQuotes:ansiBossQuotes)[name];return quotes?{title:defeated?name+' 격퇴':name+' 출현',speaker:name,text:quotes[defeated?1:0],defeated}:null;}
  const front=frontForStage(stage);
  const target=front.id==='emperor'?'고구려군의 최후 방어선':front.name;
  if(name==='수양제')return {title:defeated?'최종 클리어':'65라운드 · ★수 양제 (본대 최종 병기)★',speaker:'수 양제',defeated,text:defeated?'30만 대군을 보냈거늘... 겨우 2,700명만 살아 돌아왔다고?! 내 나라가, 내 위대한 수나라가 고작 고구려 따위에게 이렇게 무너진단 말이냐아악!':'감히 고구려 놈들이 내 위대한 수나라를 모욕하느냐! 천자의 분노를 보여주마, 모두 비켜라!'};
@@ -28,7 +29,7 @@ export function bossLine(name:string,stage:number,defeated=false,chapter:Chapter
  return null;
 }
 export function defeatedDialogueBoss(enemies:{id:number;name:string;boss:boolean;hp:number}[],hits:Map<number,number>){
- return enemies.find(e=>e.boss&&[vanguardName,siegeName,umunsulName,naehoaName,ujungmunName,remnantName,...Object.keys(noryangBossQuotes).filter(n=>n!=='시마즈 요시히로'),...Object.keys(haengjuBossQuotes).filter(n=>n!=='우키타 히데이에'),...Object.keys(hansandoBossQuotes).filter(n=>n!=='와키자카 야스하루'),...Object.keys(cheoinBossQuotes).filter(n=>n!=='살리타'),...Object.keys(gwijuBossQuotes).filter(n=>n!=='소배압'),...Object.keys(nadangBossQuotes).filter(n=>n!=='설인귀'),...Object.keys(hwangsanBossQuotes).filter(n=>n!=='계백'),...Object.keys(ansiBossQuotes).filter(n=>n!=='당 태종')].includes(e.name)&&e.hp>0&&e.hp<=(hits.get(e.id)??0));
+ return enemies.find(e=>e.boss&&[vanguardName,siegeName,umunsulName,naehoaName,ujungmunName,remnantName,...Object.keys(noryangBossQuotes).filter(n=>n!=='시마즈 요시히로'),...Object.keys(myeongnyangBossQuotes).filter(n=>n!=='구루시마 미치후사'),...Object.keys(haengjuBossQuotes).filter(n=>n!=='우키타 히데이에'),...Object.keys(hansandoBossQuotes).filter(n=>n!=='와키자카 야스하루'),...Object.keys(cheoinBossQuotes).filter(n=>n!=='살리타'),...Object.keys(gwijuBossQuotes).filter(n=>n!=='소배압'),...Object.keys(nadangBossQuotes).filter(n=>n!=='설인귀'),...Object.keys(hwangsanBossQuotes).filter(n=>n!=='계백'),...Object.keys(ansiBossQuotes).filter(n=>n!=='당 태종')].includes(e.name)&&e.hp>0&&e.hp<=(hits.get(e.id)??0));
 }
 export const vanguardName='수나라 선봉장';
 export const vanguardArrival='고구려 놈들! 내가 이 요새를 뚫고 수양제님께 요동성을 바치겠다!';

@@ -9,4 +9,4 @@ export const storyChapters=[
  {title:'행주대첩',year:'1593년',image:'/story/chapters/haengju.png'},
  {title:'명량대첩',year:'1597년',image:'/story/chapters/myeongnyang.png'},
  {title:'노량해전',year:'1598년',image:'/story/chapters/noryang.png'},
-].map((chapter,index)=>({...chapter,id:index+1,available:index<=7||index===9}));
+].map((chapter,index)=>({...chapter,id:index+1,available:true}));

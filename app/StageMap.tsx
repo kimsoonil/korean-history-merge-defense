@@ -31,7 +31,7 @@ export default function StageMap({onBack,onStart,blocked,onModalChange,highestCl
  const front=selected===null?null:battleFronts[selected];
  return <main className={`stage-map-screen front-selection ${hard?'hard-preview':''}`} inert={blocked}>
   <div className="front-selection-shell" inert={selected!==null}>
-   <header className="region-heading"><button onClick={onBack} aria-label="초기 화면으로"><ChevronLeft size={22}/></button><h1>{chapter===10?'노량해전':chapter===8?'행주대첩':chapter===7?'한산도대첩':chapter===6?'처인성 전투':chapter===5?'귀주대첩':chapter===4?'나당전쟁':chapter===3?'황산벌 전투':chapter===2?'안시성 전투':'살수대첩'} · 지역 선택</h1><span>{progress} / 10</span></header>
+   <header className="region-heading"><button onClick={onBack} aria-label="초기 화면으로"><ChevronLeft size={22}/></button><h1>{chapter===10?'노량해전':chapter===9?'명량대첩':chapter===8?'행주대첩':chapter===7?'한산도대첩':chapter===6?'처인성 전투':chapter===5?'귀주대첩':chapter===4?'나당전쟁':chapter===3?'황산벌 전투':chapter===2?'안시성 전투':'살수대첩'} · 지역 선택</h1><span>{progress} / 10</span></header>
    <div className="region-mode" aria-label="난이도"><button className={!hard?'active':''} aria-pressed={!hard} onClick={()=>setHard(false)}>일반</button><button className={hard?'active':''} aria-pressed={hard} onClick={()=>setHard(true)} aria-describedby="hard-status"><Lock size={14}/> 하드</button><small id="hard-status">{highestClearedWave>=10?'하드 · 무작위 5단계 영웅 3명 조합 금지':'하드 미리보기 · 일반 10스테이지 클리어 후 개방 예정'}</small></div>
    <div className="region-viewport" ref={view} tabIndex={0} aria-label="좌우로 스크롤하여 지역 선택" onKeyDown={e=>{if(e.target!==e.currentTarget)return;if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();e.currentTarget.scrollBy({left:e.key==='ArrowRight'?320:-320,behavior:'smooth'});}}}>
     <div className="region-world" style={canvas}>

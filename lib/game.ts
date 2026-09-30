@@ -1,4 +1,5 @@
 import {noryangEnemyNames,noryangBossNames} from './noryang.ts';
+import {myeongnyangEnemyNames,myeongnyangBossNames} from './myeongnyang.ts';
 import {haengjuEnemyNames,haengjuBossNames} from './haengju.ts';
 import {hansandoEnemyNames,hansandoBossNames} from './hansando.ts';
 import {cheoinEnemyNames,cheoinBossNames} from './cheoin.ts';
@@ -58,13 +59,14 @@ for(const [index,name] of cheoinEnemyNames.entries())enemyPortraits[name]={src:'
 for(const name of [...Object.values(cheoinBossNames),'몽골 장군'])enemyPortraits[name]=enemyPortraits['수나라 정예군'];
 for(const name of [...hansandoEnemyNames,...Object.values(hansandoBossNames),'일본 수군장'])enemyPortraits[name]={src:'/portraits/hansando-ship.png',col:0,row:0,standalone:true};
 for(const name of [...haengjuEnemyNames,...Object.values(haengjuBossNames),'일본군 장군'])enemyPortraits[name]={src:'/portraits/haengju-infantry.png',col:0,row:0,standalone:true};
+for(const name of [...myeongnyangEnemyNames,...Object.values(myeongnyangBossNames),'명량 일본 함장'])enemyPortraits[name]={src:'/portraits/hansando-ship.png',col:0,row:0,standalone:true};
 for(const name of noryangEnemyNames)enemyPortraits[name]={src:'/portraits/hansando-ship.png',col:0,row:0,standalone:true};
 for(const name of [...Object.values(noryangBossNames),'노량 일본 함장'])enemyPortraits[name]={src:'/portraits/hansando-ship.png',col:0,row:0,standalone:true};
 export function createRoundInvader(stage:number,round:number,index:number,id:number,difficulty:Difficulty='normal',chapter:ChapterId=1):Enemy{
  const bossName=index===0?roundBossName(stage,round,chapter):null;
  const level=Math.ceil(globalRound(stage,round)/5);
- const {hp,armor}=enemyStats(round,index,!!bossName,(bossName==='수양제'||bossName==='당 태종'||bossName==='계백'||bossName==='설인귀'||bossName==='소배압'||bossName==='살리타'||bossName==='와키자카 야스하루'||bossName==='우키타 히데이에'||bossName==='시마즈 요시히로'),difficulty);
- return {id,chapter,name:bossName??(chapter===10?noryangEnemyNames:chapter===8?haengjuEnemyNames:chapter===7?hansandoEnemyNames:chapter===6?cheoinEnemyNames:chapter===5?gwijuEnemyNames:chapter===4?nadangEnemyNames:chapter===3?hwangsanEnemyNames:chapter===2?ansiEnemyNames:enemyNames)[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))],hp,maxHp:hp,armor,progress:0,speed:bossName?.025:.043+(index%4)*.003,reward:bossName?30*round:difficulty==='hard'?15:20,boss:!!bossName,originStage:stage,originRound:round};
+ const {hp,armor}=enemyStats(round,index,!!bossName,(bossName==='수양제'||bossName==='당 태종'||bossName==='계백'||bossName==='설인귀'||bossName==='소배압'||bossName==='살리타'||bossName==='와키자카 야스하루'||bossName==='우키타 히데이에'||bossName==='구루시마 미치후사'||bossName==='시마즈 요시히로'),difficulty);
+ return {id,chapter,name:bossName??(chapter===10?noryangEnemyNames:chapter===9?myeongnyangEnemyNames:chapter===8?haengjuEnemyNames:chapter===7?hansandoEnemyNames:chapter===6?cheoinEnemyNames:chapter===5?gwijuEnemyNames:chapter===4?nadangEnemyNames:chapter===3?hwangsanEnemyNames:chapter===2?ansiEnemyNames:enemyNames)[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))],hp,maxHp:hp,armor,progress:0,speed:bossName?.025:.043+(index%4)*.003,reward:bossName?30*round:difficulty==='hard'?15:20,boss:!!bossName,originStage:stage,originRound:round};
 }
 // The invaders make one complete lap around the square unit field.
 export const pathAt=roadPosition;

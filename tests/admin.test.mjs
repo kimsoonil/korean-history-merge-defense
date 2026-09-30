@@ -23,5 +23,5 @@ test('administrator profile always skips onboarding and uses the administrator n
  const existing={version:1,nickname:'기존이름',prologueComplete:false,avatar:'세종대왕',hardClearReward:true,title:'salsu',frame:'crimson'};
  assert.deepEqual(adminPlayerProfile(existing),{...existing,nickname:ADMIN_NICKNAME,prologueComplete:true,tutorialComplete:true});
  assert.deepEqual(adminPlayerProfile(null),{version:1,nickname:'관리자',prologueComplete:true,tutorialComplete:true});
- assert.deepEqual(ADMIN_CHAPTERS,[1,2,3,4,5,6,7,8,10]);
+ assert.deepEqual(ADMIN_CHAPTERS,[1,2,3,4,5,6,7,8,9,10]);
 });

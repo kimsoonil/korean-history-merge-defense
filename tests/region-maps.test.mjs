@@ -5,7 +5,7 @@ import {regionMaps,regionPins,regionCanvasSize} from '../lib/region-maps.ts';
 
 test('every implemented chapter has its own panoramic region map, Salsu is retained',()=>{
  assert.equal(regionMaps[1],'/terrain/campaign-panorama.png');
- assert.equal(new Set(Object.values(regionMaps)).size,9);
+ assert.equal(new Set(Object.values(regionMaps)).size,10);
  for(const [chapter,path] of Object.entries(regionMaps)){
   if(chapter!=='1')assert.match(path,/^\/regions\//);
   const png=readFileSync(new URL('../public'+path,import.meta.url));

@@ -24,8 +24,8 @@ test('Noryang requires previous nine normal chapters and has independent progres
  assert.equal(chapterUnlocked(10,10,10,10,10,10,10,10,10,10),true);
  for(let i=0;i<9;i++){const progress=[10,10,10,10,10,10,10,10,10];progress[i]=9;assert.equal(chapterUnlocked(10,...progress),false);}
  assert.equal(chapterUnlocked(10,10,10,10,10,10),false);
- assert.equal(new Set([1,2,3,4,5,6,7,8,10].flatMap(c=>[progressKey(c),progressKey(c,true)])).size,18);
- assert.ok(storyChapters[9].available);assert.equal(storyChapters[8].available,false);
+ assert.equal(new Set([1,2,3,4,5,6,7,8,9,10].flatMap(c=>[progressKey(c),progressKey(c,true)])).size,20);
+ assert.ok(storyChapters[9].available);assert.ok(storyChapters[8].available);
  assert.ok(existsSync(new URL('../public'+NORYANG_IMAGE,import.meta.url)));
  assert.match(noryangArrival(0,'홍길동').text,/홍길동/);assert.equal(noryangArrival(5,'홍길동'),undefined);
 });
