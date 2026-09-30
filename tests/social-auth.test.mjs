@@ -2,11 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
-test('social login offers only Google, Apple and guest access',()=>{
+test('social login offers Google and guest access, with Apple limited to iOS',()=>{
  const title=readFileSync(new URL('../app/TitleScreen.tsx',import.meta.url),'utf8');
  const auth=readFileSync(new URL('../app/AuthProvider.tsx',import.meta.url),'utf8');
  assert.match(title,/Google로 계속하기/);
  assert.match(title,/Apple로 계속하기/);
+ assert.match(title,/isIos&&<button className="auth-apple"/);
+ assert.match(title,/준비 중입니다\./);
  assert.match(title,/게스트로 시작하기/);
  assert.doesNotMatch(title,/카카오|Kakao/i);
  assert.match(auth,/type SocialProvider='google'\|'apple'/);
