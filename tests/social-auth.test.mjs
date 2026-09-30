@@ -28,3 +28,13 @@ test('new players pass social login before the prologue',()=>{
  const prologueGate=page.indexOf('if(!player||!player.prologueComplete');
  assert.ok(authGate>0&&authGate<prologueGate);
 });
+
+test('login automatically resumes a save or starts a new game without a choice menu',()=>{
+ const title=readFileSync(new URL('../app/TitleScreen.tsx',import.meta.url),'utf8');
+ const screen=title.slice(0,title.indexOf('export function NewGameConfirm'));
+ assert.match(screen,/if\(resumable\)onContinue\(\);else onNew\(\)/);
+ assert.match(screen,/sessionStorage\.setItem\(START_FLOW_KEY,'1'\)/);
+ assert.match(screen,/sessionStorage\.removeItem\(START_FLOW_KEY\)/);
+ assert.doesNotMatch(screen,/home-menu|home-primary|home-secondary/);
+ assert.doesNotMatch(screen,/>이어하기<|>새로하기</);
+});

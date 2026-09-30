@@ -2,12 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
-test('home keeps the codex in settings and removes archive shortcuts and close icon',()=>{
- const source=readFileSync(new URL('../app/TitleScreen.tsx',import.meta.url),'utf8');
- assert.match(source,/home-settings-panel[\s\S]*영웅 도감/);
- assert.doesNotMatch(source,/home-shortcuts/);
- assert.doesNotMatch(source,/홈 설정 닫기/);
- assert.match(source,/document\.addEventListener\('pointerdown',close\)/);
+test('battle settings keep profile, codex and account access after the home menu is removed',()=>{
+ const title=readFileSync(new URL('../app/TitleScreen.tsx',import.meta.url),'utf8');
+ const settings=readFileSync(new URL('../app/BattleSettings.tsx',import.meta.url),'utf8');
+ assert.doesNotMatch(title,/home-settings-panel|home-menu/);
+ assert.match(settings,/영웅 도감/);
+ assert.match(settings,/프로필 변경/);
+ assert.match(settings,/로그아웃/);
+ assert.match(settings,/SNS 로그인/);
 });
 
 test('unit bag uses a themed auto-store check and omits explanatory copy',()=>{
