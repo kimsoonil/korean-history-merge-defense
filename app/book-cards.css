@@ -2,19 +2,19 @@
 .book-modal{width:min(1060px,100%);height:min(760px,calc(100dvh - 24px))}
 .book-card{
  position:relative;isolation:isolate;min-height:0;overflow:hidden;padding:0;gap:0;
- display:flex;flex-direction:column;justify-content:flex-end;
+ display:flex;flex-direction:column;
  background:#405737;border:1px solid #879769;border-radius:7px;
  color:#f5eccf;cursor:default;transition:border-color .16s,box-shadow .16s,background .16s;
 }
-.book-card::after{content:"";position:absolute;z-index:1;inset:25% 0 0;pointer-events:none;background:linear-gradient(transparent,#173027c9 42%,#11231df5 100%)}
+.book-card::after{content:"";position:absolute;z-index:1;inset:0;pointer-events:none;background:linear-gradient(#11231de8 0%,#173027a8 18%,transparent 42%,transparent 55%,#173027c9 76%,#11231df5 100%)}
 .book-card-art{position:absolute;inset:0;z-index:0;display:grid;place-items:center;overflow:hidden;pointer-events:none;background:#d9d0ad;border-radius:6px}
 .book-card-art .unit-portrait.normal{position:relative;width:100%;height:100%;max-height:none;border:0;background:transparent;font-size:90px}
 .book-card-art .atlas-viewport{inset:0}
-.book-card .book-card-head{position:relative;z-index:2;display:flex;align-items:flex-start;gap:6px;min-width:0;padding:32px 9px 2px;text-shadow:0 1px 3px #000,0 0 8px #0a1d17}
+.book-card .book-card-head{position:relative;z-index:2;display:flex;align-items:flex-start;gap:6px;min-width:0;padding:8px 9px 2px;text-shadow:0 1px 3px #000,0 0 8px #0a1d17}
 .book-card .book-card-head>div{min-width:0;flex:1}
 .book-card .book-card-head h3{font-size:15px;color:#fff7df;margin:2px 0 0;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .book-card .book-card-head small{display:block;font-size:9px;color:#ffe1a0;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.book-card .book-ingredients{position:relative;z-index:2;display:flex;flex-wrap:wrap;align-content:flex-start;gap:3px;margin:0;padding:2px 9px 9px;overflow:hidden}
+.book-card .book-ingredients{position:relative;z-index:2;display:flex;flex-wrap:wrap;align-content:flex-start;gap:3px;margin:auto 0 0;padding:2px 9px 9px;overflow:hidden}
 .book-card .book-ingredients span{font-size:9px;line-height:1.35;padding:2px 4px;background:#182b24d9;border:1px solid #9aab90;color:#eef3df;border-radius:3px;white-space:nowrap;box-shadow:0 1px 2px #0004}
 .book-card .book-ingredients span.have{background:#527b5ee8;border-color:#f0d68e;color:#fff6bf}
 .book-card.ready{cursor:pointer;background:#546b3f;border:2px solid #f4d88d;box-shadow:0 0 0 2px #725f2d,0 0 16px #f0cf6766}
@@ -25,7 +25,7 @@
 @media(max-width:760px){
  .book-modal{height:calc(100dvh - 20px);padding:8px}
  .book-grid{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
- .book-card .book-card-head{padding:25px 5px 1px}
+ .book-card .book-card-head{padding:5px 5px 1px}
  .book-card-art .unit-portrait.normal{width:100%;height:100%;max-height:none;font-size:54px}
  .book-card .book-card-head h3{font-size:11px;margin:1px 0}
  .book-card .book-card-head small{font-size:7px;line-height:1.3}
@@ -35,7 +35,7 @@
 }
 @media(max-height:540px) and (min-width:600px){
  .book-grid{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
- .book-card .book-card-head{padding:22px 5px 1px}
+ .book-card .book-card-head{padding:5px 5px 1px}
  .book-card-art .unit-portrait.normal{width:100%;height:100%;max-height:none}
  .book-card .book-card-head h3{font-size:11px}.book-card .book-card-head small{font-size:7px}
  .book-card .book-ingredients{gap:2px;padding:1px 5px 5px}.book-card .book-ingredients span{font-size:7px;padding:1px 2px}

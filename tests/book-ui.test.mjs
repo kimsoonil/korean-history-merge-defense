@@ -14,7 +14,8 @@ test('recipe cards merge from the whole highlighted card without effect copy or 
  assert.match(styles,/\.book-card-art\{position:absolute;inset:0/);
  assert.match(styles,/\.book-card-art \.unit-portrait\.normal\{[^}]*width:100%;height:100%/);
  assert.match(styles,/\.book-card \.book-card-head\{position:relative;z-index:2/);
- assert.match(styles,/\.book-card \.book-ingredients\{position:relative;z-index:2/);
+ assert.match(styles,/\.book-card \.book-card-head\{[^}]*padding:8px 9px 2px/);
+ assert.match(styles,/\.book-card \.book-ingredients\{position:relative;z-index:2[^}]*margin:auto 0 0/);
  assert.match(styles,/@media\(max-width:760px\)\{[\s\S]*?\.book-grid\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\);grid-template-rows:repeat\(2,minmax\(0,1fr\)\)\}/);
  assert.doesNotMatch(mergeHandler,/setOverlay\(null\)/);
 });
