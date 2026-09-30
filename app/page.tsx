@@ -55,7 +55,7 @@ import {frontForStage,CAMPAIGN_STORAGE_KEY,FINAL_WAVE,isWaveUnlocked,readCampaig
 import {SAVE_KEY,canContinue,makeGameSave,readGameSave,remainingStageMs,restoredCounters,type GameSave} from '@/lib/save';
 import {useSocialAuth} from './AuthProvider';
 import {accountScopeFor,readAccountItem,writeAccountItem,removeAccountItem} from '@/lib/account-storage';
-import {ADMIN_PROGRESS_KEYS,adminProgressValue,isAdminAccount} from '@/lib/admin';
+import {ADMIN_CHAPTERS,ADMIN_PROGRESS_KEYS,adminPlayerProfile,adminProgressValue,isAdminAccount} from '@/lib/admin';
 
 type Phase='ready'|'battle'|'cleared'|'lost'|'won';
 type Overlay='book'|'help'|null;
@@ -88,8 +88,8 @@ export default function Game(){
  const markStorySeen=(id:ChapterId)=>{seenStories.current.add(id);try{writeStored(storySeenKey(id),'complete');}catch{setStorageError(true);}};
  const [storyOpen,setStoryOpen]=useState(false),[storyBattle,setStoryBattle]=useState<StoryProgress|null>(null);
  const [player,setPlayer]=useState<PlayerProfile|null>(null),[playerReady,setPlayerReady]=useState(false),[playerStorageError,setPlayerStorageError]=useState(false),[replayPrologue,setReplayPrologue]=useState(false);
- useEffect(()=>{setPlayerReady(false);setPlayer(null);setPlayerStorageError(false);if(!storageScope)return;try{setPlayer(readPlayer(readAccountItem(localStorage,storageScope,PLAYER_KEY)));}catch{setPlayerStorageError(true);}setPlayerReady(true);},[storageScope]);
- const savePlayer=(next:PlayerProfile)=>{setPlayer(next);try{writeStored(PLAYER_KEY,JSON.stringify(next));setPlayerStorageError(false);}catch{setPlayerStorageError(true);}};
+ useEffect(()=>{setPlayerReady(false);setPlayer(null);setPlayerStorageError(false);if(!storageScope)return;try{const restored=readPlayer(readAccountItem(localStorage,storageScope,PLAYER_KEY)),next=isAdmin?adminPlayerProfile(restored):restored;setPlayer(next);if(isAdmin&&next)writeAccountItem(localStorage,storageScope,PLAYER_KEY,JSON.stringify(next));}catch{setPlayerStorageError(true);}setPlayerReady(true);},[storageScope,isAdmin]);
+ const savePlayer=(next:PlayerProfile)=>{const profile=isAdmin?adminPlayerProfile(next):next;setPlayer(profile);try{writeStored(PLAYER_KEY,JSON.stringify(profile));setPlayerStorageError(false);}catch{setPlayerStorageError(true);}};
 
  const [profileOpen,setProfileOpen]=useState(false);
  const [bag,setBag]=useState<Bag>({}),[bagOpen,setBagOpen]=useState(false);
@@ -162,7 +162,7 @@ export default function Game(){
   try{
    const stored=(key:string)=>readAccountItem(localStorage,storageScope,key);
    const store=(key:string,value:string)=>writeAccountItem(localStorage,storageScope,key,value);
-   if(isAdmin){const complete=adminProgressValue();for(const key of ADMIN_PROGRESS_KEYS)store(key,complete);}
+   if(isAdmin){const complete=adminProgressValue();for(const key of ADMIN_PROGRESS_KEYS)store(key,complete);for(const id of ADMIN_CHAPTERS){seenStories.current.add(id);store(storySeenKey(id),'complete');}}
    const restored=readGameSave(stored(SAVE_KEY));setSaved(restored);
    setMyeongnyangCleared(readCampaignProgress(stored('myeongnyang-campaign-v1')));
    const haengjuRecorded=readCampaignProgress(stored(progressKey(8)));
