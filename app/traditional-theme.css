@@ -1,16 +1,17 @@
 :root{
- --trad-ink:#171714;
- --trad-panel:#29251f;
- --trad-wood:#3b3026;
- --trad-paper:#e7d5ad;
- --trad-text:#f2e6c9;
- --trad-muted:#b9a27b;
- --trad-red:#9e3f32;
- --trad-red-hover:#bd5845;
- --trad-brass:#c5a45b;
- --trad-disabled:#625c50;
- --trad-jade:#4f8276;
- --trad-boss:#7f2924;
+ color-scheme:light;
+ --trad-ink:#efe4cf;
+ --trad-panel:#fffaf0;
+ --trad-wood:#e7d3ae;
+ --trad-paper:#355047;
+ --trad-text:#263a32;
+ --trad-muted:#6d756a;
+ --trad-red:#a9463c;
+ --trad-red-hover:#c45c4d;
+ --trad-brass:#b78832;
+ --trad-disabled:#c9c2b4;
+ --trad-jade:#4c8978;
+ --trad-boss:#8c352f;
 }
 
 html,body{background:var(--trad-ink);color:var(--trad-text)}
@@ -138,3 +139,94 @@ html,body{background:var(--trad-ink);color:var(--trad-text)}
 .gamble-result-alert.failure{background:#4b2420f5;border-color:var(--trad-red-hover)}
 
 button:focus-visible,[role="button"]:focus-visible{outline-color:var(--trad-brass)!important}
+
+/* Bright oriental skin: warm hanji, celadon jade and restrained dancheong. */
+html,body{background:#efe6d5;color:var(--trad-text)}
+.ad-layout{background:linear-gradient(135deg,#efe4cf,#fbf6eb 52%,#ead9bc)}
+.game-root{background:radial-gradient(circle at 50% 28%,#fffdf6,#eee2cc 78%);color:var(--trad-text)}
+.ad-layout>.game-root{border-color:#b99b6255!important}
+.ad-placeholder{background:repeating-linear-gradient(135deg,#fffaf066 0 12px,#e7d3ae55 12px 24px)!important;border-color:#bda87599!important;color:#65776e!important}
+.ad-rail-label,.ad-rail>small,.ad-placeholder p,.ad-placeholder>span:not(.ad-placeholder-mark){color:#78867d!important}
+.ad-placeholder-mark{border-color:#ad9361!important;color:#49665b!important}
+
+.game-header{background:linear-gradient(180deg,#fffdf6,#eadbbe);border-color:#b78938;box-shadow:0 2px 12px #6e533826}
+.game-brand strong,.game-chapter{color:#294239}.game-brand small{color:#738078}.game-chapter i{background:#ad9c78}
+.music-controls{background:linear-gradient(180deg,#fffdf7,#ead6b1);border-color:#b99a61;color:#304b42;box-shadow:inset 0 1px #fff,0 2px 5px #6f55301f}
+.music-controls.is-playing{background:linear-gradient(180deg,#e2f0e9,#bad8cb);border-color:#659687;color:#24463c}
+.music-toggle:hover{color:#9b3e35}
+.game-status{background:linear-gradient(180deg,#fffaf0,#eee0c6);border-color:#c5ad7e}
+.game-status>div{border-right-color:#d3c09b}.game-status small,.status-stage span{color:#6f786f}
+.status-stage b,.status-enemy b,.status-gold b,.action-gold{color:#2f5549}
+.status-speed button,.hud-speed button{background:#f2e5cb;border-color:#bba77d;color:#3e574e}
+.status-speed button.on,.hud-speed button.on,.hud-speed button.active,.hud-speed button[aria-pressed=true]{background:#4c8978;border-color:#397363;color:#fff}
+
+.stage-panel,.detail-side{background:linear-gradient(145deg,#fffdf6,#f3e8d4 68%,#e7d6b8);border-color:#baa06c;box-shadow:inset 0 0 0 3px #fffaf099,0 4px 14px #6e513824}
+.panel-kicker,.stage-panel small,.detail-side small,.arena-heading small{color:#6f796f}
+.stage-panel p,.selected-skill,.selected-stats span,.detail-placeholder,.side-help span{color:#64736a}
+.hud-stat,.selected-stats,.side-help{border-color:#cfbb92}.selected-stats span{border-bottom-color:#ddceb1}.selected-stats b{color:#304b42}
+.stage-items{border-top-color:#cfbb92}.stage-item{color:#748078}.stage-item.active{background:#dcebe3;color:#29473d;border-left-color:#4c8978}.stage-item.done{color:#527466}
+.arena-heading{color:#263a32}
+.arena-stage{background:#d8c7a7;border-color:#ad9160}
+.arena-foot{background:#f7edda;border-color:#c3aa77}.arena-message{color:#4c5d54;border-color:#d7c39d}
+.wave-action>span{color:#42564d}
+.wave-action button{background:linear-gradient(180deg,#c95f50,#a9463c);border-color:#91382f;color:#fffaf0;box-shadow:inset 0 1px #df8a7d,0 2px 4px #73372b33}
+.wave-action button:hover:not(:disabled){background:linear-gradient(180deg,#d46f60,#b44e43)}
+.wave-action button:disabled{background:#d5cec0;border-color:#b9b1a2;color:#7e7a72}
+.phase-label{background:#efe0c4;border-color:#bba171;color:#3d5148}.phase-label.battle{background:#f1d0c8;border-color:#b95b50;color:#87372f}
+.game-actions{background:linear-gradient(180deg,#fffaf0,#eadabd);border-color:#bea26d;box-shadow:0 -3px 12px #7257371f}
+.game-actions button,.side-book,.side-sell,.battle-story button{background:#f3e6ce;border-color:#bca477;color:#30483f}
+.game-actions button small{color:#6d786f}.game-actions button:hover:not(:disabled),.side-book:hover,.side-sell:hover{border-color:#9a7937;background:#fff7e7}
+.game-actions .action-summon{background:linear-gradient(180deg,#c95f50,#a9463c);border-color:#90382f;color:#fffaf0;box-shadow:inset 0 1px #e08e82}
+.game-actions .action-summon small{color:#ffe0da}
+.battle-resource{background:linear-gradient(180deg,#fffdf6,#e9d5af);border-color:#b69250;color:#304b42;box-shadow:inset 0 1px #fff,0 2px 5px #72552c25}
+.battle-resource svg{color:#a57522}.battle-resource small{color:#69776e}
+.board-bag{background:linear-gradient(180deg,#fffaf0f2,#e7d1aaf2);border-color:#b78c3d;color:#304a41;box-shadow:0 3px 9px #614a2c30,inset 0 1px #fff}
+.board-bag:hover{background:linear-gradient(180deg,#fffdf8,#efd9af);border-color:#9c722b}.board-bag span{background:#a9463c;color:#fff}
+
+.book-modal,.help-modal,.gamble-modal,.upgrade-dialog,.unit-bag,.battle-settings-dialog,.profile-settings,.stage-map-dialog,.new-game-dialog{
+ background:linear-gradient(145deg,#fffdf7,#f4e8d2 68%,#e8d5b5);border-color:#b68b3c;color:#263a32;
+ box-shadow:0 20px 65px #5d442d45,inset 0 0 0 4px #fffaf080;
+}
+.book-modal>header,.gamble-modal>header,.upgrade-heading,.unit-bag>header,.battle-settings-dialog>header,.profile-settings>header{border-color:#c9b181}
+.book-modal header b,.gamble-modal header b,.upgrade-heading b{color:#283d34}
+.book-modal>header button,.gamble-modal>header>button,.upgrade-dialog .upgrade-heading>button,.unit-bag header>button,.battle-settings-dialog>header button,.profile-settings header>button{color:#3b554b}
+.overlay-shade,.gamble-shade,.stage-map-shade{background:#3b302554;backdrop-filter:blur(3px)}
+.book-tabs button,.upgrade-tabs button,.bag-tabs button{background:#ebd9b8;border-color:#b89e70;color:#3c544a}
+.book-tabs button.active,.upgrade-tabs button[aria-pressed=true],.bag-tabs button[aria-pressed=true]{background:#4c8978;border-color:#397364;color:#fff}
+.book-card{background:#f6ead4;border-color:#c5ad7f;color:#263a32}.book-card-art{background:#e3d0ad}
+.book-card .book-card-head h3{color:#30483f}.book-card .book-ingredients span{background:#fffaf0;border-color:#c8b48f;color:#58685f}
+.book-card .book-ingredients span.have{background:#dcebe3;border-color:#5f9585;color:#27483e}
+.book-card.ready{background:#edf5ef;border-color:#4f8b79;box-shadow:0 0 0 2px #7cac9d55,0 0 18px #4f8b7933}.book-card.ready:hover{background:#f7fff9;box-shadow:0 0 0 2px #579481,0 0 22px #4f8b7944}
+.gamble-scroll p,.gamble-grid article>span,.upgrade-list small,.battle-settings-dialog>p{color:#65736a}
+.gamble-grid article,.upgrade-list article{background:#f4e6cc;border-color:#c2aa7c}
+.gamble-grid article>button,.upgrade-dialog button,.upgrade-open{background:#a9463c;border-color:#8e372f;color:#fff}
+.gamble-grid article>button:hover:not(:disabled),.upgrade-dialog button:hover:not(:disabled){background:#c45c4d}
+.gamble-grid article>button:disabled,.upgrade-dialog button:disabled{background:#d0c9bc;border-color:#b9b1a3;color:#7c7972}
+.unit-bag button,.battle-settings-dialog button,.profile-settings button{background:#ead8b8;border-color:#baa273;color:#30483f}
+.bag-grid>button{background:#f4e7d1}.bag-grid>button.selected{outline-color:#4c8978;background:#deebe4}.bag-grid>button>span:last-child{background:#425b51;color:#fffaf0}
+.bag-auto-store{background:linear-gradient(180deg,#fffaf0,#ead7b4);border-color:#b99f70;color:#344d43}.bag-auto-store .bag-auto-check{background:#fffdf7;border-color:#a99166}.bag-selection{border-color:#c3aa7c}
+
+.title-landscape:after{background:linear-gradient(90deg,#f7eddbed 0%,#fff9edbc 34%,#fff9ed38 64%,transparent),linear-gradient(0deg,#ead9b9b8,transparent 48%)}
+.mobile-home,.home-keyart{background-color:#e9ddc6}
+.title-intro,.title-chapter p,.title-save-note,.title-footer{color:#5e6d64;text-shadow:0 1px #fff}
+.title-new,.home-primary,.splash-entry button,.story-primary,.chapter-start{background:linear-gradient(180deg,#c96152,#a9463c);border-color:#91372f;color:#fffaf0;box-shadow:0 4px 0 #78312a,0 8px 24px #64433335}
+.title-continue,.title-archives>button,.home-secondary,.home-settings-toggle,.home-settings-panel,.home-settings-panel button,.home-return{background:#fff8e9e8;border-color:#b99f6f;color:#2d473d}
+.title-continue:hover:not(:disabled),.title-archives>button:hover,.home-secondary:hover{background:#fffdf7;border-color:#99742f}
+.title-chapter,.title-footer{border-color:#a98c5455}.home-vignette{background:linear-gradient(180deg,#fff6df1c,transparent 42%,#ead7b6bf 86%,#e4d0ad)}
+.home-title{color:#fffaf0;text-shadow:0 2px 0 #8d4338,0 4px 16px #284a3c99}.home-title i{color:#f2d47f}
+.home-settings-panel{box-shadow:0 10px 30px #59432f3d}.home-settings-panel hr{border-top-color:#cbb58b}.home-settings-account{color:#65746b}
+.home-auth-panel{border-color:#b89a62;background:#fff9eced;box-shadow:0 -10px 35px #54402d3d;color:#293f36}
+.home-auth-panel h2{color:#293f36}.home-auth-panel>p,.auth-config-note{color:#69766d!important}.auth-guest{background:#e9d6b3;border-color:#b89a67;color:#30483f}.auth-error{color:#a63f35!important}
+
+.story-library{background:radial-gradient(ellipse at 50% 35%,#fffdf6,#ead9bc 70%,#d7c19d);color:#263a32}
+.story-library>header,.story-library>footer{background:#fffaf0e8;border-color:#bda474}.story-library header button,.story-library footer button{background:#ead7b5;border-color:#b99d6d;color:#304a41}
+.story-shelf{background:linear-gradient(0deg,#c6a878 0 13%,transparent 13%);scrollbar-color:#b78832 #f2e5cf}
+.story-arrival{background:#efe4cf;color:#263a32}.story-arrival>header,.story-journal,.story-dialogue{background:#fffaf0e8;border-color:#bda474}.story-arrival header button,.story-training{background:#ead8b8;border-color:#b89f72;color:#30483f}
+.story-dialogue h2,.story-journal span,.story-training-top,.story-recipe h3{color:#365047}
+
+.stage-map-screen,.front-selection .front-selection-shell{background:#efe4cf;color:#263a32}.stage-map-heading,.region-heading,.region-navigation{background:#fffaf0;color:#293f36;box-shadow:0 3px 10px #654c3224}
+.map-back,.region-heading button,.region-navigation button,.region-mode button{background:#ead8b8;border-color:#baa172;color:#30483f}.map-chapter-count,.region-mode small{background:#f8edda;color:#3c5148;border-color:#c0a777}
+.region-pin strong,.region-pin small{background:#fffaf0ed;color:#30483f;border-color:#b99c65;box-shadow:0 2px 6px #49372430}.region-pin.locked .region-seal{background:#c9c2b4;border-color:#a9a297;color:#6f6c66}.stage-map-viewport{border-color:#b78832;scrollbar-color:#b78832 #f1e4cd}
+.battle-settings-trigger{background:#f1e3c9;border-color:#b99e6e;color:#304a41}.settings-links button{background:#ead8b8;border-color:#b99f70;color:#30483f}.settings-links button:hover{background:#fff8e9;border-color:#9a762f}
+.merge-success{background:#fff9ecf5;border-color:#b78832;color:#2b4239;box-shadow:0 8px 28px #4f392e38}.merge-success strong{color:#8a4b2d}.gamble-result-alert.failure{background:#fff0ecf5;border-color:#b95145}
+.front-route-note,.battle-story{color:#43584f}.battle-story small{color:#6f786f}.front-announcement{background:#fff8e9ed;border-color:#b78832;color:#293f36;text-shadow:none;box-shadow:0 8px 30px #4d39283d}

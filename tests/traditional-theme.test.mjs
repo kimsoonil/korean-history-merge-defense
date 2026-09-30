@@ -2,10 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
-test('traditional ink, wood, paper, dancheong and brass palette is loaded last',()=>{
+test('bright oriental hanji, celadon, dancheong and brass palette is loaded last',()=>{
  const css=readFileSync(new URL('../app/traditional-theme.css',import.meta.url),'utf8');
  const layout=readFileSync(new URL('../app/layout.tsx',import.meta.url),'utf8');
- for(const color of ['#171714','#29251f','#3b3026','#e7d5ad','#f2e6c9','#9e3f32','#c5a45b','#4f8276'])assert.match(css,new RegExp(color));
+ for(const color of ['#efe4cf','#fffaf0','#e7d3ae','#355047','#263a32','#a9463c','#b78832','#4c8978'])assert.match(css,new RegExp(color));
+ assert.match(css,/color-scheme:light/);
  assert.match(css,/\.game-header/);
  assert.match(css,/\.music-controls/);
  assert.match(css,/\.game-actions/);
