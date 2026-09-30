@@ -55,6 +55,7 @@ import {frontForStage,CAMPAIGN_STORAGE_KEY,FINAL_WAVE,isWaveUnlocked,readCampaig
 import {SAVE_KEY,canContinue,makeGameSave,readGameSave,remainingStageMs,restoredCounters,type GameSave} from '@/lib/save';
 import {useSocialAuth} from './AuthProvider';
 import {accountScopeFor,readAccountItem,writeAccountItem,removeAccountItem} from '@/lib/account-storage';
+import {ADMIN_PROGRESS_KEYS,adminProgressValue,isAdminAccount} from '@/lib/admin';
 
 type Phase='ready'|'battle'|'cleared'|'lost'|'won';
 type Overlay='book'|'help'|null;
@@ -72,6 +73,7 @@ function AttackOverlay({effects}:{effects:AttackEffect[]}){return <svg className
 export default function Game(){
  const auth=useSocialAuth();
  const storageScope=accountScopeFor(auth.status,auth.user?.id);
+ const isAdmin=isAdminAccount(auth.user?.email,process.env.NEXT_PUBLIC_ADMIN_EMAIL);
  const readStored=(key:string)=>storageScope?readAccountItem(localStorage,storageScope,key):null;
  const writeStored=(key:string,value:string)=>{if(storageScope)writeAccountItem(localStorage,storageScope,key,value);};
  const removeStored=(key:string)=>{if(storageScope)removeAccountItem(localStorage,storageScope,key);};
@@ -160,6 +162,7 @@ export default function Game(){
   try{
    const stored=(key:string)=>readAccountItem(localStorage,storageScope,key);
    const store=(key:string,value:string)=>writeAccountItem(localStorage,storageScope,key,value);
+   if(isAdmin){const complete=adminProgressValue();for(const key of ADMIN_PROGRESS_KEYS)store(key,complete);}
    const restored=readGameSave(stored(SAVE_KEY));setSaved(restored);
    setMyeongnyangCleared(readCampaignProgress(stored('myeongnyang-campaign-v1')));
    const haengjuRecorded=readCampaignProgress(stored(progressKey(8)));
@@ -196,7 +199,7 @@ export default function Game(){
    const cleared=Math.max(recorded,fromSave);clearedWaveRef.current=cleared;setHighestClearedWave(cleared);setSalsuCleared(cleared);
    if(cleared>recorded)store(CAMPAIGN_STORAGE_KEY,JSON.stringify({version:1,highestClearedWave:cleared}));
   }catch{setStorageError(true);}setSaveReady(true);
- },[storageScope,auth.status]);
+ },[storageScope,auth.status,isAdmin]);
  useEffect(()=>{
   if(home)return;
   persistGame();
