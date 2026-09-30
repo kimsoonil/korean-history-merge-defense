@@ -193,10 +193,10 @@ html,body{background:#efe6d5;color:var(--trad-text)}
 .overlay-shade,.gamble-shade,.stage-map-shade{background:#3b302554;backdrop-filter:blur(3px)}
 .book-tabs button,.upgrade-tabs button,.bag-tabs button{background:#ebd9b8;border-color:#b89e70;color:#3c544a}
 .book-tabs button.active,.upgrade-tabs button[aria-pressed=true],.bag-tabs button[aria-pressed=true]{background:#4c8978;border-color:#397364;color:#fff}
-.book-card{background:#f6ead4;border-color:#c5ad7f;color:#263a32}.book-card-art{background:#e3d0ad}
-.book-card .book-card-head h3{color:#30483f}.book-card .book-ingredients span{background:#fffaf0;border-color:#c8b48f;color:#58685f}
-.book-card .book-ingredients span.have{background:#dcebe3;border-color:#5f9585;color:#27483e}
-.book-card.ready{background:#edf5ef;border-color:#4f8b79;box-shadow:0 0 0 2px #7cac9d55,0 0 18px #4f8b7933}.book-card.ready:hover{background:#f7fff9;box-shadow:0 0 0 2px #579481,0 0 22px #4f8b7944}
+.book-card{background:#f6ead4;border-color:#c5ad7f;color:#fff}.book-card-art{background:#e3d0ad}
+.book-card .book-card-head h3{color:#fffaf0}.book-card .book-card-head small{color:#ffe0a0}.book-card .book-ingredients span{background:#203a31df;border-color:#95a98f;color:#f6f2df}
+.book-card .book-ingredients span.have{background:#4c8978e8;border-color:#f0d080;color:#fff9ce}
+.book-card.ready{background:#edf5ef;border-color:#4f8b79;box-shadow:0 0 0 2px #7cac9d77,0 0 18px #4f8b7955}.book-card.ready:hover{background:#f7fff9;box-shadow:0 0 0 2px #579481,0 0 22px #4f8b7966}
 .gamble-scroll p,.gamble-grid article>span,.upgrade-list small,.battle-settings-dialog>p{color:#65736a}
 .gamble-grid article,.upgrade-list article{background:#f4e6cc;border-color:#c2aa7c}
 .gamble-grid article>button,.upgrade-dialog button,.upgrade-open{background:#a9463c;border-color:#8e372f;color:#fff}
