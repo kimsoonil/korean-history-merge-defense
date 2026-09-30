@@ -54,6 +54,7 @@ import {stageRoundCount,roundBossName,roundEnemyCount,roundKey,ROUND_CLEAR_GOLD,
 import {frontForStage,CAMPAIGN_STORAGE_KEY,FINAL_WAVE,isWaveUnlocked,readCampaignProgress,recordWaveClear} from '@/lib/campaign';
 import {SAVE_KEY,canContinue,makeGameSave,readGameSave,remainingStageMs,restoredCounters,type GameSave} from '@/lib/save';
 import {useSocialAuth} from './AuthProvider';
+import {accountScopeFor,readAccountItem,writeAccountItem,removeAccountItem} from '@/lib/account-storage';
 
 type Phase='ready'|'battle'|'cleared'|'lost'|'won';
 type Overlay='book'|'help'|null;
@@ -70,6 +71,10 @@ function AttackOverlay({effects}:{effects:AttackEffect[]}){return <svg className
 
 export default function Game(){
  const auth=useSocialAuth();
+ const storageScope=accountScopeFor(auth.status,auth.user?.id);
+ const readStored=(key:string)=>storageScope?readAccountItem(localStorage,storageScope,key):null;
+ const writeStored=(key:string,value:string)=>{if(storageScope)writeAccountItem(localStorage,storageScope,key,value);};
+ const removeStored=(key:string)=>{if(storageScope)removeAccountItem(localStorage,storageScope,key);};
  const [chapter,setChapter]=useState<ChapterId>(1);
  const [salsuCleared,setSalsuCleared]=useState(0),[ansiCleared,setAnsiCleared]=useState(0),[hwangsanCleared,setHwangsanCleared]=useState(0),[nadangCleared,setNadangCleared]=useState(0),[gwijuCleared,setGwijuCleared]=useState(0),[cheoinCleared,setCheoinCleared]=useState(0),[hansandoCleared,setHansandoCleared]=useState(0),[haengjuCleared,setHaengjuCleared]=useState(0),[myeongnyangCleared,setMyeongnyangCleared]=useState(0);
  const canEnterChapter=(id:ChapterId)=>chapterUnlocked(id,salsuCleared,ansiCleared,hwangsanCleared,nadangCleared,gwijuCleared,cheoinCleared,hansandoCleared,haengjuCleared,myeongnyangCleared);
@@ -77,12 +82,12 @@ export default function Game(){
  const hardClearedRef=useRef(0);
  const [booksOpen,setBooksOpen]=useState(false);
  const seenStories=useRef(new Set<ChapterId>());
- const storyWasSeen=(id:ChapterId)=>{if(seenStories.current.has(id))return true;try{return hasSeenStory(localStorage.getItem(storySeenKey(id)));}catch{return false;}};
- const markStorySeen=(id:ChapterId)=>{seenStories.current.add(id);try{localStorage.setItem(storySeenKey(id),'complete');}catch{setStorageError(true);}};
+ const storyWasSeen=(id:ChapterId)=>{if(seenStories.current.has(id))return true;try{return hasSeenStory(readStored(storySeenKey(id)));}catch{return false;}};
+ const markStorySeen=(id:ChapterId)=>{seenStories.current.add(id);try{writeStored(storySeenKey(id),'complete');}catch{setStorageError(true);}};
  const [storyOpen,setStoryOpen]=useState(false),[storyBattle,setStoryBattle]=useState<StoryProgress|null>(null);
  const [player,setPlayer]=useState<PlayerProfile|null>(null),[playerReady,setPlayerReady]=useState(false),[playerStorageError,setPlayerStorageError]=useState(false),[replayPrologue,setReplayPrologue]=useState(false);
- useEffect(()=>{try{setPlayer(readPlayer(localStorage.getItem(PLAYER_KEY)));}catch{setPlayerStorageError(true);}setPlayerReady(true);},[]);
- const savePlayer=(next:PlayerProfile)=>{setPlayer(next);try{localStorage.setItem(PLAYER_KEY,JSON.stringify(next));setPlayerStorageError(false);}catch{setPlayerStorageError(true);}};
+ useEffect(()=>{setPlayerReady(false);setPlayer(null);setPlayerStorageError(false);if(!storageScope)return;try{setPlayer(readPlayer(readAccountItem(localStorage,storageScope,PLAYER_KEY)));}catch{setPlayerStorageError(true);}setPlayerReady(true);},[storageScope]);
+ const savePlayer=(next:PlayerProfile)=>{setPlayer(next);try{writeStored(PLAYER_KEY,JSON.stringify(next));setPlayerStorageError(false);}catch{setPlayerStorageError(true);}};
 
  const [profileOpen,setProfileOpen]=useState(false);
  const [bag,setBag]=useState<Bag>({}),[bagOpen,setBagOpen]=useState(false);
@@ -97,10 +102,10 @@ export default function Game(){
  useEffect(()=>{if(!player||!saveReady||chapter!==1)return;const next=awardHardClear(player,hardCleared);if(next!==player)savePlayer(next);},[player,hardCleared,saveReady,chapter]);
  const clearedWaveRef=useRef(0),homeRef=useRef(true);
  const markWaveCleared=(wave:number)=>{
-  if(difficulty==='hard'){const next=recordWaveClear(hardClearedRef.current,wave);hardClearedRef.current=next;setHardCleared(next);try{localStorage.setItem(progressKey(chapter,true),JSON.stringify({version:1,highestClearedWave:next}));}catch{setStorageError(true);}return;}
+  if(difficulty==='hard'){const next=recordWaveClear(hardClearedRef.current,wave);hardClearedRef.current=next;setHardCleared(next);try{writeStored(progressKey(chapter,true),JSON.stringify({version:1,highestClearedWave:next}));}catch{setStorageError(true);}return;}
   const next=recordWaveClear(clearedWaveRef.current,wave);if(next===clearedWaveRef.current)return;
   clearedWaveRef.current=next;setHighestClearedWave(next);if(chapter===1)setSalsuCleared(next);if(chapter===2)setAnsiCleared(next);if(chapter===3)setHwangsanCleared(next);if(chapter===4)setNadangCleared(next);if(chapter===5)setGwijuCleared(next);if(chapter===6)setCheoinCleared(next);if(chapter===7)setHansandoCleared(next);if(chapter===8)setHaengjuCleared(next);
-  try{window.localStorage.setItem(progressKey(chapter),JSON.stringify({version:1,highestClearedWave:next}));}catch{setStorageError(true);}
+  try{writeStored(progressKey(chapter),JSON.stringify({version:1,highestClearedWave:next}));}catch{setStorageError(true);}
  };
  const [roster,setRoster]=useState<Soldier[]>([]),[gold,setGold]=useState(START_GOLD),[troopCards,setTroopCards]=useState(START_TROOP_CARDS),[wall,setWall]=useState(10),[stage,setStage]=useState(1),[round,setRound]=useState(1),[phase,setPhase]=useState<Phase>('ready'),[timeLeft,setTimeLeft]=useState(STAGE_SECONDS),[enemies,setEnemies]=useState<Enemy[]>([]),[attackFx,setAttackFx]=useState<AttackEffect[]>([]),[selected,setSelected]=useState<number|null>(null),[overlay,setOverlay]=useState<Overlay>(null),[tier,setTier]=useState(2),[speed,setSpeed]=useState(1),[spawned,setSpawned]=useState(0),[notice,setNotice]=useState('병사를 모집하고 전투를 준비하세요.');
  const heroTimers=useRef(new Map<number,number>()),flashQueue=useRef<string[]>([]),flashSerial=useRef(0);
@@ -133,9 +138,9 @@ export default function Game(){
   const current=progressRef.current;
   const snapshot=makeGameSave({...current,heroCooldowns:[...heroTimers.current].filter(([id])=>current.roster.some(s=>s.id===id&&byName[s.name].tier===5)),remainingMs:remainingStageMs(deadlineRef.current,current.phase,Date.now(),legendary.pausedAtRef.current)});
   setSaved(snapshot);
-  try{window.localStorage.setItem(SAVE_KEY,JSON.stringify(snapshot));setStorageError(false);}catch{setStorageError(true);}
+  try{writeStored(SAVE_KEY,JSON.stringify(snapshot));setStorageError(false);}catch{setStorageError(true);}
  };
- const selectChapter=(next:ChapterId)=>{setChapter(next);let normal=0,hard=0;try{normal=readCampaignProgress(localStorage.getItem(progressKey(next)));hard=readCampaignProgress(localStorage.getItem(progressKey(next,true)));}catch{setStorageError(true);}clearedWaveRef.current=normal;hardClearedRef.current=hard;setHighestClearedWave(normal);setHardCleared(hard);};
+ const selectChapter=(next:ChapterId)=>{setChapter(next);let normal=0,hard=0;try{normal=readCampaignProgress(readStored(progressKey(next)));hard=readCampaignProgress(readStored(progressKey(next,true)));}catch{setStorageError(true);}clearedWaveRef.current=normal;hardClearedRef.current=hard;setHighestClearedWave(normal);setHardCleared(hard);};
  const returnHome=()=>{setBagOpen(false);setUpgradeOpen(false);persistGame();flashQueue.current=[];setSkillFlash(null);homeRef.current=true;legendary.close();deadlineRef.current=null;setHome(true);setMapOpen(false);setMapModalOpen(false);setOverlay(null);setSelected(null);setAttackFx([]);};
  const continueGame=()=>{
   if(!canContinue(saved)||!saveReady)return;
@@ -147,44 +152,51 @@ export default function Game(){
   rewardedBossesRef.current.clear();setUpgrades(readUpgrades(saved.upgrades));setUnitGambleUsage(readUnitGambleUsage(saved.unitGambleUsage,saved.round));setUpgradeOpen(false);setAutoStoreBasic(false);const inventory=migrateDeployment(saved.roster,saved.bag??{});setRoster(inventory.roster);setBag(inventory.bag);setEnemies(saved.enemies);setGold(saved.gold);setTroopCards(saved.troopCards??START_TROOP_CARDS);setWall(saved.wall);setStage(saved.stage);setRound(saved.round);setPhase(saved.phase);setSpawned(saved.spawned);setSpeed(saved.speed);setTimeLeft(Math.ceil(saved.remainingMs/1000));setAttackFx([]);setSelected(null);setOverlay(null);setNotice('저장된 방어전을 이어갑니다.');homeRef.current=false;setHome(false);
  };
  useEffect(()=>{
+  setSaveReady(false);setSaved(null);setStorageError(false);seenStories.current.clear();
+  setSalsuCleared(0);setAnsiCleared(0);setHwangsanCleared(0);setNadangCleared(0);setGwijuCleared(0);setCheoinCleared(0);setHansandoCleared(0);setHaengjuCleared(0);setMyeongnyangCleared(0);
+  clearedWaveRef.current=0;hardClearedRef.current=0;setHighestClearedWave(0);setHardCleared(0);
+  homeRef.current=true;setHome(true);setMapOpen(false);setMapModalOpen(false);setBooksOpen(false);setStoryOpen(false);setProfileOpen(false);
+  if(!storageScope){if(auth.status==='signedOut')setSaveReady(true);return;}
   try{
-   const restored=readGameSave(window.localStorage.getItem(SAVE_KEY));setSaved(restored);
-   setMyeongnyangCleared(readCampaignProgress(localStorage.getItem('myeongnyang-campaign-v1')));
-   const haengjuRecorded=readCampaignProgress(localStorage.getItem(progressKey(8)));
+   const stored=(key:string)=>readAccountItem(localStorage,storageScope,key);
+   const store=(key:string,value:string)=>writeAccountItem(localStorage,storageScope,key,value);
+   const restored=readGameSave(stored(SAVE_KEY));setSaved(restored);
+   setMyeongnyangCleared(readCampaignProgress(stored('myeongnyang-campaign-v1')));
+   const haengjuRecorded=readCampaignProgress(stored(progressKey(8)));
    const haengjuFromSave=restored?.chapter===8&&restored.difficulty!=='hard'?((restored.phase==='cleared'||restored.phase==='won')&&isStageComplete(restored.stage,restored.round)?restored.stage:restored.stage-1):0;
    setHaengjuCleared(Math.max(haengjuRecorded,haengjuFromSave));
-   if(haengjuFromSave>haengjuRecorded)localStorage.setItem(progressKey(8),JSON.stringify({version:1,highestClearedWave:haengjuFromSave}));
-   const hansandoRecorded=readCampaignProgress(localStorage.getItem(progressKey(7)));
+   if(haengjuFromSave>haengjuRecorded)store(progressKey(8),JSON.stringify({version:1,highestClearedWave:haengjuFromSave}));
+   const hansandoRecorded=readCampaignProgress(stored(progressKey(7)));
    const hansandoFromSave=restored?.chapter===7&&restored.difficulty!=='hard'?((restored.phase==='cleared'||restored.phase==='won')&&isStageComplete(restored.stage,restored.round)?restored.stage:restored.stage-1):0;
    setHansandoCleared(Math.max(hansandoRecorded,hansandoFromSave));
-   if(hansandoFromSave>hansandoRecorded)localStorage.setItem(progressKey(7),JSON.stringify({version:1,highestClearedWave:hansandoFromSave}));
-   const cheoinRecorded=readCampaignProgress(localStorage.getItem(progressKey(6)));
+   if(hansandoFromSave>hansandoRecorded)store(progressKey(7),JSON.stringify({version:1,highestClearedWave:hansandoFromSave}));
+   const cheoinRecorded=readCampaignProgress(stored(progressKey(6)));
    const cheoinFromSave=restored?.chapter===6&&restored.difficulty!=='hard'?((restored.phase==='cleared'||restored.phase==='won')&&isStageComplete(restored.stage,restored.round)?restored.stage:restored.stage-1):0;
    setCheoinCleared(Math.max(cheoinRecorded,cheoinFromSave));
-   if(cheoinFromSave>cheoinRecorded)localStorage.setItem(progressKey(6),JSON.stringify({version:1,highestClearedWave:cheoinFromSave}));
-   const gwijuRecorded=readCampaignProgress(localStorage.getItem(progressKey(5)));
+   if(cheoinFromSave>cheoinRecorded)store(progressKey(6),JSON.stringify({version:1,highestClearedWave:cheoinFromSave}));
+   const gwijuRecorded=readCampaignProgress(stored(progressKey(5)));
    const gwijuFromSave=restored?.chapter===5&&restored.difficulty!=='hard'?((restored.phase==='cleared'||restored.phase==='won')&&isStageComplete(restored.stage,restored.round)?restored.stage:restored.stage-1):0;
    setGwijuCleared(Math.max(gwijuRecorded,gwijuFromSave));
-   if(gwijuFromSave>gwijuRecorded)localStorage.setItem(progressKey(5),JSON.stringify({version:1,highestClearedWave:gwijuFromSave}));
-   const nadangRecorded=readCampaignProgress(localStorage.getItem(progressKey(4)));
+   if(gwijuFromSave>gwijuRecorded)store(progressKey(5),JSON.stringify({version:1,highestClearedWave:gwijuFromSave}));
+   const nadangRecorded=readCampaignProgress(stored(progressKey(4)));
    const nadangFromSave=restored?.chapter===4&&restored.difficulty!=='hard'?((restored.phase==='cleared'||restored.phase==='won')&&isStageComplete(restored.stage,restored.round)?restored.stage:restored.stage-1):0;
    setNadangCleared(Math.max(nadangRecorded,nadangFromSave));
-   if(nadangFromSave>nadangRecorded)localStorage.setItem(progressKey(4),JSON.stringify({version:1,highestClearedWave:nadangFromSave}));
-   const hwangsanRecorded=readCampaignProgress(localStorage.getItem(progressKey(3)));
+   if(nadangFromSave>nadangRecorded)store(progressKey(4),JSON.stringify({version:1,highestClearedWave:nadangFromSave}));
+   const hwangsanRecorded=readCampaignProgress(stored(progressKey(3)));
    const hwangsanFromSave=restored?.chapter===3&&restored.difficulty!=='hard'?((restored.phase==='cleared'||restored.phase==='won')&&isStageComplete(restored.stage,restored.round)?restored.stage:restored.stage-1):0;
    setHwangsanCleared(Math.max(hwangsanRecorded,hwangsanFromSave));
-   if(hwangsanFromSave>hwangsanRecorded)localStorage.setItem(progressKey(3),JSON.stringify({version:1,highestClearedWave:hwangsanFromSave}));
-   const ansiRecorded=readCampaignProgress(localStorage.getItem(progressKey(2)));
+   if(hwangsanFromSave>hwangsanRecorded)store(progressKey(3),JSON.stringify({version:1,highestClearedWave:hwangsanFromSave}));
+   const ansiRecorded=readCampaignProgress(stored(progressKey(2)));
    const ansiFromSave=restored?.chapter===2&&restored.difficulty!=='hard'?((restored.phase==='cleared'||restored.phase==='won')&&isStageComplete(restored.stage,restored.round)?restored.stage:restored.stage-1):0;
    setAnsiCleared(Math.max(ansiRecorded,ansiFromSave));
-   if(ansiFromSave>ansiRecorded)localStorage.setItem(progressKey(2),JSON.stringify({version:1,highestClearedWave:ansiFromSave}));
-   const hardRecord=readCampaignProgress(localStorage.getItem(HARD_PROGRESS_KEY));hardClearedRef.current=hardRecord;setHardCleared(hardRecord);
-   const recorded=readCampaignProgress(window.localStorage.getItem(CAMPAIGN_STORAGE_KEY));
+   if(ansiFromSave>ansiRecorded)store(progressKey(2),JSON.stringify({version:1,highestClearedWave:ansiFromSave}));
+   const hardRecord=readCampaignProgress(stored(HARD_PROGRESS_KEY));hardClearedRef.current=hardRecord;setHardCleared(hardRecord);
+   const recorded=readCampaignProgress(stored(CAMPAIGN_STORAGE_KEY));
    const fromSave=restored&&(restored.chapter??1)===1&&restored.difficulty!=='hard'?((restored.phase==='cleared'||restored.phase==='won')&&isStageComplete(restored.stage,restored.round)?restored.stage:restored.stage-1):0;
    const cleared=Math.max(recorded,fromSave);clearedWaveRef.current=cleared;setHighestClearedWave(cleared);setSalsuCleared(cleared);
-   if(cleared>recorded)window.localStorage.setItem(CAMPAIGN_STORAGE_KEY,JSON.stringify({version:1,highestClearedWave:cleared}));
+   if(cleared>recorded)store(CAMPAIGN_STORAGE_KEY,JSON.stringify({version:1,highestClearedWave:cleared}));
   }catch{setStorageError(true);}setSaveReady(true);
- },[]);
+ },[storageScope,auth.status]);
  useEffect(()=>{
   if(home)return;
   persistGame();
@@ -304,7 +316,7 @@ export default function Game(){
   if(progress.step!==12||!progress.merged||progress.summoned!==4)return;
   selectChapter(1);prepareStage(1,'normal');setRoster(storyRoster(progress));setGold(storyGold(progress));idRef.current=6;setStoryOpen(false);setStoryBattle(null);
   if(player)savePlayer({...player,tutorialComplete:true});
-  try{localStorage.removeItem(STORY_KEY);}catch{}
+  try{removeStored(STORY_KEY);}catch{}
   beginRound(1,1);setNotice(`${player?.nickname}의 첫 전투 · 온달과 함께 요동성을 지켜내세요!`);
  };
  const requestStoryBattle=(progress:StoryProgress)=>{if(canContinue(saved)){setStoryBattle(progress);setConfirmNew(true);}else launchStoryBattle(progress);};
