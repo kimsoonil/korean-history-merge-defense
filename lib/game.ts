@@ -8,7 +8,7 @@ import {nadangEnemyNames,nadangBossNames} from './nadang.ts';
 import {hwangsanEnemyNames,hwangsanBossNames} from './hwangsan.ts';
 import {ansiEnemyNames,ansiBossNames,type ChapterId} from './ansi.ts';
 import {chapterOneBattles,FINAL_WAVE,waveCombatLevel} from './campaign.ts';
-import {globalRound,roundBossName} from './rounds.ts';
+import {globalRound,roundBossName,stageRoundCount} from './rounds.ts';
 import {roadPosition} from './battlefield.ts';
 import {enemyStats,type Difficulty} from './enemy-stats.ts';
 export type UnitDef = { name:string; tier:number; icon:string; role:string; skill:string; damage:number; range:number; rate:number; color:string; recipe?:string[]; portrait?:string; atlas?:{src:string;col:number;row:number} };
@@ -66,7 +66,8 @@ export function createRoundInvader(stage:number,round:number,index:number,id:num
  const bossName=index===0?roundBossName(stage,round,chapter):null;
  const level=Math.ceil(globalRound(stage,round)/5);
  const {hp,armor}=enemyStats(round,index,!!bossName,(bossName==='수양제'||bossName==='당 태종'||bossName==='계백'||bossName==='설인귀'||bossName==='소배압'||bossName==='살리타'||bossName==='와키자카 야스하루'||bossName==='우키타 히데이에'||bossName==='구루시마 미치후사'||bossName==='시마즈 요시히로'),difficulty);
- return {id,chapter,name:bossName??(chapter===10?noryangEnemyNames:chapter===9?myeongnyangEnemyNames:chapter===8?haengjuEnemyNames:chapter===7?hansandoEnemyNames:chapter===6?cheoinEnemyNames:chapter===5?gwijuEnemyNames:chapter===4?nadangEnemyNames:chapter===3?hwangsanEnemyNames:chapter===2?ansiEnemyNames:enemyNames)[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))],hp,maxHp:hp,armor,progress:0,speed:bossName?.025:.043+(index%4)*.003,reward:bossName?30*round:difficulty==='hard'?15:20,boss:!!bossName,originStage:stage,originRound:round};
+ const finalBoss=!!bossName&&round===stageRoundCount(stage);
+ return {id,chapter,name:bossName??(chapter===10?noryangEnemyNames:chapter===9?myeongnyangEnemyNames:chapter===8?haengjuEnemyNames:chapter===7?hansandoEnemyNames:chapter===6?cheoinEnemyNames:chapter===5?gwijuEnemyNames:chapter===4?nadangEnemyNames:chapter===3?hwangsanEnemyNames:chapter===2?ansiEnemyNames:enemyNames)[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))],hp,maxHp:hp,armor,progress:0,speed:bossName?.025:.043+(index%4)*.003,reward:finalBoss?0:bossName?30*round:difficulty==='hard'?15:20,boss:!!bossName,originStage:stage,originRound:round};
 }
 // The invaders make one complete lap around the square unit field.
 export const pathAt=roadPosition;
