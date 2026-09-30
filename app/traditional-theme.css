@@ -1,17 +1,22 @@
 :root{
  color-scheme:light;
- --trad-ink:#efe4cf;
- --trad-panel:#fffaf0;
- --trad-wood:#e7d3ae;
- --trad-paper:#355047;
- --trad-text:#263a32;
- --trad-muted:#6d756a;
- --trad-red:#a9463c;
- --trad-red-hover:#c45c4d;
- --trad-brass:#b78832;
- --trad-disabled:#c9c2b4;
- --trad-jade:#4c8978;
- --trad-boss:#8c352f;
+ --trad-ink:#dcecef;
+ --trad-panel:#f8f4ea;
+ --trad-wood:#cfe1de;
+ --trad-paper:#2f6975;
+ --trad-text:#263b3f;
+ --trad-muted:#62777a;
+ --trad-red:#b85f68;
+ --trad-red-hover:#ca737a;
+ --trad-brass:#9a7a42;
+ --trad-disabled:#c8cfcc;
+ --trad-jade:#5f806b;
+ --trad-boss:#8e4c64;
+ --trad-byeok:#68aab8;
+ --trad-byeok-deep:#356f7b;
+ --trad-byeok-pale:#e3f1f1;
+ --trad-purple:#765574;
+ --trad-yellow:#a8864d;
 }
 
 html,body{background:var(--trad-ink);color:var(--trad-text)}
@@ -230,3 +235,84 @@ html,body{background:#efe6d5;color:var(--trad-text)}
 .battle-settings-trigger{background:#f1e3c9;border-color:#b99e6e;color:#304a41}.settings-links button{background:#ead8b8;border-color:#b99f70;color:#30483f}.settings-links button:hover{background:#fff8e9;border-color:#9a762f}
 .merge-success{background:#fff9ecf5;border-color:#b78832;color:#2b4239;box-shadow:0 8px 28px #4f392e38}.merge-success strong{color:#8a4b2d}.gamble-result-alert.failure{background:#fff0ecf5;border-color:#b95145}
 .front-route-note,.battle-story{color:#43584f}.battle-story small{color:#6f786f}.front-announcement{background:#fff8e9ed;border-color:#b78832;color:#293f36;text-shadow:none;box-shadow:0 8px 30px #4d39283d}
+
+/* Ogansaek skin: byeok blue leads, with green, hong, purple and yuhwang accents. */
+html,body{background:#e5eff0;color:var(--trad-text)}
+.ad-layout{background:linear-gradient(135deg,#d3e6e8,#f7f3e9 52%,#c6dde0)}
+.game-root{background:radial-gradient(circle at 50% 24%,#f9f7ef,#dcebed 76%);color:var(--trad-text)}
+.ad-layout>.game-root{border-color:#6e9ba655!important}
+.ad-placeholder{background:repeating-linear-gradient(135deg,#f8f5ec88 0 12px,#cfe4e688 12px 24px)!important;border-color:#7ea6ad99!important;color:#587177!important}
+.ad-rail-label,.ad-rail>small,.ad-placeholder p,.ad-placeholder>span:not(.ad-placeholder-mark){color:#60787c!important}
+.ad-placeholder-mark{border-color:#779da5!important;color:var(--trad-byeok-deep)!important}
+
+.game-header{background:linear-gradient(180deg,#f8f6ed,#cce3e5);border-color:#568c97;box-shadow:0 2px 12px #274b5328}
+.game-brand strong,.game-chapter{color:#244f58}.game-brand small{color:#647a7e}.game-chapter i{background:#88a9ae}
+.music-controls,.battle-resource{background:linear-gradient(180deg,#f8f6ed,#c9dfe0);border-color:#6f9da5;color:#295b65;box-shadow:inset 0 1px #fff,0 2px 5px #315b6422}
+.music-controls.is-playing{background:linear-gradient(180deg,#d8edef,#9fcbd1);border-color:var(--trad-byeok-deep);color:#183f48}
+.music-toggle:hover{color:var(--trad-purple)}.music-volume{accent-color:var(--trad-byeok-deep)}
+.game-status{background:linear-gradient(180deg,#f8f5ec,#dcebed);border-color:#83a7ad}
+.game-status>div{border-right-color:#b6ced1}.game-status small,.status-stage span{color:var(--trad-muted)}
+.status-stage b,.status-enemy b,.status-gold b,.action-gold{color:var(--trad-byeok-deep)}
+.status-speed button,.hud-speed button{background:#dcebec;border-color:#8eafb4;color:#2d555d}
+.status-speed button.on,.hud-speed button.on,.hud-speed button.active,.hud-speed button[aria-pressed=true]{background:var(--trad-byeok-deep);border-color:#285f69;color:#fff}
+
+.stage-panel,.detail-side{background:linear-gradient(145deg,#f9f7ef,#dfedef 68%,#c8dde0);border-color:#709ba3;box-shadow:inset 0 0 0 3px #fff9,0 4px 14px #31525a22}
+.panel-kicker{color:var(--trad-purple)}.stage-panel small,.detail-side small,.arena-heading small{color:#64797d}
+.stage-panel p,.selected-skill,.selected-stats span,.detail-placeholder,.side-help span{color:#5d7377}
+.hud-stat,.selected-stats,.side-help{border-color:#a9c3c6}.selected-stats span{border-bottom-color:#c7dadd}.selected-stats b{color:#285a64}
+.hud-stage strong,.hud-stat strong{color:var(--trad-byeok-deep)}.hud-stage strong span,.hud-stage>b,.hud-stage small,.hud-stat small,.hud-speed small,.hud-stat strong span,.hud-stat p{color:#526f74}
+.battle-story h3,.side-help b{color:var(--trad-byeok-deep)}.battle-story p{color:#395b61}.detail-placeholder>span{color:var(--trad-yellow)}
+.hud-rule{color:#526f74!important;border-top-color:#a9c3c6!important}
+.stage-items{border-top-color:#a9c3c6}.stage-item{color:#667d81}.stage-item.active{background:#cde5e8;color:#214f59;border-left-color:var(--trad-byeok-deep)}.stage-item.done{color:var(--trad-jade)}
+.arena-heading{color:#263b3f}.arena-stage{background:#b8d3d6;border-color:#628e97}
+.arena-foot{background:#edf3ef;border-color:#83a6aa}.arena-message{color:#405d62;border-color:#b4cbce}.wave-action>span{color:#3b5b61}
+.phase-label{background:#d8e9ea;border-color:#83a7ad;color:#31575e}.phase-label.battle{background:#efd8dc;border-color:var(--trad-red);color:#7d3d4a}
+.wave-action button,.game-actions .action-summon,.title-new,.home-primary,.splash-entry button,.story-primary,.chapter-start{background:linear-gradient(180deg,#81bdc8,var(--trad-byeok-deep));border-color:#2d6470;color:#fff;box-shadow:inset 0 1px #b9dde2,0 3px 0 #234e57,0 7px 18px #31545b2d}
+.wave-action button:hover:not(:disabled),.game-actions .action-summon:hover:not(:disabled),.title-new:hover:not(:disabled),.home-primary:hover:not(:disabled),.splash-entry button:hover:not(:disabled),.story-primary:hover:not(:disabled),.chapter-start:hover:not(:disabled){background:linear-gradient(180deg,#91c8d1,#427d88)}
+.wave-action button:disabled{background:#d1d8d6;border-color:#acb8b6;color:#78817f;box-shadow:none}
+.game-actions{background:linear-gradient(180deg,#f7f4eb,#cee2e3);border-color:#719aa2;box-shadow:0 -3px 12px #2e555d1f}
+.game-actions button,.side-book,.side-sell,.battle-story button{background:#dcebec;border-color:#82a7ad;color:#2c545c}
+.game-actions button small{color:#647a7e}.game-actions button:hover:not(:disabled),.side-book:hover,.side-sell:hover{border-color:var(--trad-byeok-deep);background:#f1f7f5}
+.game-actions .action-summon small{color:#e0f2f3}.battle-resource svg{color:var(--trad-yellow)}.battle-resource small{color:#61787c}
+.board-bag{background:linear-gradient(180deg,#f6f4eaf2,#c6dfe1f2);border-color:#5e919b;color:#295963;box-shadow:0 3px 9px #284b532d,inset 0 1px #fff}
+.board-bag:hover{background:linear-gradient(180deg,#fffdf5,#b8d8dc);border-color:var(--trad-byeok-deep)}.board-bag span{background:var(--trad-red);color:#fff}
+
+.book-modal,.help-modal,.gamble-modal,.upgrade-dialog,.unit-bag,.battle-settings-dialog,.profile-settings,.stage-map-dialog,.new-game-dialog{background:linear-gradient(145deg,#faf8f0,#e2eff0 68%,#c8dfe1);border-color:#5d8d96;color:var(--trad-text);box-shadow:0 20px 65px #29495042,inset 0 0 0 4px #fff9}
+.book-modal>header,.gamble-modal>header,.upgrade-heading,.unit-bag>header,.battle-settings-dialog>header,.profile-settings>header{border-color:#98b9bd}
+.book-modal>header>div,.gamble-modal>header>div:first-child,.upgrade-heading>div{color:var(--trad-byeok-deep)}
+.book-modal header b,.gamble-modal header b,.upgrade-heading b{color:#234a52}
+.book-modal>header button,.gamble-modal>header>button,.upgrade-dialog .upgrade-heading>button,.unit-bag header>button,.battle-settings-dialog>header button,.profile-settings header>button{color:#2e5962}
+.overlay-shade,.gamble-shade,.stage-map-shade{background:#18363b5c;backdrop-filter:blur(3px)}
+.book-tabs button,.upgrade-tabs button,.bag-tabs button{background:#d6e8e9;border-color:#86a9ae;color:#315a62}
+.book-tabs button.active,.upgrade-tabs button[aria-pressed=true],.bag-tabs button[aria-pressed=true]{background:var(--trad-byeok-deep);border-color:#285e68;color:#fff}
+.book-card{background:#dcebed;border-color:#7da4aa;color:#fff}.book-card-art{background:#c8e0e2}
+.book-card .book-card-head h3{color:#fff}.book-card .book-card-head small{color:#d9f0f2}
+.book-card .book-ingredients span{background:#244b54df;border-color:#8fb8bd;color:#eef8f8}.book-card .book-ingredients span.have{background:#5f806be8;border-color:#d8bf79;color:#fffbdc}
+.book-card.ready{background:#e2f0f1;border-color:#4b8d99;box-shadow:0 0 0 2px #68aab877,0 0 18px #68aab866}.book-card.ready:hover{background:#f1f8f8;box-shadow:0 0 0 2px #4f929e,0 0 24px #68aab888}
+
+.gamble-scroll h3,.upgrade-list span,.upgrade-status{color:#2d5b65}.gamble-scroll p,.gamble-grid article>span,.upgrade-list small,.battle-settings-dialog>p{color:#60767a}.gamble-balance{color:var(--trad-yellow)}
+.gamble-grid article,.upgrade-list article{background:#e4eff0;border-color:#90afb4}.gamble-grid article>button,.upgrade-dialog button,.upgrade-open{background:var(--trad-purple);border-color:#60435f;color:#fff}.gamble-grid article>button:hover:not(:disabled),.upgrade-dialog button:hover:not(:disabled){background:#8a6687}.gamble-grid article>button:disabled,.upgrade-dialog button:disabled{background:#cdd4d2;border-color:#aeb9b7;color:#77817f}
+.unit-bag button,.battle-settings-dialog button,.profile-settings button{background:#d8e8e9;border-color:#86a8ad;color:#2c555e}.bag-grid>button{background:#eaf2ef}.bag-grid>button.selected{outline-color:var(--trad-byeok-deep);background:#cbe4e7}.bag-grid>button>span:last-child{background:#315d65;color:#fff}.bag-auto-store{background:linear-gradient(180deg,#f7f5ec,#cfe3e4);border-color:#81a5aa;color:#315960}.bag-auto-store .bag-auto-check{background:#f9f7ef;border-color:#7ea3a9}.bag-auto-store input:checked+.bag-auto-check{background:var(--trad-jade);border-color:#496c58}.bag-selection{border-color:#91b0b4}
+
+.title-landscape:after{background:linear-gradient(90deg,#e3f0f0ed 0%,#f8f5ecb8 35%,#e4f1f13d 65%,transparent),linear-gradient(0deg,#c7e0e3c4,transparent 50%)}
+.mobile-home,.home-keyart{background-color:#d8e9ea}.title-intro,.title-chapter p,.title-save-note,.title-footer{color:#526d72;text-shadow:0 1px #fff}
+.title-continue,.title-archives>button,.home-secondary,.home-settings-toggle,.home-settings-panel,.home-settings-panel button,.home-return{background:#f7f5eceb;border-color:#7ba1a7;color:#28525a}
+.title-continue:hover:not(:disabled),.title-archives>button:hover,.home-secondary:hover{background:#fffdf6;border-color:var(--trad-byeok-deep)}
+.title-chapter,.title-footer{border-color:#65909a55}.home-vignette{background:linear-gradient(180deg,#e2eff01c,transparent 42%,#b9d8dcbf 86%,#aacdd2)}
+.home-title{color:#fff;text-shadow:0 2px 0 #356f7b,0 4px 16px #274d55a6}.home-title i{color:#d8bd78}.home-settings-panel{box-shadow:0 10px 30px #294b5238}.home-settings-panel hr{border-top-color:#99b7bb}.home-settings-account{color:#5f777b}
+.home-auth-panel{border-color:#67959e;background:#f7f5ecef;box-shadow:0 -10px 35px #2949503b;color:#264c54}.home-auth-panel h2{color:#264c54}.home-auth-panel>p,.auth-config-note{color:#60777b!important}.auth-guest{background:#d6e7e8;border-color:#7ca1a7;color:#2b555e}.auth-error{color:#a34f5a!important}
+
+.story-library{background:radial-gradient(ellipse at 50% 35%,#f9f7ef,#d7e9ea 70%,#b6d4d8);color:var(--trad-text)}
+.story-library>header,.story-library>footer{background:#f7f5eceb;border-color:#789fa6}.story-library header button,.story-library footer button{background:#d3e6e7;border-color:#7ea3a9;color:#2a565f}
+.story-shelf{background:linear-gradient(0deg,#86abb1 0 13%,transparent 13%);scrollbar-color:var(--trad-byeok-deep) #e1eeee}
+.story-arrival{background:#dcecef;color:var(--trad-text)}.story-arrival>header,.story-journal,.story-dialogue{background:#f8f5eceb;border-color:#7fa4aa}.story-arrival header button,.story-training{background:#d6e7e8;border-color:#83a6ab;color:#2b555e}.story-dialogue h2,.story-journal span,.story-training-top,.story-recipe h3{color:#2d606a}
+
+.stage-map-screen,.front-selection .front-selection-shell{background:#dcecef;color:var(--trad-text)}.stage-map-heading,.region-heading,.region-navigation{background:#f8f5ec;color:#264d55;box-shadow:0 3px 10px #294b5224}
+.map-back,.region-heading button,.region-navigation button,.region-mode button{background:#d3e5e6;border-color:#7ea3a9;color:#2b555e}.map-chapter-count,.region-mode small{background:#e8f1ef;color:#315960;border-color:#8cabb0}
+.region-mode button.active{background:var(--trad-jade);border-color:#4b705a;color:#fff}.region-pin strong,.region-pin small{background:#f8f5eced;color:#2e5961;border-color:#709aa2;box-shadow:0 2px 6px #27495130}.region-seal{background:linear-gradient(135deg,#86c0ca,var(--trad-byeok-deep));border-color:#b7dce1}.region-pin.available:hover .region-seal,.region-pin:focus-visible .region-seal{box-shadow:0 0 0 5px #68aab855,0 0 24px #68aab8}.region-pin.complete .region-seal{background:var(--trad-jade)}.region-pin.locked .region-seal{background:#c8cfcc;border-color:#a5b0ae;color:#737c7a}
+.hard-preview .region-mode button.active{background:var(--trad-red);border-color:#994d58;color:#fff}.hard-preview .region-pin .region-seal{background:linear-gradient(135deg,#ca737a,#765574);border-color:#e1a0a4;color:#fff}.hard-preview .region-pin.locked .region-seal{background:linear-gradient(135deg,#a78590,#725462);border-color:#b98b98}.hard-preview .region-pin:focus-visible .region-seal,.hard-preview .region-pin:hover .region-seal{box-shadow:0 0 0 5px #b85f6855,0 0 24px var(--trad-red)}
+.stage-map-viewport{border-color:#608f98;scrollbar-color:var(--trad-byeok-deep) #dfedef}
+.battle-settings-trigger{background:#d7e8e9;border-color:#7fa4aa;color:#2a565f}.settings-links button{background:#d4e6e7;border-color:#80a5aa;color:#2b555d}.settings-links button:hover{background:#f4f8f5;border-color:var(--trad-byeok-deep)}
+.merge-success{background:#f7f5ecf5;border-color:var(--trad-byeok-deep);color:#294e56;box-shadow:0 8px 28px #29495038}.merge-success strong{color:var(--trad-purple)}.gamble-result-alert.failure{background:#f8e8ebf5;border-color:var(--trad-red)}
+.front-route-note,.battle-story{color:#395b61}.battle-story small{color:#637a7e}.front-announcement{background:#f7f5eced;border-color:#67949d;color:#274f57;text-shadow:none;box-shadow:0 8px 30px #29495038}
+button:focus-visible,[role="button"]:focus-visible{outline-color:var(--trad-byeok-deep)!important}
