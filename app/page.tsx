@@ -53,6 +53,7 @@ import {salePrice} from '@/lib/selling';
 import {stageRoundCount,roundBossName,roundEnemyCount,roundKey,ROUND_CLEAR_GOLD,isStageComplete,isCampaignComplete,nextRound} from '@/lib/rounds';
 import {frontForStage,CAMPAIGN_STORAGE_KEY,FINAL_WAVE,isWaveUnlocked,readCampaignProgress,recordWaveClear} from '@/lib/campaign';
 import {SAVE_KEY,canContinue,makeGameSave,readGameSave,remainingStageMs,restoredCounters,type GameSave} from '@/lib/save';
+import {useSocialAuth} from './AuthProvider';
 
 type Phase='ready'|'battle'|'cleared'|'lost'|'won';
 type Overlay='book'|'help'|null;
@@ -68,6 +69,7 @@ function Hearts({remaining}:{remaining:number}){return <div className="heart-row
 function AttackOverlay({effects}:{effects:AttackEffect[]}){return <svg className="battle-effects" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">{effects.map(fx=><g key={fx.id} style={{'--fx-color':fx.color} as React.CSSProperties}><line className="attack-glow" x1={fx.fromX} y1={fx.fromY} x2={fx.toX} y2={fx.toY}/><line className="attack-streak" x1={fx.fromX} y1={fx.fromY} x2={fx.toX} y2={fx.toY} pathLength="100"/><circle className="attack-origin" cx={fx.fromX} cy={fx.fromY} r=".8"/><circle className="attack-impact" cx={fx.toX} cy={fx.toY} r="1.2"/></g>)}</svg>}
 
 export default function Game(){
+ const auth=useSocialAuth();
  const [chapter,setChapter]=useState<ChapterId>(1);
  const [salsuCleared,setSalsuCleared]=useState(0),[ansiCleared,setAnsiCleared]=useState(0),[hwangsanCleared,setHwangsanCleared]=useState(0),[nadangCleared,setNadangCleared]=useState(0),[gwijuCleared,setGwijuCleared]=useState(0),[cheoinCleared,setCheoinCleared]=useState(0),[hansandoCleared,setHansandoCleared]=useState(0),[haengjuCleared,setHaengjuCleared]=useState(0),[myeongnyangCleared,setMyeongnyangCleared]=useState(0);
  const canEnterChapter=(id:ChapterId)=>chapterUnlocked(id,salsuCleared,ansiCleared,hwangsanCleared,nadangCleared,gwijuCleared,cheoinCleared,hansandoCleared,haengjuCleared,myeongnyangCleared);
@@ -388,6 +390,7 @@ export default function Game(){
  },[home,phase,stage,round]);
  useEffect(()=>{if(home||legendary.active||phase==='lost'||phase==='won')return;if(isOverrun(enemies.length)){setWall(0);setPhase('lost');deadlineRef.current=null;setNotice('적군이 100명 누적되어 방어선이 무너졌습니다.');return}if(!canCompleteStage({phase,timeLeft,spawned,maxSpawn,enemyCount:enemies.length,paused:!!legendary.active},stage,round)&&!( !stageEnd&&canAutoAdvanceRound({phase,timeLeft,spawned,maxSpawn,enemyCount:enemies.length,paused:!!legendary.active})))return;finishRound(true);},[home,wall,timeLeft,spawned,enemies.length,phase,stage,round,maxSpawn,legendary.active,bossDialogue]);
  const timeLabel=`00:${String(timeLeft).padStart(2,'0')}`;
+ if(auth.status==='loading'||auth.status==='signedOut')return <div className="game-root on-title"><TitleScreen onProfile={()=>setProfileOpen(true)} onPrologue={()=>setReplayPrologue(true)} save={saved} ready={saveReady} storageError={storageError} inert={false} onNew={newGame} onContinue={continueGame} onCodex={()=>openCodex()}/></div>;
  if(!playerReady)return <div className="game-root prologue"><p role="status">서책을 펼치는 중입니다…</p></div>;
  if(!player||!player.prologueComplete||replayPrologue)return <div className="game-root on-prologue"><Prologue profile={player} storageError={playerStorageError} onCreate={nickname=>savePlayer({version:1,nickname,prologueComplete:false})} onComplete={()=>{if(player)savePlayer({...player,prologueComplete:true});setReplayPrologue(false);setBooksOpen(true);}} onClose={replayPrologue?()=>setReplayPrologue(false):undefined}/></div>;
  if(booksOpen&&home)return <div className="game-root"><StoryBooks haengjuCleared={haengjuCleared} myeongnyangCleared={myeongnyangCleared} hansandoCleared={hansandoCleared} cheoinCleared={cheoinCleared} gwijuCleared={gwijuCleared} nadangCleared={nadangCleared} hwangsanCleared={hwangsanCleared} ansiCleared={ansiCleared} salsuCleared={salsuCleared} onBack={()=>setBooksOpen(false)} onSelect={next=>{if(!canEnterChapter(next))return;selectChapter(next);setBooksOpen(false);const seen=storyWasSeen(next);setStoryOpen(!seen);setMapOpen(seen);setMapModalOpen(false);}}/></div>;

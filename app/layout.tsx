@@ -42,7 +42,9 @@ import './popup-scroll.css';
 import './gambling.css';
 import './troop-cards.css';
 import './bottom-sheets.css';
+import './social-auth.css';
 import './traditional-theme.css';
 import AdPlaceholder from './AdPlaceholder';
+import AuthProvider from './AuthProvider';
 export const metadata: Metadata = { title: '한국사 조합 디펜스', description: '병사를 모집하고 한국사의 영웅을 조합하여 다양한 전장에 도전하세요.' };
-export default function RootLayout({ children }: Readonly<{children: React.ReactNode}>) { return <html lang="ko"><body><div className="ad-layout"><AdPlaceholder side="left"/>{children}<AdPlaceholder side="right"/></div></body></html>; }
+export default function RootLayout({ children }: Readonly<{children: React.ReactNode}>) { return <html lang="ko"><body><AuthProvider><div className="ad-layout"><AdPlaceholder side="left"/>{children}<AdPlaceholder side="right"/></div></AuthProvider></body></html>; }
