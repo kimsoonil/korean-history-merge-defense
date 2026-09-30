@@ -14,7 +14,7 @@
 .book-card .book-card-head>div{min-width:0;flex:1}
 .book-card .book-card-head h3{font-size:15px;color:#fff7df;margin:2px 0 0;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .book-card .book-card-head small{display:block;font-size:9px;color:#ffe1a0;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.book-card .book-ingredients{position:relative;z-index:2;display:flex;flex-wrap:wrap;align-content:flex-start;gap:3px;margin:auto 0 0;padding:2px 9px 9px;overflow:hidden}
+.book-card .book-ingredients{position:relative;z-index:2;display:flex;flex:0 0 auto;flex-wrap:wrap;align-content:flex-start;gap:3px;margin:auto 0 0;padding:2px 9px 9px;overflow:hidden}
 .book-card .book-ingredients span{font-size:9px;line-height:1.35;padding:2px 4px;background:#182b24d9;border:1px solid #9aab90;color:#eef3df;border-radius:3px;white-space:nowrap;box-shadow:0 1px 2px #0004}
 .book-card .book-ingredients span.have{background:#527b5ee8;border-color:#f0d68e;color:#fff6bf}
 .book-card.ready{cursor:pointer;background:#546b3f;border:2px solid #f4d88d;box-shadow:0 0 0 2px #725f2d,0 0 16px #f0cf6766}
