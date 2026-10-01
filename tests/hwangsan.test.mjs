@@ -37,8 +37,8 @@ test('Hwangsan boss dialogues, Gaebaek art and final victory use chapter three',
   assert.ok(bossLine(name,10,false,3));assert.ok(bossLine(name,10,true,3));
   if(name!=='계백')assert.equal(defeatedDialogueBoss([{id:1,name,boss:true,hp:1}],new Map([[1,5]])).name,name);
  }
- assert.equal(createRoundInvader(10,65,0,1,'normal',3).hp,50000);
- assert.equal(createRoundInvader(10,65,0,1,'hard',3).hp,100000);
+ assert.equal(createRoundInvader(10,65,0,1,'normal',3).hp,111000);
+ assert.equal(createRoundInvader(10,65,0,1,'hard',3).hp,111000);
  assert.deepEqual(enemyPortraits['계백'],byName['계백'].atlas);
  const save=makeGameSave({chapter:3,stage:10,round:65,enemies:[],roster:[],gold:400,wall:10,phase:'won',spawned:15,speed:1,remainingMs:0},1);
  assert.deepEqual(readGameSave(JSON.stringify(save)),save);

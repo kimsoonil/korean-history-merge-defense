@@ -3,15 +3,17 @@ import assert from 'node:assert/strict';
 import {nicknameError,normalizeNickname,readPlayer,spiritDialogue,profileAvatars,resolveProfileAvatar} from '../lib/player.ts';
 test('profile image persists and invalid images fall back without losing progress',()=>{
  const profile={version:1,nickname:'새이름',prologueComplete:true,tutorialComplete:true,avatar:'세종대왕'};
- assert.deepEqual(readPlayer(JSON.stringify(profile)),profile);
+ const restored=readPlayer(JSON.stringify(profile));
+ assert.equal(restored.avatar,'세종대왕');assert.deepEqual(restored.unlockedAvatars,['시민','세종대왕']);
  const invalid=readPlayer(JSON.stringify({...profile,avatar:'../../unknown'}));
  assert.equal(invalid.avatar,undefined);assert.equal(invalid.tutorialComplete,true);
 });
-test('profile choices are only tier four and five with centered face crops',()=>{
- assert.equal(profileAvatars.length,16);
- assert.ok(profileAvatars.every(a=>[4,5].includes(a.tier)&&a.x>=120&&a.x<=1416&&a.y>=120&&a.y<=904));
- assert.equal(resolveProfileAvatar('scholar').id,'이순신');
- assert.equal(resolveProfileAvatar(undefined).id,'이순신');
+test('profile choices include every current unit and begin with the citizen',()=>{
+ assert.equal(profileAvatars.length,40);
+ assert.deepEqual([...new Set(profileAvatars.map(a=>a.tier))],[1,2,3,4,5]);
+ assert.ok(profileAvatars.every(a=>a.src&&((a.standalone&&!a.x&&!a.y)||(!a.standalone&&a.x>=0&&a.y>=0))));
+ assert.equal(resolveProfileAvatar('scholar').id,'시민');
+ assert.equal(resolveProfileAvatar(undefined).id,'시민');
  for(const avatar of profileAvatars)assert.equal(resolveProfileAvatar(avatar.id),avatar);
 });
 test('nickname validates before insertion and normalizes Korean text',()=>{

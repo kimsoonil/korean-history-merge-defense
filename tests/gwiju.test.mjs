@@ -35,8 +35,8 @@ test('Gwiju boss speech, final balance and victory save use chapter five',()=>{
   assert.equal(roundBossName(10,Number(round),5),name);assert.ok(bossLine(name,10,false,5));assert.ok(bossLine(name,10,true,5));
   if(name!=='소배압')assert.equal(defeatedDialogueBoss([{id:1,name,boss:true,hp:1}],new Map([[1,5]])).name,name);
  }
- assert.equal(createRoundInvader(10,65,0,1,'normal',5).hp,50000);
- assert.equal(createRoundInvader(10,65,0,1,'hard',5).hp,100000);
+ assert.equal(createRoundInvader(10,65,0,1,'normal',5).hp,122000);
+ assert.equal(createRoundInvader(10,65,0,1,'hard',5).hp,122000);
  const save=makeGameSave({chapter:5,stage:10,round:65,enemies:[],roster:[],gold:400,wall:10,phase:'won',spawned:15,speed:1,remainingMs:0},1);
  assert.deepEqual(readGameSave(JSON.stringify(save)),save);
 });

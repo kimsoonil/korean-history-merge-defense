@@ -1,4 +1,4 @@
-import type {PlayerProfile} from './player.ts';
+import {PROFILE_REWARD_PLAN,profileAvatars,type PlayerProfile} from './player.ts';
 
 export const ADMIN_COMPLETE_PROGRESS=10;
 export const ADMIN_NICKNAME='관리자';
@@ -17,7 +17,8 @@ export function isAdminAccount(userEmail:string|undefined|null,adminEmail:string
 }
 
 export function adminPlayerProfile(existing:PlayerProfile|null):PlayerProfile{
- return {...(existing??{}),version:1,nickname:ADMIN_NICKNAME,prologueComplete:true,tutorialComplete:true};
+ const claimed=Object.entries(PROFILE_REWARD_PLAN).flatMap(([chapter,stages])=>Object.keys(stages).map(stage=>`${chapter}-${stage}`));
+ return {...(existing??{}),version:1,nickname:ADMIN_NICKNAME,prologueComplete:true,tutorialComplete:true,unlockedAvatars:profileAvatars.map(avatar=>avatar.id),claimedProfileRewards:claimed};
 }
 
 export const adminProgressValue=()=>JSON.stringify({version:1,highestClearedWave:ADMIN_COMPLETE_PROGRESS});

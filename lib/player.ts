@@ -1,26 +1,52 @@
+import {units} from './game.ts';
+import type {ChapterId} from './ansi.ts';
+
 export const PLAYER_KEY='salsu-player-v1';
-// Face centers on the 1536×1024 hero atlases; crop each hero individually.
-export const profileAvatars=[
- {id:'연개소문',name:'연개소문',tier:4,x:255,y:185},
- {id:'김춘추',name:'김춘추',tier:4,x:590,y:175},
- {id:'대조영',name:'대조영',tier:4,x:1005,y:185},
- {id:'왕건',name:'왕건',tier:4,x:1375,y:180},
- {id:'강감찬',name:'강감찬',tier:4,x:205,y:680},
- {id:'권율',name:'권율',tier:4,x:610,y:690},
- {id:'계백',name:'계백',tier:4,x:1005,y:690},
- {id:'장보고',name:'장보고',tier:4,x:1385,y:670},
- {id:'이순신',name:'이순신',tier:5,x:245,y:220},
- {id:'세종대왕',name:'세종대왕',tier:5,x:590,y:205},
- {id:'광개토대왕',name:'광개토대왕',tier:5,x:1010,y:220},
- {id:'을지문덕',name:'을지문덕',tier:5,x:1370,y:230},
- {id:'김유신',name:'김유신',tier:5,x:235,y:715},
- {id:'이성계',name:'이성계',tier:5,x:590,y:715},
- {id:'척준경',name:'척준경',tier:5,x:1000,y:720},
- {id:'정조',name:'정조',tier:5,x:1355,y:695}
-];
-export const defaultProfileAvatar='이순신';
+export type ProfileAvatar={id:string;name:string;tier:number;src:string;x?:number;y?:number;standalone:boolean};
+
+// Hand-tuned face centers for the current high-tier atlases. Any future tier 6/7
+// unit registered in game.ts with atlas artwork is added here automatically.
+const faceCenters:Record<string,[number,number]>={
+ 연개소문:[255,185],김춘추:[590,175],대조영:[1005,185],왕건:[1375,180],강감찬:[205,680],권율:[610,690],계백:[1005,690],장보고:[1385,670],
+ 이순신:[245,220],세종대왕:[590,205],광개토대왕:[1010,220],을지문덕:[1370,230],김유신:[235,715],이성계:[590,715],척준경:[1000,720],정조:[1355,695],
+};
+export const profileAvatars:ProfileAvatar[]=units.map(unit=>{
+ const atlas=unit.atlas,center=faceCenters[unit.name]??(atlas?[atlas.col*384+192,atlas.row*512+190] as [number,number]:undefined);
+ return {id:unit.name,name:unit.name,tier:unit.tier,src:atlas?.src??unit.portrait??'',...(center?{x:center[0],y:center[1]}:{}),standalone:!atlas};
+});
+export const defaultProfileAvatar='시민';
+export type PlayerProfile={version:1;nickname:string;prologueComplete:boolean;tutorialComplete?:boolean;avatar?:string;unlockedAvatars?:string[];claimedProfileRewards?:string[];hardClearReward?:boolean;title?:'salsu';frame?:'crimson'};
+export type ProfileReward={avatar:ProfileAvatar;chapter:ChapterId;stage:number};
+
+// 55 planned rewards: seven tier-one units and eight units in every tier 2–7.
+// Tier 6/7 slots stay dormant until matching units are added to the game data.
+export const PROFILE_REWARD_PLAN:Readonly<Record<ChapterId,Readonly<Partial<Record<number,number>>>>>= {
+ 1:{1:1,2:1,3:1,4:1,6:1,8:1,10:1},
+ 2:{1:2,2:2,4:2,6:2,8:2,10:2},
+ 3:{1:2,2:2,4:3,6:3,8:3,10:3},
+ 4:{1:3,2:3,4:3,6:3,8:4,10:4},
+ 5:{2:4,4:4,6:4,8:4,10:4},
+ 6:{2:4,4:5,6:5,8:5,10:5},
+ 7:{2:5,4:5,6:5,8:5,10:6},
+ 8:{2:6,4:6,6:6,8:6,10:6},
+ 9:{2:6,4:6,6:7,8:7,10:7},
+ 10:{2:7,4:7,6:7,8:7,10:7},
+};
+const validAvatar=(id:unknown):id is string=>typeof id==='string'&&profileAvatars.some(avatar=>avatar.id===id);
+export function unlockedProfileIds(profile:Pick<PlayerProfile,'avatar'|'unlockedAvatars'>){
+ return new Set([defaultProfileAvatar,...(profile.unlockedAvatars??[]).filter(validAvatar),...(validAvatar(profile.avatar)?[profile.avatar]:[])]);
+}
+export function profileRewardTier(chapter:ChapterId,stage:number){return PROFILE_REWARD_PLAN[chapter][stage]??null;}
+export const profileRewardKey=(chapter:ChapterId,stage:number)=>`${chapter}-${stage}`;
+export function awardStageProfile(profile:PlayerProfile,chapter:ChapterId,stage:number,random=Math.random):{profile:PlayerProfile;reward:ProfileReward|null}{
+ const tier=profileRewardTier(chapter,stage),key=profileRewardKey(chapter,stage),claimed=new Set(profile.claimedProfileRewards??[]);
+ if(!tier||claimed.has(key))return {profile,reward:null};
+ const unlocked=unlockedProfileIds(profile),candidates=profileAvatars.filter(avatar=>avatar.tier===tier&&avatar.id!==defaultProfileAvatar&&!unlocked.has(avatar.id));
+ if(!candidates.length)return {profile,reward:null};
+ const avatar=candidates[Math.min(candidates.length-1,Math.floor(Math.max(0,Math.min(.999999999,random()))*candidates.length))];
+ return {profile:{...profile,unlockedAvatars:[...unlocked,avatar.id],claimedProfileRewards:[...claimed,key]},reward:{avatar,chapter,stage}};
+}
 export function resolveProfileAvatar(id?:string){return profileAvatars.find(a=>a.id===id)??profileAvatars.find(a=>a.id===defaultProfileAvatar)!;}
-export type PlayerProfile={version:1;nickname:string;prologueComplete:boolean;tutorialComplete?:boolean;avatar?:string;hardClearReward?:boolean;title?:'salsu';frame?:'crimson'};
 export const HARD_CLEAR_TITLE='살수의 지배자';
 export function awardHardClear(profile:PlayerProfile,cleared:number):PlayerProfile{
  return cleared>=10&&!profile.hardClearReward?{...profile,hardClearReward:true,title:'salsu',frame:'crimson'}:profile;
@@ -34,7 +60,10 @@ export function readPlayer(raw:string|null):PlayerProfile|null{
  try{
   const value=JSON.parse(raw??'null');
   if(value?.version!==1||typeof value.nickname!=='string'||nicknameError(value.nickname)||typeof value.prologueComplete!=='boolean')return null;
-  return {version:1,nickname:normalizeNickname(value.nickname),prologueComplete:value.prologueComplete,...(value.tutorialComplete===true?{tutorialComplete:true}:{}),...(profileAvatars.some(a=>a.id===value.avatar)?{avatar:value.avatar}:{}),...(value.hardClearReward===true?{hardClearReward:true,...(value.title==='salsu'?{title:'salsu' as const}:{}),...(value.frame==='crimson'?{frame:'crimson' as const}:{})}:{})};
+  const unlocked=unlockedProfileIds({avatar:value.avatar,unlockedAvatars:Array.isArray(value.unlockedAvatars)?value.unlockedAvatars:[]});
+  const claimed:string[]=Array.isArray(value.claimedProfileRewards)?value.claimedProfileRewards.filter((key:unknown):key is string=>typeof key==='string'&&/^([1-9]|10)-([1-9]|10)$/.test(key)):[];
+  const avatar=validAvatar(value.avatar)&&unlocked.has(value.avatar)?value.avatar:undefined;
+  return {version:1,nickname:normalizeNickname(value.nickname),prologueComplete:value.prologueComplete,...(value.tutorialComplete===true?{tutorialComplete:true}:{}),...(avatar?{avatar}:{}),...(unlocked.size>1?{unlockedAvatars:[...unlocked]}:{}),...(claimed.length?{claimedProfileRewards:[...new Set(claimed)]}:{}),...(value.hardClearReward===true?{hardClearReward:true,...(value.title==='salsu'?{title:'salsu' as const}:{}),...(value.frame==='crimson'?{frame:'crimson' as const}:{})}:{})};
  }catch{return null;}
 }
 export function spiritDialogue(name:string){return `마침내... 천명을 이을 자가 나타났구나. ${name}, 들리느냐? 지금 누군가에 의해 우리의 역사가 지워지고 있다! 이대로 가면 네가 사는 미래도, 네 존재도 흔적 없이 사라질 것이다!`;}

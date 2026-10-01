@@ -35,8 +35,8 @@ test('Nadang boss dialogues, final balance and victory are chapter-specific',()=
   assert.ok(bossLine(name,10,false,4));assert.ok(bossLine(name,10,true,4));
   if(name!=='설인귀')assert.equal(defeatedDialogueBoss([{id:1,name,boss:true,hp:1}],new Map([[1,5]])).name,name);
  }
- assert.equal(createRoundInvader(10,65,0,1,'normal',4).hp,50000);
- assert.equal(createRoundInvader(10,65,0,1,'hard',4).hp,100000);
+ assert.equal(createRoundInvader(10,65,0,1,'normal',4).hp,117000);
+ assert.equal(createRoundInvader(10,65,0,1,'hard',4).hp,117000);
  const save=makeGameSave({chapter:4,stage:10,round:65,enemies:[],roster:[],gold:400,wall:10,phase:'won',spawned:15,speed:1,remainingMs:0},1);
  assert.deepEqual(readGameSave(JSON.stringify(save)),save);
  assert.match(nadangVictory,/나당전쟁/);

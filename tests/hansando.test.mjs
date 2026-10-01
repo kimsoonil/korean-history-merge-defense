@@ -34,8 +34,8 @@ test('Hansando dialogue, final boss balance and victory save use chapter seven',
   assert.equal(roundBossName(10,Number(round),7),name);assert.ok(bossLine(name,10,false,7));assert.ok(bossLine(name,10,true,7));
   if(name!=='와키자카 야스하루')assert.equal(defeatedDialogueBoss([{id:1,name,boss:true,hp:1}],new Map([[1,5]])).name,name);
  }
- assert.equal(createRoundInvader(10,65,0,1,'normal',7).hp,50000);
- assert.equal(createRoundInvader(10,65,0,1,'hard',7).hp,100000);
+ assert.equal(createRoundInvader(10,65,0,1,'normal',7).hp,133000);
+ assert.equal(createRoundInvader(10,65,0,1,'hard',7).hp,133000);
  const save=makeGameSave({chapter:7,stage:10,round:65,enemies:[],roster:[],gold:400,wall:10,phase:'won',spawned:15,speed:1,remainingMs:0},1);
  assert.deepEqual(readGameSave(JSON.stringify(save)),save);
 });

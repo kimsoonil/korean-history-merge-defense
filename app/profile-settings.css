@@ -1,3 +1,4 @@
+.profile-options button{position:relative}.profile-options button.locked{filter:grayscale(1);opacity:.46;cursor:not-allowed}.profile-options button.locked .profile-face{filter:brightness(.35)}.profile-options .profile-lock{position:absolute;top:24px;left:50%;transform:translate(-50%,-50%);color:#fff3cf;filter:drop-shadow(0 1px 2px #000)}
 .profile-face{position:relative;display:block!important;flex:none;width:36px;height:36px;overflow:hidden;border-radius:50%;background:#344e3e;border:1px solid #ceba80}
 .profile-face.profile-frame-crimson{border:3px solid #db6556;box-sizing:border-box;box-shadow:0 0 0 2px #722a35,0 0 0 3px #f4cb82,0 0 12px #de554b80}
 .profile-preview{flex-direction:column;align-items:center;gap:12px}

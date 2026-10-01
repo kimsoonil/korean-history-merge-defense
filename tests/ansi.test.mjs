@@ -32,8 +32,8 @@ test('Ansi every stage round spawns and resumes with Tang enemies',()=>{
 });
 test('Ansi bosses preserve established balance and chapter one remains Sui',()=>{
  for(const [round,name] of Object.entries(ansiBossNames))assert.equal(roundBossName(10,Number(round),2),name);
- assert.equal(createRoundInvader(10,65,0,1,'normal',2).hp,50000);
- assert.equal(createRoundInvader(10,65,0,1,'hard',2).hp,100000);
+ assert.equal(createRoundInvader(10,65,0,1,'normal',2).hp,106000);
+ assert.equal(createRoundInvader(10,65,0,1,'hard',2).hp,106000);
  assert.equal(createRoundInvader(10,65,0,1,'normal',1).name,'수양제');
  assert.equal(createRoundInvader(10,60,0,1,'normal',2).reward,1800);
 });

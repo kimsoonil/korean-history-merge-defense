@@ -14,6 +14,6 @@ test('normal enemies pay twenty or fifteen, while stage-final bosses pay no rewa
  }
  assert.equal(createRoundInvader(1,10,0,1).reward,300);
  assert.equal(createRoundInvader(9,60,0,1).reward,0);
- assert.equal(createRoundInvader(10,65,0,1).hp,50000);
+ assert.equal(createRoundInvader(10,65,0,1).hp,100000);
  assert.equal(createRoundInvader(10,65,0,1,'hard').hp,100000);
 });

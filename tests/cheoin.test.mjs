@@ -34,8 +34,8 @@ test('Cheoin dialogue, final boss balance and victory save use chapter six',()=>
   assert.equal(roundBossName(10,Number(round),6),name);assert.ok(bossLine(name,10,false,6));assert.ok(bossLine(name,10,true,6));
   if(name!=='살리타')assert.equal(defeatedDialogueBoss([{id:1,name,boss:true,hp:1}],new Map([[1,5]])).name,name);
  }
- assert.equal(createRoundInvader(10,65,0,1,'normal',6).hp,50000);
- assert.equal(createRoundInvader(10,65,0,1,'hard',6).hp,100000);
+ assert.equal(createRoundInvader(10,65,0,1,'normal',6).hp,128000);
+ assert.equal(createRoundInvader(10,65,0,1,'hard',6).hp,128000);
  const save=makeGameSave({chapter:6,stage:10,round:65,enemies:[],roster:[],gold:400,wall:10,phase:'won',spawned:15,speed:1,remainingMs:0},1);
  assert.deepEqual(readGameSave(JSON.stringify(save)),save);
 });
