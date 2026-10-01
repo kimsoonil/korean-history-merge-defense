@@ -2,4 +2,8 @@
 .hero-skill-flash>img{position:absolute;width:100%;height:100%;inset:0;object-fit:cover;opacity:.7}
 .hero-skill-caption{position:absolute;left:8%;right:8%;bottom:15%;display:flex;flex-direction:column;gap:5px;text-align:center;color:#fff4ce;text-shadow:0 2px 5px #161c12;padding:10px;background:linear-gradient(90deg,transparent,#14251bc9,transparent);font-size:clamp(12px,2vw,22px)}
 .hero-skill-caption span{font-size:.65em}
+.hero-skill-flash.tier-seven-ultimate{box-shadow:inset 0 0 70px var(--ultimate-accent,#f2cf72);animation:ultimate-pulse .42s ease-out both}
+.ultimate-fallback{position:absolute;inset:0;background:radial-gradient(circle at 50% 42%,color-mix(in srgb,var(--ultimate-accent,#f2cf72) 78%,white),transparent 18%),conic-gradient(from 45deg,#0c1510,var(--ultimate-accent,#f2cf72),#182319,var(--ultimate-accent,#f2cf72),#0c1510);opacity:.72}
+.tier-seven-ultimate .hero-skill-caption{border-block:1px solid var(--ultimate-accent,#f2cf72);background:linear-gradient(90deg,transparent,#111b17e8,transparent)}
+@keyframes ultimate-pulse{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:scale(1)}}
 .hero-extra-skill{display:block;margin-top:7px;color:#f4d48b;font-size:12px;line-height:1.5}

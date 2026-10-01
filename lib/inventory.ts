@@ -1,5 +1,6 @@
 import {byName,type Soldier,type UnitDef} from './game.ts';
 import {salePrice} from './selling.ts';
+import {isFinalUnitTier,isStorableUnitTier,isUnitTier} from './unit-tiers.ts';
 export const DEPLOY_LIMIT=25;
 export type Bag=Record<string,number>;
 export function inventoryRecipeStatus(recipe:string[],roster:Soldier[],bag:Bag){
@@ -23,7 +24,7 @@ export function combineInventory(unit:UnitDef,roster:Soldier[],bag:Bag,id:number
   else return {ok:false as const,reason:'materials' as const};
  }
  if(field.length>=DEPLOY_LIMIT){
-  if(unit.tier>=5)return {ok:false as const,reason:'capacity' as const};
+  if(isFinalUnitTier(unit.tier))return {ok:false as const,reason:'capacity' as const};
   next[unit.name]=(next[unit.name]??0)+1;
   return {ok:true as const,roster:field,bag:next,stored:true};
  }
@@ -33,17 +34,19 @@ export function combineInventory(unit:UnitDef,roster:Soldier[],bag:Bag,id:number
  return {ok:true as const,roster:field,bag:next,stored:false};
 }
 export function validBag(value:unknown):value is Bag{
- return !!value&&typeof value==='object'&&!Array.isArray(value)&&Object.entries(value).every(([name,count])=>Object.hasOwn(byName,name)&&byName[name].tier<5&&Number.isSafeInteger(count)&&Number(count)>=0&&Number(count)<=1000000);
+ // Final-tier entries are accepted only for compatibility with saves made before heroes
+ // moved from tier five to tier seven. New tier-seven units can never be put into the bag.
+ return !!value&&typeof value==='object'&&!Array.isArray(value)&&Object.entries(value).every(([name,count])=>Object.hasOwn(byName,name)&&isUnitTier(byName[name].tier)&&Number.isSafeInteger(count)&&Number(count)>=0&&Number(count)<=1000000);
 }
 export function storeUnits(roster:Soldier[],bag:Bag,tier:number,name?:string){
- const moved=roster.filter(u=>byName[u.name].tier===tier&&tier<5&&(!name||u.name===name));
+ const moved=roster.filter(u=>byName[u.name].tier===tier&&isStorableUnitTier(tier)&&(!name||u.name===name));
  const next={...bag};for(const u of moved)next[u.name]=(next[u.name]??0)+1;
  return {roster:roster.filter(u=>!moved.includes(u)),bag:next,count:moved.length};
 }
 export function deployUnits(roster:Soldier[],bag:Bag,tier:number,nextId:number,name?:string,one=false){
  const field=[...roster],next={...bag};let count=0;
  for(const unitName of Object.keys(next)){
-  if(!Object.hasOwn(byName,unitName)||byName[unitName].tier!==tier||tier>=5||name&&unitName!==name)continue;
+  if(!Object.hasOwn(byName,unitName)||byName[unitName].tier!==tier||name&&unitName!==name)continue;
   while(next[unitName]>0&&field.length<DEPLOY_LIMIT){
    const slot=Array.from({length:40},(_,i)=>i).find(i=>!field.some(u=>u.slot===i));if(slot===undefined)break;
    field.push({id:nextId++,name:unitName,slot});next[unitName]--;count++;
@@ -58,9 +61,9 @@ export function sellStored(bag:Bag,name:string,all:boolean){
  return {bag:{...bag,[name]:bag[name]-count},gold:price*count,count};
 }
 export function migrateDeployment(roster:Soldier[],bag:Bag){
- // Never discard old units or put legendary heroes in the bag.
- const kept=roster.filter(u=>byName[u.name].tier===5),next={...bag};
- for(const unit of roster.filter(u=>byName[u.name].tier<5)){
+ // Never discard old units or put final-tier heroes in the bag.
+ const kept=roster.filter(u=>isFinalUnitTier(byName[u.name].tier)),next={...bag};
+ for(const unit of roster.filter(u=>isStorableUnitTier(byName[u.name].tier))){
   if(kept.length<DEPLOY_LIMIT)kept.push(unit);else next[unit.name]=(next[unit.name]??0)+1;
  }
  return {roster:kept,bag:next};

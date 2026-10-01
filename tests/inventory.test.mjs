@@ -33,13 +33,14 @@ test('mixed materials consume deployed first and preserve unrelated inventory',(
  assert.equal(result.bag[name],1);
  assert.deepEqual(inventoryRecipeStatus([name,name,name],[{id:1,name,slot:0}],{[name]:1}),[true,true,false]);
 });
-test('full field stores lower heroes but blocks legendary without consuming materials',()=>{
+test('full field stores tiers below seven and blocks only the final tier without consuming materials',()=>{
  const full=field.map(u=>({...u,name:'이순신'}));
- for(const hero of [recipes[0],byName.이순신]){
+ const finalHero={...byName.이순신,name:'7단계 테스트',tier:7};
+ for(const hero of [recipes[0],byName.이순신,finalHero]){
   const bag={};for(const n of hero.recipe)bag[n]=(bag[n]??0)+1;
   const before=JSON.stringify(bag),result=combineInventory(hero,full,bag,100);
   assert.equal(JSON.stringify(bag),before);assert.equal(full.length,25);
-  if(hero.tier===5){assert.equal(result.ok,false);assert.equal(result.reason,'capacity');}
+  if(hero.tier===7){assert.equal(result.ok,false);assert.equal(result.reason,'capacity');}
   else{assert.equal(result.ok,true);assert.equal(result.stored,true);assert.equal(result.bag[hero.name],1);assert.equal(result.roster.length,25);}
  }
 });
@@ -63,10 +64,11 @@ test('an exact tier-one material is consumed before a citizen wildcard',()=>{
  const status=inventoryRecipeStatus(['창병','창병'],[],{창병:1,시민:1});
  assert.deepEqual(status,[true,true]);
 });
-test('deposit by tier preserves legends and groups copies',()=>{
- const result=storeUnits([...field,{id:30,name:'이순신',slot:30}],{},1);
+test('deposit by tier allows tier five and groups copies',()=>{
+ const result=storeUnits([...field,{id:30,name:'주몽',slot:30}],{},1);
  assert.equal(result.bag.창병,25);assert.equal(result.roster.length,1);
- assert.equal(storeUnits(result.roster,result.bag,5).count,0);
+ const stored=storeUnits(result.roster,result.bag,5);
+ assert.equal(stored.count,1);assert.equal(stored.bag.주몽,1);
 });
 test('withdraw only fills available capacity, with unique slots and ids',()=>{
  const result=deployUnits(field.slice(0,23),{창병:5},1,100);
@@ -80,15 +82,15 @@ test('one and all sales affect only the selected stored type',()=>{
  assert.equal(result.gold,35);assert.equal(result.bag.창병,2);
  const all=sellStored(result.bag,'창병',true);
  assert.equal(all.gold,70);assert.equal(all.bag.활병,2);
- assert.equal(sellStored({이순신:1},'이순신',true).gold,0);
+ assert.equal(sellStored({주몽:1},'주몽',true).gold,2700);
 });
-test('legacy overflow is preserved in bag, keeping legends deployed',()=>{
+test('legacy overflow deploys a promoted final hero and preserves the remaining bag',()=>{
  const result=migrateDeployment([...field,...Array.from({length:15},(_,i)=>({id:30+i,name:i===14?'이순신':'활병',slot:25+i}))],{포수:2});
- assert.equal(result.roster.length,25);assert.ok(result.roster.some(u=>u.name==='이순신'));
+ assert.equal(result.roster.length,25);assert.equal(result.roster.some(unit=>unit.name==='이순신'),true);
  assert.equal(Object.values(result.bag).reduce((a,b)=>a+b,0),17);
 });
-test('bag saves round trip and reject invalid quantities and tier five',()=>{
- const state={roster:[],bag:{창병:7,시민:3},enemies:[],gold:400,wall:10,stage:1,round:1,phase:'ready',spawned:0,speed:1,remainingMs:30000};
+test('legacy final-tier bag entries round trip until they can be deployed',()=>{
+ const state={roster:[],bag:{창병:7,시민:3,이순신:1},enemies:[],gold:400,wall:10,stage:1,round:1,phase:'ready',spawned:0,speed:1,remainingMs:30000};
  const save=makeGameSave(state,1);assert.deepEqual(readGameSave(JSON.stringify(save)),save);
- for(const bag of [{이순신:1},{창병:-1},{창병:1.5},{unknown:1}]){assert.equal(validBag(bag),false);assert.equal(readGameSave(JSON.stringify({...save,bag})),null);}
+ for(const bag of [{창병:-1},{창병:1.5},{unknown:1}]){assert.equal(validBag(bag),false);assert.equal(readGameSave(JSON.stringify({...save,bag})),null);}
 });

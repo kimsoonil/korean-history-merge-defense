@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {drawBannedHeroes,validBannedHeroes} from '../lib/hard-mode.ts';
+import {drawBannedHeroes,HARD_BAN_COUNT,HARD_BAN_TIER,validBannedHeroes} from '../lib/hard-mode.ts';
 import {makeGameSave,readGameSave} from '../lib/save.ts';
 import {createRoundInvader} from '../lib/game.ts';
 import {isWaveUnlocked,recordWaveClear} from '../lib/campaign.ts';
-test('hard bans three distinct top-tier heroes, never Eulji',()=>{
+test('hard bans three distinct tier-seven heroes, never Eulji',()=>{
+ assert.equal(HARD_BAN_TIER,7);assert.equal(HARD_BAN_COUNT,3);
  for(let i=0;i<100;i++){
   const banned=drawBannedHeroes();
   assert.equal(validBannedHeroes(banned),true);
@@ -12,6 +13,8 @@ test('hard bans three distinct top-tier heroes, never Eulji',()=>{
  }
  assert.equal(validBannedHeroes(['이순신','이순신','정조']),false);
  assert.equal(validBannedHeroes(['이순신','창병','정조']),false);
+ // Previously saved tier-five restrictions remain readable.
+ assert.equal(validBannedHeroes(['이순신','세종대왕','정조'],2),true);
 });
 test('save preserves difficulty and bans without rerolling; old saves remain normal',()=>{
  const progress={roster:[],enemies:[],gold:400,wall:10,stage:1,round:1,phase:'ready',spawned:0,speed:1,remainingMs:30000};

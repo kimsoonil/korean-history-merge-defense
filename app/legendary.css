@@ -16,6 +16,8 @@
 .legendary-hero{position:absolute;left:50%;top:36%;height:40%;aspect-ratio:3/4;z-index:4;transform:translateX(-50%);filter:drop-shadow(0 0 16px var(--legendary-accent));animation:legendary-hero .65s cubic-bezier(.16,.8,.3,1) both}
 .legendary-hero-viewport{position:absolute;inset:0;overflow:hidden}
 .legendary-hero-viewport img{position:absolute;width:400%;height:200%;max-width:none;object-fit:fill}
+.legendary-hero.standalone{height:48%;top:31%;aspect-ratio:1}
+.legendary-hero.standalone .legendary-hero-viewport img{inset:0;width:100%;height:100%;object-fit:contain}
 .legendary-caption{position:absolute;left:5%;right:5%;bottom:3%;text-align:center;z-index:5;text-shadow:0 2px 4px #000}
 .legendary-symbol{font-size:clamp(8px,1.8cqw,12px);letter-spacing:.25em;color:var(--legendary-accent)}
 .legendary-caption blockquote{font-family:'Noto Serif KR',serif;font-size:clamp(13px,3.4cqw,23px);font-weight:700;line-height:1.5;word-break:keep-all;margin:5px auto;max-width:95%;text-wrap:balance}
@@ -23,7 +25,6 @@
 .legendary-letters{position:absolute;inset:0;z-index:3;pointer-events:none;color:#ffe6b7;font-family:serif;text-shadow:0 0 14px #dfba73}
 .legendary-letters>span{position:absolute;left:7%;top:39%;writing-mode:vertical-rl;letter-spacing:.25em;font-size:5cqw;opacity:.6}
 .legendary-letters i{position:absolute;font-style:normal;font-size:8cqw;opacity:.3;animation:legendary-letter 4s ease-in-out infinite alternate}.legendary-letters i:nth-child(2){top:31%;left:25%}.legendary-letters i:nth-child(3){top:46%;left:76%;animation-delay:-2s}.legendary-letters i:nth-child(4){top:61%;left:19%;animation-delay:-1s}.legendary-letters i:nth-child(5){top:29%;left:84%;animation-delay:-3s}.legendary-letters i:nth-child(6){top:63%;left:84%;animation-delay:-.5s}
-.book-preview{margin-left:auto;border:1px solid #c9ac71!important;background:#5d4d32!important;color:#ffe2a2!important;border-radius:4px;padding:4px;display:grid;place-items:center;flex:none;width:26px;height:26px}.book-preview:hover{background:#826338!important}.book-preview:focus-visible{outline:2px solid #ffe2a2}
 .cinematic-active .mobile-unit-info{display:none}.cinematic-active .invader *{animation-play-state:paused!important}
 @keyframes legendary-hero{from{opacity:0;transform:translateX(-50%) translateY(18%) scale(.83)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
 @keyframes legendary-landscape{from{transform:scale(1.08)}to{transform:scale(1)}}

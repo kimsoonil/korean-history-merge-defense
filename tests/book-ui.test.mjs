@@ -6,10 +6,12 @@ test('recipe cards merge from the whole highlighted card without effect copy or 
  const page=readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8');
  const styles=readFileSync(new URL('../app/book-cards.css',import.meta.url),'utf8');
  const mergeHandler=page.slice(page.indexOf('const merge='),page.indexOf('const buyUpgrade='));
- assert.match(page,/className={`book-card \$\{ready\?'ready':''\}`} role="button"/);
+ assert.match(page,/className={`book-card \$\{ready\?'ready':''\} \$\{locked\?'locked':''\}`} role="button"/);
  assert.match(page,/onClick={activate}/);
  assert.doesNotMatch(page,/book-role-effect/);
  assert.doesNotMatch(page,/>조합하기</);
+ assert.doesNotMatch(page,/book-preview/);
+ assert.doesNotMatch(page,/등장 연출 미리보기/);
  assert.match(styles,/\.book-card\.ready\{[^}]*border:2px solid #f4d88d/);
  assert.match(styles,/\.book-card-art\{position:absolute;inset:0/);
  assert.match(styles,/\.book-card-art \.unit-portrait\.normal\{[^}]*width:100%;height:100%/);

@@ -14,6 +14,7 @@
 .hero-codex-heroes button small{font-size:9px;color:#d6d5ae;white-space:nowrap}
 .hero-codex-portrait{position:relative;display:block;width:42px;height:50px;overflow:hidden;flex-shrink:1;min-height:18px}
 .hero-codex-portrait img{position:absolute;width:400%;height:200%;max-width:none;object-fit:fill}
+.hero-codex-portrait.standalone img{inset:0;width:100%;height:100%;object-fit:contain}
 .hero-codex-canvas{display:grid;place-items:center;min-height:0;min-width:0;container-type:size;border:1px solid #71835b;background:#233924;border-radius:5px;padding:4px}
 .hero-codex-stage{position:relative;width:min(100%,100cqh);aspect-ratio:1;overflow:hidden;background:linear-gradient(#71963616,#71963616),url('/terrain/forest-ground.png') center/cover;border:2px solid #c4ac6d;isolation:isolate}
 .hero-codex-footer{flex:none;display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:12px}

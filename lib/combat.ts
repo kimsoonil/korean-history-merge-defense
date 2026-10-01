@@ -2,8 +2,8 @@ import {byName,pathAt,type Soldier,type Enemy,type UnitDef} from './game.ts';
 import {emptyHeroBuffs,buffDamageMultiplier,type HeroBuffs} from './hero-buffs.ts';
 import {upgradedAttack,type Upgrades} from './upgrades.ts';
 import {fieldPosition,LANE_RANGE_ALLOWANCE} from './battlefield.ts';
-export function roleStats(tier:number){const t=Math.max(1,Math.min(5,tier));return {support:(5+5*t)/100,mobility:(10+10*t)/100,tactics:(15+5*t)/100,damage:5*t/100,boss:(5+5*t)/100,armorReduction:20*t,stun:t/10,stunChance:(5+5*t)/100,mobilityAura:(10+10*t)/100*.3};}
-export function roleDescription(u:UnitDef){const s=roleStats(u.tier),pct=(n:number)=>Math.round(n*100),armor=`사거리 내 적 방어도 -${s.armorReduction} · 중첩 적용`;return (({만능:'공격하지 않음 · 모든 1단계 조합 재료 대체',지원:`주변 공격속도·공격력 +${pct(s.support)}% · 중첩 적용`,책략:`적 이동속도 -${pct(s.tactics)}% · ${armor}`,전열:`공격 피해 +${pct(s.damage)}% · 공격 시 ${pct(s.stunChance)}% 확률로 ${s.stun}초 스턴`,화포:`공격 피해 +${pct(s.damage)}%`,기동:`자신 공격속도 +${pct(s.mobility)}% · 주변 공격속도 +${pct(s.mobilityAura)}% · 중첩 적용`,수성:`${armor} · 공격 시 ${pct(s.stunChance)}% 확률로 ${s.stun}초 스턴`,수군:`단일 공격 · ${armor}`,군주:`보스 공격 피해 +${pct(s.boss)}%`} as Record<string,string>)[u.role]??'')+(u.tier===5&&['군주','기동'].includes(u.role)?` · ${armor}`:'');}
+export function roleStats(tier:number){const t=Math.max(1,Math.min(7,tier));return {support:(5+5*t)/100,mobility:(10+10*t)/100,tactics:Math.min(.5,(15+5*t)/100),damage:5*t/100,boss:(5+5*t)/100,armorReduction:20*t,stun:t/10,stunChance:(5+5*t)/100,mobilityAura:(10+10*t)/100*.3};}
+export function roleDescription(u:UnitDef){const s=roleStats(u.tier),pct=(n:number)=>Math.round(n*100),armor=`사거리 내 적 방어도 -${s.armorReduction} · 중첩 적용`;return (({만능:'공격하지 않음 · 모든 1단계 조합 재료 대체',지원:`주변 공격속도·공격력 +${pct(s.support)}% · 중첩 적용`,책략:`적 이동속도 -${pct(s.tactics)}% · ${armor}`,전열:`공격 피해 +${pct(s.damage)}% · 공격 시 ${pct(s.stunChance)}% 확률로 ${s.stun}초 스턴`,화포:`공격 피해 +${pct(s.damage)}%`,기동:`자신 공격속도 +${pct(s.mobility)}% · 주변 공격속도 +${pct(s.mobilityAura)}% · 중첩 적용`,수성:`${armor} · 공격 시 ${pct(s.stunChance)}% 확률로 ${s.stun}초 스턴`,수군:`단일 공격 · ${armor}`,군주:`보스 공격 피해 +${pct(s.boss)}%`} as Record<string,string>)[u.role]??'')+(u.tier===7&&['군주','기동'].includes(u.role)?` · ${armor}`:'');}
 export const unitPosition=fieldPosition;
 export const attackRadius=(unit:UnitDef)=>unit.range*8.8+LANE_RANGE_ALLOWANCE;
 const distance=(a:{x:number;y:number},b:{x:number;y:number})=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -13,12 +13,15 @@ export function attackRate(soldier:Soldier,roster:Soldier[]){
 }
 export function weakening(enemy:Enemy,roster:Soldier[]){return Math.max(0,...roster.filter(s=>byName[s.name].role==='책략'&&distance(unitPosition(s.slot),pathAt(enemy.progress))<=attackRadius(byName[s.name])).map(s=>roleStats(byName[s.name].tier).tactics));}
 export function isWeakened(enemy:Enemy,roster:Soldier[]){return weakening(enemy,roster)>0;}
-export function armorReduction(enemy:Enemy,roster:Soldier[]){return roster.filter(s=>{const u=byName[s.name];return (['책략','수군','수성'].includes(u.role)||u.tier===5&&['군주','기동'].includes(u.role))&&distance(unitPosition(s.slot),pathAt(enemy.progress))<=attackRadius(u);}).map(s=>roleStats(byName[s.name].tier).armorReduction).reduce((sum,value)=>sum+value,0);}
+export function armorReduction(enemy:Enemy,roster:Soldier[]){return roster.filter(s=>{const u=byName[s.name];return (['책략','수군','수성'].includes(u.role)||u.tier===7&&['군주','기동'].includes(u.role))&&distance(unitPosition(s.slot),pathAt(enemy.progress))<=attackRadius(u);}).map(s=>roleStats(byName[s.name].tier).armorReduction).reduce((sum,value)=>sum+value,0);}
 export function supportAttackBonus(soldier:Soldier,roster:Soldier[]){return roster.filter(s=>s.id!==soldier.id&&byName[s.name].role==='지원'&&distance(unitPosition(s.slot),unitPosition(soldier.slot))<=22).map(s=>roleStats(byName[s.name].tier).support).reduce((sum,value)=>sum+value,0);}
 export function movementSpeed(enemy:Enemy,roster:Soldier[]){return enemy.speed*(1-weakening(enemy,roster));}
 // Legacy saved enemies without armor retain their original 20-point defense.
 export function hitDamage(name:string,enemy:Enemy,reduction:number|boolean,stage:number,upgrades?:Upgrades,support=0){
- const u=byName[name],stats=roleStats(u.tier),armor=Math.max(0,(enemy.armor??20)-(typeof reduction==='boolean'?(reduction?20:0):reduction));
+ return hitDamageForUnit(byName[name],enemy,reduction,stage,upgrades,support);
+}
+export function hitDamageForUnit(u:UnitDef,enemy:Enemy,reduction:number|boolean,stage:number,upgrades?:Upgrades,support=0){
+ const name=u.name,stats=roleStats(u.tier),armor=Math.max(0,(enemy.armor??20)-(typeof reduction==='boolean'?(reduction?20:0):reduction));
  return upgradedAttack(u,upgrades)*(1+support)*(u.role==='전열'||u.role==='화포'?1+stats.damage:1)*(u.role==='군주'&&enemy.boss?1+stats.boss:1)
   *(enemy.boss&&['이순신','을지문덕','척준경'].includes(name)?1.6:1)*((enemy.chapter??1)===1&&stage===8&&name==='을지문덕'?1.5:1)*100/(100+armor);
 }

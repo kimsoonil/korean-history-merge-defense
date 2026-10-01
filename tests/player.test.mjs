@@ -9,8 +9,8 @@ test('profile image persists and invalid images fall back without losing progres
  assert.equal(invalid.avatar,undefined);assert.equal(invalid.tutorialComplete,true);
 });
 test('profile choices include every current unit and begin with the citizen',()=>{
- assert.equal(profileAvatars.length,40);
- assert.deepEqual([...new Set(profileAvatars.map(a=>a.tier))],[1,2,3,4,5]);
+ assert.equal(profileAvatars.length,56);
+ assert.deepEqual([...new Set(profileAvatars.map(a=>a.tier))],[1,2,3,4,5,6,7]);
  assert.ok(profileAvatars.every(a=>a.src&&((a.standalone&&!a.x&&!a.y)||(!a.standalone&&a.x>=0&&a.y>=0))));
  assert.equal(resolveProfileAvatar('scholar').id,'시민');
  assert.equal(resolveProfileAvatar(undefined).id,'시민');

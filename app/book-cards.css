@@ -20,7 +20,6 @@
 .book-card.ready{cursor:pointer;background:#546b3f;border:2px solid #f4d88d;box-shadow:0 0 0 2px #725f2d,0 0 16px #f0cf6766}
 .book-card.ready:hover{background:#607847;box-shadow:0 0 0 2px #806b31,0 0 20px #f0cf6788}
 .book-card.ready:focus-visible{outline:3px solid #fff2b4;outline-offset:2px}
-.book-preview{position:absolute;right:8px;top:8px;z-index:2;width:27px;height:27px!important;min-height:0!important;padding:0!important;border-radius:50%!important;background:#1b3028dd!important;border:1px solid #d8c17d!important;color:#ffe4a0!important;display:grid;place-items:center}
 .selected-skill strong,.mobile-unit-info p strong{color:#ffe2a1;font-weight:500}
 @media(max-width:760px){
  .book-modal{height:calc(100dvh - 20px);padding:8px}
@@ -31,7 +30,6 @@
  .book-card .book-card-head small{font-size:7px;line-height:1.3}
  .book-card .book-ingredients{gap:2px;padding:1px 5px 5px}
  .book-card .book-ingredients span{font-size:7px;padding:1px 2px;line-height:1.3}
- .book-preview{right:4px;top:4px;width:23px;height:23px!important}
 }
 @media(max-height:540px) and (min-width:600px){
  .book-grid{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
@@ -40,3 +38,14 @@
  .book-card .book-card-head h3{font-size:11px}.book-card .book-card-head small{font-size:7px}
  .book-card .book-ingredients{gap:2px;padding:1px 5px 5px}.book-card .book-ingredients span{font-size:7px;padding:1px 2px}
 }
+
+/* The archive is tier-driven through seven; empty future tiers keep a stable layout. */
+.book-tabs{grid-template-columns:repeat(6,minmax(0,1fr))}
+.book-empty{grid-column:1/-1;display:flex;min-height:180px;align-items:center;justify-content:center;flex-direction:column;gap:8px;border:1px dashed #806f55;border-radius:6px;color:#d7ccb9;text-align:center}
+.book-empty strong{font:700 18px 'Noto Serif KR',serif;color:#f1dfbd}
+.book-empty span{font-size:11px;color:#b9ae9c}
+.book-card.locked{cursor:not-allowed;filter:saturate(.45);border-style:dashed}
+.book-card.locked::after{background:linear-gradient(#101a18e8,#17231fbb)}
+.book-locked-art{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:#d9c89f}
+.book-locked-art small{font-size:10px;font-weight:700}
+@media(max-width:760px){.book-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}.book-empty{min-height:120px}}

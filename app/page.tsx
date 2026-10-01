@@ -2,7 +2,7 @@
 import LoadingImage,{LoadingBackground,useImageStatus,ImageLoadingIndicator,preloadImages} from './LoadingImage';
 
 import {useEffect,useRef,useState} from 'react';
-import {Backpack,BookOpen,Clock3,Coins,Dices,Heart,Home,Images,RotateCcw,ShoppingBag,SkipForward,Sparkles,Ticket,Play,X} from 'lucide-react';
+import {Backpack,BookOpen,Clock3,Coins,Dices,Heart,Home,Images,Lock,RotateCcw,ShoppingBag,SkipForward,Sparkles,Ticket,X} from 'lucide-react';
 import {basics,byName,createRoundInvader,enemyPortraits,pathAt,recipes,waveNames,type Enemy,type Soldier,type UnitDef} from '@/lib/game';
 
 import LegendaryReveal from './LegendaryReveal';
@@ -59,9 +59,12 @@ import {SAVE_KEY,canContinue,makeGameSave,readGameSave,remainingStageMs,restored
 import {useSocialAuth} from './AuthProvider';
 import {accountScopeFor,readAccountItem,writeAccountItem,removeAccountItem} from '@/lib/account-storage';
 import {ADMIN_CHAPTERS,ADMIN_PROGRESS_KEYS,adminPlayerProfile,adminProgressValue,isAdminAccount} from '@/lib/admin';
+import {COMBINATION_TIERS,hasHeroSkillTier} from '@/lib/unit-tiers';
+import {isLockedUnit} from '@/lib/planned-units';
 
 type Phase='ready'|'battle'|'cleared'|'lost'|'won';
 type Overlay='book'|'help'|null;
+const recipeCatalog:UnitDef[]=recipes;
 type AttackEffect={id:number;fromX:number;fromY:number;toX:number;toY:number;color:string};
 const MAX_UNITS=40, START_GOLD=400, STAGE_SECONDS=30;
 const isStoryVictory=(phase:Phase)=>phase==='won';
@@ -150,7 +153,6 @@ export default function Game(){
  useEffect(()=>{if(!skillFlash)return;const timer=window.setTimeout(()=>setSkillFlash(null),Math.max(0,skillFlash.expiresAt-Date.now()));return()=>window.clearTimeout(timer);},[skillFlash]);
  const idRef=useRef(1),deadlineRef=useRef<number|null>(null),completedStageRef=useRef(0),rewardedBossesRef=useRef(new Set<number>()),stateRef=useRef({roster,enemies,stage,round,spawned,phase,speed,upgrades,difficulty,chapter});stateRef.current={roster,enemies,stage,round,spawned,phase,speed,upgrades,difficulty,chapter};
  const legendary=useLegendaryReveal((pausedAt,now)=>{if(!homeRef.current&&stateRef.current.phase==='battle')deadlineRef.current=resumeStageDeadline(deadlineRef.current,pausedAt,now)});
- const previewLegendary=(name:string)=>{if(home){openCodex(name);return;}setOverlay(null);setSelected(null);setAttackFx([]);legendary.show(name,'preview')};
  const codexHeroRef=useRef(legendaryScenes[0].name);
  const openCodex=(name=codexHeroRef.current)=>{codexHeroRef.current=name;setOverlay(null);setAttackFx([]);legendary.show(name,'codex')};
  const progressRef=useRef({roster,bag,enemies,gold,troopCards,wall,stage,round,phase,spawned,speed,upgrades,unitGambleUsage,difficulty,bannedHeroes,chapter});
@@ -158,7 +160,7 @@ export default function Game(){
  const persistGame=()=>{
   if(homeRef.current)return;
   const current=progressRef.current;
-  const snapshot=makeGameSave({...current,heroCooldowns:[...heroTimers.current].filter(([id])=>current.roster.some(s=>s.id===id&&byName[s.name].tier===5)),remainingMs:remainingStageMs(deadlineRef.current,current.phase,Date.now(),legendary.pausedAtRef.current)});
+  const snapshot=makeGameSave({...current,heroCooldowns:[...heroTimers.current].filter(([id])=>current.roster.some(s=>s.id===id&&hasHeroSkillTier(byName[s.name].tier))),remainingMs:remainingStageMs(deadlineRef.current,current.phase,Date.now(),legendary.pausedAtRef.current)});
   setSaved(snapshot);
   try{writeStored(SAVE_KEY,JSON.stringify(snapshot));setStorageError(false);}catch{setStorageError(true);}
  };
@@ -272,12 +274,12 @@ export default function Game(){
   if(bannedHeroes.includes(u.name)){setNotice('이번 하드 전투에서 조합이 금지된 영웅입니다.');return;}
   if(homeRef.current||phase==='lost'||phase==='won'||stageCleared||legendary.active)return;
   const current=progressRef.current,id=idRef.current,result=combineInventory(u,current.roster,current.bag,id);
-  if(!result.ok){setNotice(result.reason==='capacity'?'5단계 영웅을 배치할 자리가 필요합니다. 전장 유닛을 가방에 넣어 주세요.':'조합 재료가 부족합니다.');return;}
+  if(!result.ok){setNotice(result.reason==='capacity'?'최종 단계 영웅을 배치할 자리가 필요합니다. 전장 유닛을 가방에 넣어 주세요.':'조합 재료가 부족합니다.');return;}
   idRef.current++;
   progressRef.current={...current,roster:result.roster,bag:result.bag};stateRef.current={...stateRef.current,roster:result.roster};
   setRoster(result.roster);setBag(result.bag);setSelected(result.stored?null:id);setMergeSuccess({id,unit:u,stored:result.stored});
   setNotice(`${u.name} 조합 성공! ${result.stored?'가방에 보관했습니다.':'전장에 배치했습니다.'}`);
-  if(u.tier===5){setAttackFx([]);legendary.show(u.name)}
+  if(u.tier===7){setAttackFx([]);legendary.show(u.name)}
  };
  const buyUpgrade=(kind:UpgradeKind,key:string)=>{
   const current=progressRef.current;
@@ -388,6 +390,7 @@ export default function Game(){
    if(s.phase==='battle'){
     const skill=heroSkillStep(s.roster,s.enemies,.1,s.stage,heroTimers.current,s.upgrades);
     for(const [id,damage] of skill.hits)hits.set(id,(hits.get(id)??0)+damage);
+    for(const [id,seconds] of skill.stuns)stuns.set(id,Math.max(stuns.get(id)??0,seconds));
     if(skill.gold)setGold(g=>g+skill.gold);
     // Wall healing is retired: defeat now depends on enemy accumulation.
     flashQueue.current=[...new Set([...flashQueue.current,...skill.casts])];
@@ -449,7 +452,7 @@ export default function Game(){
   <aside className="detail-side" inert={stageCleared||!!legendary.active}><div className="panel-kicker">UNIT INTELLIGENCE</div><h3>전장 정보</h3>{selDef?<><div className="selected-top"><Portrait u={selDef} size="large"/><div><span>{'★'.repeat(selDef.tier)} · {selDef.role}</span><h2>{selDef.name}</h2></div></div><p className="selected-skill">{selDef.skill}<br/><strong>{roleDescription(selDef)}</strong>{selDef.tier===5&&<span className="hero-extra-skill">{heroSkillDescription(selDef.name)}</span>}</p><div className="selected-stats"><span>공격력 <b>{Number(upgradedAttack(selDef,upgrades).toFixed(1))}</b></span><span>사거리 <b>{selDef.range}</b></span><span>공격 속도 <b>{sel?attackRate(sel,roster).toFixed(2):selDef.rate}</b></span></div><button className="side-sell" onClick={sell} disabled={salePrice(selDef)===null}><ShoppingBag size={16}/> {salePrice(selDef)===null?'최상위 유닛 · 판매 불가':`판매 · +${salePrice(selDef)} 골드`}</button></>:<div className="detail-placeholder"><span>✦</span>유닛을 클릭하면 초상화와<br/>스탯·스킬이 표시됩니다.</div>}<div className="side-help"><BookOpen size={18}/><div><b>조합 가능한 영웅 {available.length}명</b><span>책을 열어 영웅의 계보를 확인하세요.</span></div></div><button className="side-book" onClick={()=>{setTier(2);setOverlay('book')}}><BookOpen size={19}/> 조합서 열기</button></aside></main>
   <footer className="game-actions" inert={stageCleared||!!legendary.active||gambleOpen}><button className="action-summon" onClick={summon} disabled={troopCards<RECRUIT_TROOP_COST||phase==='lost'||phase==='won'}><Ticket size={23}/><span><b>병력 모집</b><small>랜덤 1단계</small></span></button><button className="action-book" onClick={()=>{setTier(2);setOverlay('book')}}><BookOpen size={24}/><span><b>조합서</b><small>{available.length}개 조합 가능</small></span></button><button className="action-upgrade" onClick={()=>{setSelected(null);setOverlay(null);setUpgradeOpen(true);}} disabled={phase==='lost'||phase==='won'}><Sparkles size={22}/><span><b>강화</b><small>공격력 증가</small></span></button><button className="action-gamble" onClick={()=>{setSelected(null);setOverlay(null);setUpgradeOpen(false);setGambleOpen(true);}} disabled={phase==='lost'||phase==='won'}><Dices size={22}/><span><b>도박</b><small>골드·유닛 획득</small></span></button></footer>
   </>}
-  {overlay==='book'&&<div className={`overlay-shade ${home?'':'battle-bottom-sheet'}`} onMouseDown={e=>{if(e.target===e.currentTarget)setOverlay(null)}}><section className="book-modal" role="dialog" aria-modal="true" aria-label="조합서"><header><div><BookOpen size={24}/><span><small>THE HERO ARCHIVE</small><b>영웅 조합서</b></span></div><button onClick={()=>setOverlay(null)} aria-label="조합서 닫기"><X size={21}/></button></header>{!home&&difficulty==='hard'&&<p role="status">하드 조합 금지: {bannedHeroes.join(' · ')}{chapter===1?' · 을지문덕 조합 가능':''}</p>}<div className="book-tabs">{[2,3,4,5].map(n=><button key={n} className={tier===n?'active':''} onClick={()=>setTier(n)}>{n}단계 <span>{home?'8명':`${recipes.filter(u=>u.tier===n&&available.includes(u)).length}/8`}</span></button>)}</div><div className="book-grid">{recipes.filter(u=>u.tier===tier).map(u=>{const have=inventoryRecipeStatus(u.recipe!,home?[]:roster,home?{}:bag),ready=!home&&!bannedHeroes.includes(u.name)&&have.every(Boolean),activate=()=>{if(ready&&phase!=='lost'&&phase!=='won')merge(u)};return <article key={u.name} className={`book-card ${ready?'ready':''}`} role="button" aria-disabled={!ready||phase==='lost'||phase==='won'} aria-label={`${u.name} ${ready?'조합 가능':`재료 ${have.filter(Boolean).length}/${have.length}`}`} tabIndex={ready?0:-1} onClick={activate} onKeyDown={e=>{if(e.target===e.currentTarget&&(e.key==='Enter'||e.key===' ')){e.preventDefault();activate();}}}><div className="book-card-art" aria-hidden="true"><Portrait u={u} size="normal"/></div><div className="book-card-head"><div><small>{'★'.repeat(tier)} · {u.role}</small><h3>{u.name}</h3></div>{u.tier===5&&<button className="book-preview" onClick={e=>{e.stopPropagation();previewLegendary(u.name)}} aria-label={`${u.name} 등장 연출 미리보기`} title="등장 연출 미리보기"><Play size={13}/></button>}</div><div className="book-ingredients">{u.recipe!.map((name,i)=><span key={i} className={have[i]?'have':''}>{have[i]?'✓':'·'} {name}</span>)}</div></article>})}</div></section></div>}
+  {overlay==='book'&&<div className={`overlay-shade ${home?'':'battle-bottom-sheet'}`} onMouseDown={e=>{if(e.target===e.currentTarget)setOverlay(null)}}><section className="book-modal" role="dialog" aria-modal="true" aria-label="조합서"><header><div><BookOpen size={24}/><span><small>THE HERO ARCHIVE</small><b>영웅 조합서</b></span></div><button onClick={()=>setOverlay(null)} aria-label="조합서 닫기"><X size={21}/></button></header>{!home&&difficulty==='hard'&&<p role="status">하드 조합 금지: {bannedHeroes.join(' · ')}{chapter===1?' · 을지문덕 조합 가능':''}</p>}<div className="book-tabs">{COMBINATION_TIERS.map(n=><button key={n} className={tier===n?'active':''} onClick={()=>setTier(n)}>{n}단계 <span>{home?`${recipeCatalog.filter(u=>u.tier===n).length}명`:`${recipes.filter(u=>u.tier===n&&available.includes(u)).length}/${recipeCatalog.filter(u=>u.tier===n).length}`}</span></button>)}</div><div className="book-grid">{recipeCatalog.filter(u=>u.tier===tier).map(u=>{const locked=isLockedUnit(u),have=inventoryRecipeStatus(u.recipe!,home?[]:roster,home?{}:bag),ready=!locked&&!home&&!bannedHeroes.includes(u.name)&&have.every(Boolean),activate=()=>{if(ready&&phase!=='lost'&&phase!=='won')merge(u)};return <article key={`${u.tier}-${u.name}`} className={`book-card ${ready?'ready':''} ${locked?'locked':''}`} role="button" aria-disabled={locked||!ready||phase==='lost'||phase==='won'} aria-label={`${u.name} ${locked?'이미지 준비 중':ready?'조합 가능':`재료 ${have.filter(Boolean).length}/${have.length}`}`} tabIndex={ready?0:-1} onClick={activate} onKeyDown={e=>{if(e.target===e.currentTarget&&(e.key==='Enter'||e.key===' ')){e.preventDefault();activate();}}}><div className="book-card-art" aria-hidden="true">{locked?<span className="book-locked-art"><Lock size={28}/><small>이미지 준비 중</small></span>:<Portrait u={u} size="normal"/>}</div><div className="book-card-head"><div><small>{'★'.repeat(tier)} · {u.role}</small><h3>{u.name}</h3></div></div><div className="book-ingredients">{u.recipe!.map((name,i)=><span key={i} className={!locked&&have[i]?'have':''}>{!locked&&have[i]?'✓':'·'} {name}</span>)}</div></article>})}</div></section></div>}
   {overlay==='help'&&<div className={`overlay-shade ${home?'':'battle-bottom-sheet'}`} onMouseDown={e=>{if(e.target===e.currentTarget)setOverlay(null)}}><section className="help-modal" role="dialog" aria-modal="true" aria-label="게임 방법"><button className="help-close" onClick={()=>setOverlay(null)} aria-label="닫기"><X size={21}/></button><small>HOW TO PLAY</small><h2>한국사 조합 디펜스</h2><div><b>01 · 병력 모집</b><p>병력패 1개로 시민을 제외한 1단계 병종 한 명을 모집합니다. 전투 시작 시 무작위 2단계 영웅 한 명이 합류하며 병력패 {START_TROOP_CARDS}개로 시작합니다.</p><b>02 · 조합</b><p>책 모양 조합서를 열고 재료가 모인 영웅을 조합합니다. 시민은 중간 보스 보상으로만 얻으며, 필요한 모든 1단계 재료를 대신할 수 있습니다.</p><b>03 · 방어</b><p>라운드가 시작될 때마다 병력패 {ROUND_TROOP_CARDS}개를 받고, 중간 보스 처치 시 병력패 {BOSS_TROOP_CARDS}개와 구간별 무작위 영웅·시민을 획득합니다. 스테이지 마지막 보스는 처치 보상을 지급하지 않습니다. 각 라운드는 30초입니다.</p><b>04 · 도박</b><p>골드 도박으로 무작위 골드를 얻거나 유닛 도박으로 1~3단계 유닛을 획득합니다. 시민은 도박에서 나오지 않습니다.</p><b>음악 출처</b><p>Music provided by 작곡하는김의홍 · Track: 決着 (Haru Studios)<br/><a href="https://www.youtube.com/watch?v=T5Xxo7dfN1I" target="_blank" rel="noreferrer">원곡 듣기</a> · <a href="https://haru-studios.itch.io/ketchaku" target="_blank" rel="noreferrer">공식 음원 페이지</a></p></div><button className="help-done" onClick={()=>setOverlay(null)}>{home?'초기 화면으로 돌아가기':'전장으로 돌아가기'}</button></section></div>}
   {!home&&stageCleared&&<StageClearPopup chapter={chapter} stage={stage} rounds={totalRounds} profileReward={profileReward} onMap={()=>{setProfileReward(null);openStageSelection();}} onHome={()=>{setProfileReward(null);openStorySelection();}}/>}
   {!home&&showStoryEpilogue&&<StoryEpilogue chapter={chapter} nickname={player.nickname} profileReward={profileReward} onComplete={()=>{setProfileReward(null);openStorySelection();}}/>}

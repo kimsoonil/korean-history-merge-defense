@@ -11,8 +11,8 @@
 }
 .upgrade-list{grid-auto-rows:max-content}
 .unit-bag .bag-grid{grid-auto-rows:max-content}
-.profile-settings form{display:flex;flex-direction:column;min-height:0;overflow:hidden}
-.profile-settings .profile-scroll-content{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:3px 6px 3px 3px}
+.profile-settings form{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;overflow:hidden}
+.profile-settings .profile-avatar-scroll{scrollbar-width:thin}
 .profile-settings footer{flex:none;padding-top:12px}
 .front-selection .stage-map-dialog{overflow:hidden}
 .stage-map-dialog .map-battle-list{flex:1 1 auto;min-height:0}

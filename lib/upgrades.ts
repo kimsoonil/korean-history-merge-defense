@@ -1,15 +1,16 @@
 import {units,type UnitDef} from './game.ts';
 import type {Difficulty} from './enemy-stats.ts';
+import {UNIT_TIERS} from './unit-tiers.ts';
 export type UpgradeKind='tier'|'role'|'hero';
 export type Upgrades=Record<UpgradeKind,Record<string,number>>;
 export const MAX_UPGRADE_LEVEL=10;
 export const TIER_MAX_UPGRADE_LEVEL=20;
 export const upgradePercentPerLevel:Record<UpgradeKind,number>={tier:1,role:3,hero:5};
-export const tierUpgradeTotalCosts:Record<number,number>={1:1000,2:3000,3:10000,4:15000,5:20000};
+export const tierUpgradeTotalCosts:Record<number,number>={1:1000,2:3000,3:10000,4:15000,5:20000,6:30000,7:50000};
 export const maxUpgradeLevel=(kind:UpgradeKind)=>kind==='tier'?TIER_MAX_UPGRADE_LEVEL:MAX_UPGRADE_LEVEL;
 export const emptyUpgrades=():Upgrades=>({tier:{},role:{},hero:{}});
 export const upgradeOptions={
- tier:[1,2,3,4,5].map(t=>({key:String(t),label:`${t}단계`,baseCost:tierUpgradeTotalCosts[t]/TIER_MAX_UPGRADE_LEVEL})),
+ tier:UNIT_TIERS.map(t=>({key:String(t),label:`${t}단계`,baseCost:tierUpgradeTotalCosts[t]/TIER_MAX_UPGRADE_LEVEL})),
  role:[...new Set(units.filter(u=>u.name!=='시민').map(u=>u.role))].map(role=>({key:role,label:role,baseCost:100})),
  hero:units.filter(u=>u.tier===5).map(u=>({key:u.name,label:u.name,baseCost:300})),
 };

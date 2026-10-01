@@ -16,6 +16,7 @@ import {ansiEnemyNames,type ChapterId} from './ansi.ts';
 import {validBannedHeroes} from './hard-mode.ts';
 import type {Difficulty} from './enemy-stats.ts';
 import {readUnitGambleUsage,type UnitGambleUsage} from './gambling.ts';
+import {hasHeroSkillTier} from './unit-tiers.ts';
 export const SAVE_KEY='salsu-progress-v1';
 export type GamePhase='ready'|'battle'|'cleared'|'lost'|'won';
 export type GameProgress={
@@ -23,7 +24,7 @@ export type GameProgress={
   roster:Soldier[]; bag?:Bag; enemies:Enemy[]; gold:number; troopCards?:number; wall:number; stage:number; round:number;
   phase:GamePhase; spawned:number; speed:number; remainingMs:number; heroCooldowns?:[number,number][]; upgrades?:Upgrades; unitGambleUsage?:UnitGambleUsage;
 };
-export type GameSave=GameProgress&{version:5;roundRules?:2;chapterScenario?:'noryang';savedAt:number};
+export type GameSave=GameProgress&{version:6;roundRules?:2;chapterScenario?:'noryang';savedAt:number};
 
 const record=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
 const number=(value:unknown,min:number,max:number):value is number=>typeof value==='number'&&Number.isFinite(value)&&value>=min&&value<=max;
@@ -36,7 +37,7 @@ export function remainingStageMs(deadline:number|null,phase:GamePhase,now:number
   return Math.max(0,Math.min(30000,deadline-(pausedAt??now)));
 }
 export function makeGameSave(progress:GameProgress,now=Date.now()):GameSave{
-  return {...progress,...(progress.chapter===10?{chapterScenario:'noryang' as const}:{}),...(progress.upgrades?{upgrades:readUpgrades(progress.upgrades)}:{}),roster:progress.roster.map(unit=>({...unit})),enemies:progress.enemies.map(enemy=>({...enemy})),version:5,roundRules:2,savedAt:now};
+  return {...progress,...(progress.chapter===10?{chapterScenario:'noryang' as const}:{}),...(progress.upgrades?{upgrades:readUpgrades(progress.upgrades)}:{}),roster:progress.roster.map(unit=>({...unit})),enemies:progress.enemies.map(enemy=>({...enemy})),version:6,roundRules:2,savedAt:now};
 }
 export function canContinue(save:GameSave|null):save is GameSave&{phase:'ready'|'battle'|'cleared'}{
   return !!save&&save.phase!=='lost'&&save.phase!=='won'&&!(save.phase==='cleared'&&isStageComplete(save.stage,save.round));
@@ -110,7 +111,7 @@ export function readGameSave(raw:string|null):GameSave|null{
       const round=legacy.phase==='cleared'||legacy.phase==='won'||legacy.enemies.some(enemy=>enemy.boss)?20+(legacy.stage-1)*5:1;
       return readGameSave(JSON.stringify({...legacy,version:4,round,enemies:legacy.enemies.slice(0,10),spawned:legacy.phase==='cleared'||legacy.phase==='won'?10:Math.min(legacy.spawned,10)}));
     }
-    if(!record(value)||![3,4,5].includes(Number(value.version))||!integer(value.savedAt,0,Number.MAX_SAFE_INTEGER))return null;
+    if(!record(value)||![3,4,5,6].includes(Number(value.version))||!integer(value.savedAt,0,Number.MAX_SAFE_INTEGER))return null;
     if(value.version===3||value.version===4){
       if(!integer(value.stage,1,8)||!integer(value.round,1,20+(value.stage-1)*5)||!Array.isArray(value.enemies)||!integer(value.spawned,0,value.version===3?40:10))return null;
       const oldRound=value.round,oldStage=value.stage;
@@ -121,14 +122,15 @@ export function readGameSave(raw:string|null):GameSave|null{
       const enemies=value.enemies.map(e=>record(e)?{...e,originStage:stage,...(e.boss&&expectedBoss?{name:expectedBoss}:{})}:e).sort((a,b)=>Number(b?.boss)-Number(a?.boss)).slice(0,10);
       // A boss from the old repeated schedule resumes at this stage's boss round.
       const migratedRound=enemies.some(e=>e?.boss)&&!expectedBoss?stageRoundCount(stage):round;
-      return readGameSave(JSON.stringify({...value,version:5,roundRules:2,stage,round:migratedRound,enemies:enemies.map(e=>e?.boss?{...e,name:roundBossName(stage,migratedRound)}:e),spawned:Math.min(value.spawned,10)}));
+      return readGameSave(JSON.stringify({...value,version:6,roundRules:2,stage,round:migratedRound,enemies:enemies.map(e=>e?.boss?{...e,name:roundBossName(stage,migratedRound)}:e),spawned:Math.min(value.spawned,10)}));
     }
     // Preserve old 5-round-stage saves and any surviving bosses. New games use
     // local rounds from one; old completed stages remain completed.
     if(value.version===5&&value.roundRules===undefined&&integer(value.stage,2,10)&&integer(value.round,1,5)){
       const round=value.phase==='ready'?1:20+(value.stage-2)*5+value.round;
-      return readGameSave(JSON.stringify({...value,roundRules:2,round}));
+      return readGameSave(JSON.stringify({...value,version:6,roundRules:2,round}));
     }
+    if(value.version===5)return readGameSave(JSON.stringify({...value,version:6}));
     const lastWave=FINAL_WAVE;
     if(!integer(value.stage,1,lastWave)||!integer(value.gold,0,Number.MAX_SAFE_INTEGER)||!integer(value.wall,0,10))return null;
     if(value.troopCards!==undefined&&!integer(value.troopCards,0,Number.MAX_SAFE_INTEGER))return null;
@@ -160,7 +162,7 @@ export function readGameSave(raw:string|null):GameSave|null{
       if(!Array.isArray(value.heroCooldowns)||value.heroCooldowns.length>40)return null;
       const seen=new Set<number>();
       for(const entry of value.heroCooldowns){
-        if(!Array.isArray(entry)||entry.length!==2||!integer(entry[0],1,Number.MAX_SAFE_INTEGER-1)||!number(entry[1],0,10)||seen.has(entry[0])||!value.roster.some(unit=>unit.id===entry[0]&&byName[unit.name].tier===5))return null;
+        if(!Array.isArray(entry)||entry.length!==2||!integer(entry[0],1,Number.MAX_SAFE_INTEGER-1)||!number(entry[1],0,10)||seen.has(entry[0])||!value.roster.some(unit=>unit.id===entry[0]&&(hasHeroSkillTier(byName[unit.name].tier)||unit.name==='척준경')))return null;
         seen.add(entry[0]);
       }
     }

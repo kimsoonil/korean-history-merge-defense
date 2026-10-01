@@ -51,7 +51,7 @@ test('version three saves adopt ten enemies without losing heroes, resources or 
  const state={version:3,savedAt:1,stage:8,round:55,roster:[{id:1,name:'이순신',slot:0}],gold:800,wall:7,phase:'battle',spawned:40,speed:3,remainingMs:4000,heroCooldowns:[[1,4]]};
  const enemies=Array.from({length:15},(_,i)=>createRoundInvader(10,65,i,100+i));enemies.forEach(e=>e.originStage=8);enemies[0].hp=123;
  const loaded=readGameSave(JSON.stringify({...state,enemies}));
- assert.equal(loaded.version,5);assert.equal(loaded.spawned,10);assert.equal(loaded.enemies.length,10);assert.equal(loaded.enemies[0].hp,123);
+ assert.equal(loaded.version,6);assert.equal(loaded.spawned,10);assert.equal(loaded.enemies.length,10);assert.equal(loaded.enemies[0].hp,123);
  for(const key of ['roster','gold','wall','heroCooldowns','remainingMs'])assert.deepEqual(loaded[key],state[key]);
  const clear=readGameSave(JSON.stringify({...state,phase:'won',enemies:[],remainingMs:0}));assert.equal(clear.spawned,10);
  const early=readGameSave(JSON.stringify({...state,stage:1,round:1,spawned:3,enemies:[]}));assert.equal(early.spawned,3);

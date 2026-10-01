@@ -1,5 +1,6 @@
 import {byName,type Soldier,type Enemy} from './game.ts';
 import {hitDamage,armorReduction,supportAttackBonus} from './combat.ts';
+import {TIER_SEVEN_ULTIMATES,tierSevenUltimateDamage} from './upper-tier-skills.ts';
 
 import {activeHeroBuffs,buffDamageMultiplier,emptyHeroBuffs,type HeroBuffs} from './hero-buffs.ts';
 import type {Upgrades} from './upgrades.ts';
@@ -14,8 +15,11 @@ export const HERO_SKILLS:Record<string,{title:string;description:string;multipli
  정조:{title:'화성의 포효',description:'전체 피해 200% · 배치 중 모든 아군 공격속도 +15% · 5초간 모든 아군 공격속도 추가 +40% (중첩 적용)',multiplier:2},
 };
 export const HERO_SKILL_INTERVAL=10;
-export function heroSkillDescription(name:string){const skill=HERO_SKILLS[name];return skill?`10초마다 ${skill.title}: ${skill.description}`:'';}
+export function combatSkill(name:string){const unit=byName[name];return unit?.tier===7?TIER_SEVEN_ULTIMATES[name]:HERO_SKILLS[name];}
+export function heroSkillDescription(name:string){const skill=combatSkill(name);return skill?`10초마다 ${byName[name]?.tier===7?'궁극기 · ':''}${skill.title}: ${skill.description}`:'';}
 export function heroSkillDamage(name:string,enemy:Enemy,roster:Soldier[],stage:number,upgrades?:Upgrades,source?:Soldier,buffs:HeroBuffs=emptyHeroBuffs()){
+ const unit=byName[name];
+ if(unit?.tier===7)return tierSevenUltimateDamage(unit,enemy,armorReduction(enemy,roster)+buffs.armor,stage,upgrades,source?supportAttackBonus(source,roster):0)*buffDamageMultiplier(buffs,enemy);
  const skill=HERO_SKILLS[name];if(!skill)return 0;
  const caster=source??roster.find(s=>s.name===name);
  let damage=hitDamage(name,enemy,armorReduction(enemy,roster)+buffs.armor,stage,upgrades,caster?supportAttackBonus(caster,roster):0)*skill.multiplier;
@@ -28,9 +32,9 @@ export function heroSkillDamage(name:string,enemy:Enemy,roster:Soldier[],stage:n
 }
 // Cooldowns survive round changes; an empty battlefield holds a charged skill.
 export function heroSkillStep(roster:Soldier[],enemies:Enemy[],dt:number,stage:number,timers:Map<number,number>,upgrades?:Upgrades){
- const heroes=roster.filter(s=>byName[s.name].tier===5),ids=new Set(heroes.map(s=>s.id));
+ const heroes=roster.filter(s=>byName[s.name].tier===7||(byName[s.name].tier===6&&!!HERO_SKILLS[s.name])),ids=new Set(heroes.map(s=>s.id));
  for(const id of timers.keys())if(!ids.has(id))timers.delete(id);
- const hits=new Map<number,number>(),casts:string[]=[],casters:Soldier[]=[];let gold=0,hearts=0;
+ const hits=new Map<number,number>(),stuns=new Map<number,number>(),casts:string[]=[],casters:Soldier[]=[];let gold=0,hearts=0;
  for(const hero of heroes){
   const remaining=Math.max(0,(timers.get(hero.id)??HERO_SKILL_INTERVAL)-dt);
   if(remaining>1e-8||!enemies.length){timers.set(hero.id,remaining);continue;}
@@ -40,6 +44,10 @@ export function heroSkillStep(roster:Soldier[],enemies:Enemy[],dt:number,stage:n
   if(hero.name==='김유신')hearts++;
  }
  const buffs=activeHeroBuffs(roster,timers);
- for(const hero of casters)for(const enemy of enemies)hits.set(enemy.id,(hits.get(enemy.id)??0)+heroSkillDamage(hero.name,enemy,roster,stage,upgrades,hero,buffs));
- return {hits,casts,gold,hearts};
+ for(const hero of casters)for(const enemy of enemies){
+  hits.set(enemy.id,(hits.get(enemy.id)??0)+heroSkillDamage(hero.name,enemy,roster,stage,upgrades,hero,buffs));
+  const stun=byName[hero.name].tier===7?TIER_SEVEN_ULTIMATES[hero.name]?.stunSeconds:0;
+  if(stun)stuns.set(enemy.id,Math.max(stuns.get(enemy.id)??0,stun));
+ }
+ return {hits,stuns,casts,gold,hearts};
 }

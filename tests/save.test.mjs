@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {createInvader} from '../lib/game.ts';
+import {byName,createInvader} from '../lib/game.ts';
 import {canContinue,makeGameSave,readGameSave,remainingStageMs,restoredCounters} from '../lib/save.ts';
 
 const progress=()=>({roster:[{id:1,name:'유생',slot:7},{id:3,name:'창병',slot:12}],enemies:[{...createInvader(2,0,8),progress:.47,hp:32}],gold:186,wall:10,stage:2,round:1,phase:'battle',spawned:3,speed:2,remainingMs:12345});
@@ -43,7 +43,7 @@ test('invalid, incompatible and inconsistent saves are safely rejected',()=>{
  assert.equal(readGameSave(null),null);assert.equal(readGameSave('{broken'),null);
  const save=makeGameSave(progress());
  for(const changes of [
-  {version:6},{phase:'unknown'},{stage:11},{wall:-1},{wall:0},{gold:-5},{speed:'2'},
+  {version:7},{phase:'unknown'},{stage:11},{wall:-1},{wall:0},{gold:-5},{speed:'2'},
   {remainingMs:40000},{spawned:21},{roster:[{id:1,name:'없는 영웅',slot:0}]},
   {roster:[{id:1,name:'constructor',slot:0}]},{roster:[{id:1,name:'유생',slot:40}]},
   {roster:[{id:1,name:'유생',slot:0},{id:2,name:'창병',slot:0}]},
@@ -63,7 +63,7 @@ test('a selected 1-8 preparation is a valid resumable save',()=>{
 });
 test('legacy ten-wave saves migrate without losing units or resources',()=>{
  const early={...makeGameSave(progress()),version:1};
- assert.equal(roundTrip(early).version,5);assert.deepEqual(roundTrip(early).roster,early.roster);
+ assert.equal(roundTrip(early).version,6);assert.deepEqual(roundTrip(early).roster,early.roster);
  for(const stage of [8,9]){
   const legacy={...early,stage,spawned:5,enemies:[{...createInvader(7,0,8),originStage:stage}]};
   const migrated=roundTrip(legacy);
@@ -77,4 +77,24 @@ test('legacy ten-wave saves migrate without losing units or resources',()=>{
  assert.deepEqual(migratedFinal.enemies,[{...boss,originStage:10}]);assert.equal(migratedFinal.remainingMs,early.remainingMs);
  const legacyWon={...legacyFinal,phase:'won',enemies:[],remainingMs:0};
  assert.equal(roundTrip(legacyWon).phase,'won');assert.equal(roundTrip(legacyWon).stage,10);
+});
+
+test('version five saves migrate to version six without losing player state',()=>{
+ const current=makeGameSave(progress(),77),old={...current,version:5};
+ const migrated=roundTrip(old);
+ assert.equal(migrated.version,6);assert.equal(migrated.savedAt,77);
+ assert.deepEqual(migrated.roster,current.roster);assert.deepEqual(migrated.enemies,current.enemies);
+ assert.equal(migrated.gold,current.gold);assert.equal(migrated.remainingMs,current.remainingMs);
+});
+
+test('future tier-six and tier-seven units survive save restoration once registered',()=>{
+ const base=byName.이순신;
+ byName['6단계 테스트']={...base,name:'6단계 테스트',tier:6};
+ byName['7단계 테스트']={...base,name:'7단계 테스트',tier:7};
+ try{
+  const save=makeGameSave({...progress(),roster:[{id:41,name:'6단계 테스트',slot:1},{id:42,name:'7단계 테스트',slot:2}],bag:{'6단계 테스트':2},heroCooldowns:[[41,4],[42,6]]},88);
+  const restored=roundTrip(save);
+  assert.deepEqual(restored.roster,save.roster);assert.deepEqual(restored.bag,save.bag);
+  assert.deepEqual(restored.heroCooldowns,save.heroCooldowns);
+ }finally{delete byName['6단계 테스트'];delete byName['7단계 테스트'];}
 });

@@ -13,14 +13,14 @@ test('mobility auras stack with support, exclude self, and stop out of range',()
  for(let tier=1;tier<=5;tier++)close(roleStats(tier).mobilityAura,roleStats(tier).mobility*.3);
 });
 test('frontline and fortress attacks stun only on successful tier-based rolls',()=>{
- for(const name of ['창병','온달','최영','계백','김유신','김시민','권율']){
+ for(const name of ['창병','온달','최영','계백','김수로왕','김시민','권율','양만춘','김유신']){
   const u=byName[name],chance=roleStats(u.tier).stunChance,e=enemy();
   const hit=combatStep([soldier(name)],[e],.01,1,new Map(),undefined,()=>chance-.001);
   const miss=combatStep([soldier(name)],[e],.01,1,new Map(),undefined,()=>chance);
   close(hit.stuns.get(e.id),u.tier/10);assert.equal(miss.stuns.size,0);
   assert.ok(miss.hits.get(e.id)>0);
  }
- assert.equal(armorReduction(enemy(),[soldier('김시민'),soldier('권율',1,2)]),120);
+ assert.equal(armorReduction(enemy(),[soldier('김시민'),soldier('권율',1,2)]),160);
 });
 test('support affects nearby allies, not self; supports stack',()=>{
  const ally=soldier('창병'),support=soldier('허준',1,2);
@@ -54,8 +54,8 @@ test('naval attacks only one enemy without splash',()=>{
 test('armor auras stack across units and duplicates, but armor never goes negative',()=>{
  const e={...enemy(),armor:400},roster=[soldier('수병'),soldier('서희',1,2),soldier('서희',2,3)];
  assert.equal(armorReduction(e,roster),100);
- assert.equal(armorReduction(e,[soldier('세종대왕')]),100);
- assert.equal(armorReduction(e,[soldier('광개토대왕')]),100);
+ assert.equal(armorReduction(e,[soldier('세종대왕')]),0);
+ assert.equal(armorReduction(e,[soldier('광개토대왕')]),140);
  assert.equal(armorReduction(e,[soldier('왕건')]),0);
  close(hitDamage('활병',e,1000,1),byName['활병'].damage);
 });

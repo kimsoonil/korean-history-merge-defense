@@ -31,13 +31,14 @@ test('the campaign plans exactly 55 increasingly valuable profile rewards',()=>{
  for(let index=1;index<rewards.length;index++)assert.ok(rewards[index].tier>=rewards[index-1].tier);
 });
 
-test('normal clear rewards are unique, while unavailable tier six and seven wait for future units',()=>{
+test('normal clear rewards are unique and high-stage clears award active tier six and seven profiles',()=>{
  let current={version:1,nickname:'홍길동',prologueComplete:true};
  for(const stage of [1,2,3,4,6,8,10]){const result=awardStageProfile(current,1,stage,()=>0);assert.ok(result.reward);assert.equal(result.reward.avatar.tier,1);current=result.profile;assert.equal(awardStageProfile(current,1,stage,()=>0).reward,null);}
  assert.equal(unlockedProfileIds(current).size,8);
  assert.equal(current.claimedProfileRewards.length,7);
  assert.equal(awardStageProfile(current,1,10,()=>0).reward,null);
- assert.equal(profileAvatars.some(avatar=>avatar.tier===6||avatar.tier===7),false);
- assert.equal(awardStageProfile(current,7,10,()=>0).reward,null);
- assert.equal(awardStageProfile(current,9,6,()=>0).reward,null);
+ assert.equal(profileAvatars.some(avatar=>avatar.tier===6),true);
+ assert.equal(profileAvatars.some(avatar=>avatar.tier===7),true);
+ const six=awardStageProfile(current,7,10,()=>0);assert.equal(six.reward.avatar.tier,6);current=six.profile;
+ const seven=awardStageProfile(current,9,6,()=>0);assert.equal(seven.reward.avatar.tier,7);
 });
