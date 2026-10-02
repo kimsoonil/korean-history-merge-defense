@@ -20,7 +20,7 @@ test('Myeongnyang unlocks after the previous eight chapters and keeps separate p
  assert.equal(storyChapters[8].title,'명량대첩');
  assert.ok(storyChapters[8].available);
  assert.ok(existsSync(new URL('../public'+MYEONGNYANG_IMAGE,import.meta.url)));
- assert.ok(existsSync(new URL('../public/regions/imjin-four-victories-v3.png',import.meta.url)));
+ assert.ok(existsSync(new URL('../public/regions/imjin-four-victories-v3.jpg',import.meta.url)));
 });
 
 test('every Myeongnyang normal and hard round spawns and resumes correctly',()=>{

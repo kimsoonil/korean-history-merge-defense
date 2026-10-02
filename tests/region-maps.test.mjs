@@ -3,15 +3,26 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {regionMaps,regionPins,regionCanvasSize} from '../lib/region-maps.ts';
 
+function jpegSize(bytes){
+ assert.equal(bytes.readUInt16BE(0),0xffd8);
+ for(let offset=2;offset<bytes.length-9;offset++)
+  if(bytes[offset]===0xff&&[0xc0,0xc1,0xc2,0xc3].includes(bytes[offset+1]))
+   return {height:bytes.readUInt16BE(offset+5),width:bytes.readUInt16BE(offset+7)};
+ throw new Error('JPEG dimensions not found');
+}
+function imageSize(bytes){
+ if(bytes.toString('ascii',1,4)==='PNG')return {width:bytes.readUInt32BE(16),height:bytes.readUInt32BE(20)};
+ return jpegSize(bytes);
+}
+
 test('every implemented chapter has its own historical region image',()=>{
- assert.equal(regionMaps[1],'/regions/pyongyang-v2.png');
- assert.equal(regionMaps[10],'/regions/imjin-four-victories-v3.png');
+ assert.equal(regionMaps[1],'/regions/pyongyang-v2.jpg');
+ assert.equal(regionMaps[10],'/regions/imjin-four-victories-v3.jpg');
  assert.equal(new Set(Object.values(regionMaps)).size,10);
  for(const [chapter,path] of Object.entries(regionMaps)){
   assert.match(path,/^\/(?:regions|terrain)\//);
-  const png=readFileSync(new URL('../public'+path,import.meta.url));
-  assert.equal(png.toString('ascii',1,4),'PNG');
-  assert.equal(png.readUInt32BE(16)/png.readUInt32BE(20),3,`chapter ${chapter} map must be a native 3:1 panorama`);
+  const {width,height}=imageSize(readFileSync(new URL('../public'+path,import.meta.url)));
+  assert.equal(width/height,3,`chapter ${chapter} map must be a native 3:1 panorama`);
  }
 });
 test('region canvas and markers retain native aspect ratio on all viewport heights',()=>{

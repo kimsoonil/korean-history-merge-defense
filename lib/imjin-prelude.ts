@@ -9,10 +9,10 @@ export const IMJIN_PRELUDE_STAGES=[1,4,7,10] as const;
 export const isImjinPreludeStage=(stage:number)=>IMJIN_PRELUDE_STAGES.includes(stage as (typeof IMJIN_PRELUDE_STAGES)[number]);
 
 const IMJIN_STORY_IMAGES={
- hansando:'/story/epilogues/hansando-victory.png',
+ hansando:'/story/epilogues/hansando-victory.jpg',
  jinju:'/story/arrivals-v2/imjin-war.png',
- haengju:'/story/epilogues/haengju-victory.png',
- myeongnyang:'/story/epilogues/myeongnyang-victory.png',
+ haengju:'/story/epilogues/haengju-victory.jpg',
+ myeongnyang:'/story/epilogues/myeongnyang-victory.jpg',
 } as const;
 
 const withExchange=(arrival:(step:number,name:string)=>StoryDialogue|undefined,name:string,enemy:string,threat:string,reply:string):StoryDialogue[]=>[

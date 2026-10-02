@@ -70,10 +70,10 @@ test('the Imjin War follows the four requested victories from Hansando to Myeong
 
 test('the first stage in each Imjin front opens its matching story image and commander exchange',()=>{
  const expected=[
-  [1,'한산도 대첩','/story/epilogues/hansando-victory.png','이순신','와키자카 야스하루'],
+  [1,'한산도 대첩','/story/epilogues/hansando-victory.jpg','이순신','와키자카 야스하루'],
   [4,'진주성 대첩','/story/arrivals-v2/imjin-war.png','김시민','일본군 공성대장'],
-  [7,'행주대첩','/story/epilogues/haengju-victory.png','권율','우키타 히데이에'],
-  [10,'명량대첩','/story/epilogues/myeongnyang-victory.png','이순신','구루시마 미치후사'],
+  [7,'행주대첩','/story/epilogues/haengju-victory.jpg','권율','우키타 히데이에'],
+  [10,'명량대첩','/story/epilogues/myeongnyang-victory.jpg','이순신','구루시마 미치후사'],
  ];
  for(const [stage,title,image,hero,enemy] of expected){
   const prelude=imjinPrelude(stage,'테스트');
