@@ -30,6 +30,8 @@ import {
   basics,
   byName,
   createRoundInvader,
+  enemyArtSheetSrc,
+  enemyPortraitFor,
   enemyPortraits,
   pathAt,
   recipes,
@@ -414,7 +416,7 @@ export default function Game() {
         preloadImages([
           EPILOGUE_RETURN_IMAGE,
           ...STORY_EPILOGUE_IMAGES,
-          ...Object.values(enemyPortraits).map((image) => image.src),
+          enemyArtSheetSrc(chapter),
           ...Object.values(byName)
             .filter((unit) => unit.tier >= 2)
             .map((unit) => unit.atlas?.src ?? unit.portrait ?? "")
@@ -423,7 +425,7 @@ export default function Game() {
       500,
     );
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [chapter]);
   const [salsuCleared, setSalsuCleared] = useState(0),
     [ansiCleared, setAnsiCleared] = useState(0),
     [hwangsanCleared, setHwangsanCleared] = useState(0),
@@ -2792,7 +2794,7 @@ export default function Game() {
                     )}
                     {enemies.map((e) => {
                       const p = pathAt(e.progress),
-                        art = enemyPortraits[e.name],
+                        art = enemyPortraitFor(e),
                         finalBoss =
                           e.boss &&
                           isStageComplete(
@@ -2828,7 +2830,15 @@ export default function Game() {
                               src={art.src}
                               alt=""
                               style={
-                                art.standalone
+                                art.crop
+                                  ? {
+                                      width: `${100 / art.crop.w}%`,
+                                      height: `${100 / art.crop.h}%`,
+                                      left: `${(-art.crop.x / art.crop.w) * 100}%`,
+                                      top: `${(-art.crop.y / art.crop.h) * 100}%`,
+                                      maxWidth: "none",
+                                    }
+                                  : art.standalone
                                   ? {
                                       width: "100%",
                                       height: "100%",

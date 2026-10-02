@@ -12,7 +12,7 @@ import {globalRound,roundBossName,stageRoundCount} from './rounds.ts';
 import {roadPosition} from './battlefield.ts';
 import {enemyStats,type Difficulty} from './enemy-stats.ts';
 import {type UnitTier} from './unit-tiers.ts';
-import {allStoryBossNames,allStoryEnemyNames,storyEnemyNames} from './story-battle.ts';
+import {allStoryBossNames,allStoryEnemyNames,legacyStageBossName,stageBossName,storyBattle,storyEnemyNames} from './story-battle.ts';
 export type UnitDef = { name:string; tier:UnitTier; icon:string; role:string; skill:string; damage:number; range:number; rate:number; color:string; recipe?:string[]; portrait?:string; atlas?:{src:string;col:number;row:number} };
 const portraitSlugs:Record<string,string>={창병:'spearman',활병:'archer',수병:'sailor',포수:'gunner',의병:'militia',기병:'cavalry',유생:'scholar',시민:'citizen'};
 const heroSheets=[
@@ -57,7 +57,8 @@ export type Soldier={id:number; name:string; slot:number};
 export type Enemy={id:number; name:string; hp:number; maxHp:number; progress:number; speed:number; boss:boolean; reward:number; originStage:number;originRound?:number;chapter?:ChapterId;bossSeconds?:number;armor?:number;stunSeconds?:number};
 export const waveNames=chapterOneBattles.map(battle=>battle.name);
 export const enemyNames=['수나라 보병','수나라 창병','수나라 궁병','수나라 기병','수나라 공성병','수나라 정예군'];
-export const enemyPortraits=Object.fromEntries([...enemyNames,'수양제'].map((name,index)=>[name,{src:'/portraits/sui-enemies-atlas.png',col:index%4,row:Math.floor(index/4)}])) as Record<string,{src:string;col:number;row:number;standalone?:boolean}>;
+export type EnemyPortrait={src:string;col:number;row:number;standalone?:boolean;crop?:{x:number;y:number;w:number;h:number}};
+export const enemyPortraits=Object.fromEntries([...enemyNames,'수양제'].map((name,index)=>[name,{src:'/portraits/sui-enemies-atlas.png',col:index%4,row:Math.floor(index/4)}])) as Record<string,EnemyPortrait>;
 export function createInvader(stage:number,index:number,id:number):Enemy{const level=waveCombatLevel(stage),boss=stage===FINAL_WAVE&&index===0,regularHp=55+level*38+(index%4)*18,hp=boss?(55+level*38+3*18)*10:regularHp;return {id,name:boss?'수양제':enemyNames[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))],hp,maxHp:hp,progress:0,speed:boss?.025:.043+(index%4)*.003,reward:boss?850:11+level*2,boss,originStage:stage}}
 export function recipeStatus(recipe:string[],owned:Soldier[]){const pool=[...owned]; return recipe.map(n=>{let i=pool.findIndex(s=>s.name===n);if(i<0&&byName[n]?.tier===1)i=pool.findIndex(s=>s.name==='시민');if(i<0)return false;pool.splice(i,1);return true})}
 // The general deliberately reuses an enlarged elite soldier, rather than the emperor art.
@@ -81,6 +82,55 @@ for(const name of [...Object.values(noryangBossNames),'노량 일본 함장'])en
 for(const name of allStoryEnemyNames)if(!enemyPortraits[name])enemyPortraits[name]={src:'/portraits/sui-enemies-atlas.png',col:0,row:0};
 for(const name of allStoryBossNames)if(!enemyPortraits[name])enemyPortraits[name]={src:'/portraits/sui-enemies-atlas.png',col:1,row:1};
 for(const name of [...storyEnemyNames(10),...allStoryBossNames.filter(name=>name.includes('일본')||name==='시마즈 요시히로')])enemyPortraits[name]={src:'/portraits/hansando-ship.png',col:0,row:0,standalone:true};
+const enemyArtSheets:Record<ChapterId,{slug:string;rows:readonly number[]}>={
+ 1:{slug:'pyongyang',rows:[4,4,4,4]},2:{slug:'conquests',rows:[6,6,6]},
+ 3:{slug:'salsu',rows:[6,6,4]},4:{slug:'ansi',rows:[6,4,4,4]},
+ 5:{slug:'hwangsan',rows:[6,5,5]},6:{slug:'nadang',rows:[6,4,4,4]},
+ 7:{slug:'cheonmunryeong',rows:[4,4,4,4]},8:{slug:'goryeo-khitan',rows:[4,4,4,4]},
+ 9:{slug:'cheoin',rows:[6,4,4,4]},10:{slug:'imjin-war',rows:[4,4,4,4]},
+};
+export const enemyArtSheetSrc=(chapter:ChapterId)=>`/portraits/enemies/${enemyArtSheets[chapter].slug}.png`;
+function storyEnemyArt(chapter:ChapterId,index:number):EnemyPortrait{
+ const sheet=enemyArtSheets[chapter],total=sheet.rows.reduce((sum,count)=>sum+count,0);
+ const cell=Math.max(0,Math.min(index,total-1));
+ let first=0;
+ for(const [row,count] of sheet.rows.entries()){
+  if(cell<first+count){
+   const col=cell-first;
+   return {src:enemyArtSheetSrc(chapter),col,row,crop:{x:col/count,y:row/sheet.rows.length,w:1/count,h:1/sheet.rows.length}};
+  }
+  first+=count;
+ }
+ throw new Error(`Missing enemy art cell ${chapter}:${index}`);
+}
+for(let chapter=1;chapter<=10;chapter++){
+ const id=chapter as ChapterId;
+ for(const [index,name] of storyEnemyNames(id).entries())enemyPortraits[name]=storyEnemyArt(id,index);
+ for(let stage=1;stage<=10;stage++){
+  const art=storyEnemyArt(id,stage===10?enemyArtSheets[id].rows.reduce((sum,count)=>sum+count,0)-1:stage+5);
+  enemyPortraits[stageBossName(id,stage)]=art;
+  enemyPortraits[legacyStageBossName(id,stage)]=art;
+ }
+ enemyPortraits[`${storyBattle(id).faction} 장군`]=storyEnemyArt(id,6);
+}
+for(const [index,name] of ['수나라 선봉장','수나라 공성대장','우문술','내호아','우중문','우중문 & 우문술'].entries())enemyPortraits[name]=storyEnemyArt(3,index+6);
+// Old in-progress Imjin saves used ship names; keep them loadable, but draw soldiers.
+enemyPortraits['일본 전선']=storyEnemyArt(10,4);
+enemyPortraits['일본 정예선']=storyEnemyArt(10,5);
+export function enemyPortraitFor(enemy:Pick<Enemy,'name'|'boss'|'chapter'|'originStage'|'originRound'>):EnemyPortrait{
+ const chapter=enemy.chapter;
+ if(chapter){
+  if(enemy.boss&&(
+   enemy.name===stageBossName(chapter,enemy.originStage)||
+   enemy.name===legacyStageBossName(chapter,enemy.originStage)
+  ))return storyEnemyArt(chapter,enemy.originStage===10?enemyArtSheets[chapter].rows.reduce((sum,count)=>sum+count,0)-1:enemy.originStage+5);
+  const normalIndex=storyEnemyNames(chapter).indexOf(enemy.name);
+  if(normalIndex>=0)return storyEnemyArt(chapter,normalIndex);
+  if(chapter===10&&enemy.name==='일본 전선')return storyEnemyArt(chapter,4);
+  if(chapter===10&&enemy.name==='일본 정예선')return storyEnemyArt(chapter,5);
+ }
+ return enemyPortraits[enemy.name];
+}
 export function createRoundInvader(stage:number,round:number,index:number,id:number,difficulty:Difficulty='normal',chapter:ChapterId=1):Enemy{
  const bossName=index===0?roundBossName(stage,round,chapter):null;
  const level=Math.ceil(globalRound(stage,round)/5);

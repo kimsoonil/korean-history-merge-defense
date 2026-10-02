@@ -19,7 +19,7 @@ import {readGambleState,readUnitGambleUsage,type GambleState,type UnitGambleUsag
 import {hasHeroSkillTier} from './unit-tiers.ts';
 import {readQuestProgress,type QuestProgress} from './quests.ts';
 import {validReinforcement,type ReinforcementProgress} from './story-campaigns.ts';
-import {allStoryEnemyNames} from './story-battle.ts';
+import {allStoryEnemyNames,legacyStageBossName} from './story-battle.ts';
 export const SAVE_KEY='salsu-progress-v1';
 export type GamePhase='ready'|'battle'|'cleared'|'lost'|'won';
 export type GameProgress={
@@ -152,7 +152,8 @@ export function readGameSave(raw:string|null):GameSave|null{
     for(const enemy of value.enemies){
       if(!record(enemy)||!integer(enemy.id,1,Number.MAX_SAFE_INTEGER-1)||ids.has(enemy.id)||typeof enemy.name!=='string'||!Object.hasOwn(enemyPortraits,enemy.name))return null;
       if(!number(enemy.maxHp,1,1000000)||!number(enemy.hp,Number.MIN_VALUE,enemy.maxHp)||!number(enemy.progress,0,1-Number.EPSILON)||!number(enemy.speed,0.001,1)||!integer(enemy.reward,0,10000)||enemy.originStage!==value.stage||typeof enemy.boss!=='boolean')return null;
-      if(enemy.boss!==!allStoryEnemyNames.includes(enemy.name)||enemy.boss&&!Array.from({length:value.round},(_,i)=>roundBossName(Number(value.stage),i+1,(value.chapter??1) as ChapterId)).includes(enemy.name))return null;
+      const legacyStageBoss=enemy.boss&&enemy.name===legacyStageBossName((value.chapter??1) as ChapterId,Number(value.stage))&&value.round===stageRoundCount(Number(value.stage));
+      if(enemy.boss!==!allStoryEnemyNames.includes(enemy.name)||enemy.boss&&!legacyStageBoss&&!Array.from({length:value.round},(_,i)=>roundBossName(Number(value.stage),i+1,(value.chapter??1) as ChapterId)).includes(enemy.name))return null;
       if(enemy.boss)bosses++;
       ids.add(enemy.id);
     }
