@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
-import {X} from 'lucide-react';
+import {Volume2,VolumeX,X} from 'lucide-react';
 import {LoadingBackground} from './LoadingImage';
 import type {ChapterId} from '@/lib/ansi';
 import {getStoryCampaign} from '@/lib/story-campaigns';
@@ -16,7 +16,7 @@ export default function StoryArrival({nickname,onClose,onComplete,chapter=1}:{ch
  const dialogue=campaign.arrival(step,nickname);
  return <main className={`story-arrival ${flash?'story-flash':''}`}>
   <LoadingBackground className="story-backdrop" src={campaign.arrivalImage}/><div className="story-whiteout" aria-hidden="true"/>
-  <header><div><small>02 · 첫 전장</small><h1>{campaign.arrivalTitle}</h1></div><div><button aria-pressed={ambience.enabled} onClick={ambience.toggle}>{ambience.enabled?'효과음 끄기':'효과음 켜기'}</button><button className="story-skip" onClick={finish} aria-label="스토리 건너뛰고 스테이지 선택">스킵</button><button className="close-icon-button" onClick={()=>{ambience.stop();onClose();}} aria-label="이야기 닫기"><X size={20}/></button></div></header>
+  <header><div><small>{campaign.year} · 첫 전장</small><h1>{campaign.title}</h1></div><div><button className="story-audio-button" aria-label={ambience.enabled?'효과음 끄기':'효과음 켜기'} aria-pressed={ambience.enabled} onClick={ambience.toggle}>{ambience.enabled?<Volume2 size={18}/>:<VolumeX size={18}/>}<span>{ambience.enabled?'효과음 끄기':'효과음 켜기'}</span></button><button className="story-skip" onClick={finish} aria-label="스토리 건너뛰고 스테이지 선택">스킵</button><button className="close-icon-button" onClick={()=>{ambience.stop();onClose();}} aria-label="이야기 닫기"><X size={20}/></button></div></header>
   <div className="story-content">
    <aside className="story-journal"><small>지금까지의 이야기</small><h2>{campaign.journalHeading}</h2><p>{campaign.journalSummary(nickname)}</p></aside>
    <section className="story-dialogue" aria-labelledby="story-speaker">

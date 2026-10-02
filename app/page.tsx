@@ -3404,7 +3404,9 @@ export default function Game() {
           profileReward={profileReward}
           onComplete={() => {
             setProfileReward(null);
-            openStorySelection();
+            returnHome();
+            setStoryOpen(false);
+            setBooksOpen(false);
           }}
         />
       )}

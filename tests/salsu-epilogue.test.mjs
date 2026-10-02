@@ -33,7 +33,8 @@ test('every normal and hard story final opens an epilogue instead of the result 
  assert.match(page,/showStoryEpilogue\s*&&\s*\(/);
  assert.match(page,/phase\s*===\s*["']won["']\s*&&\s*!showStoryEpilogue/);
  const component=readFileSync(new URL('../app/StoryEpilogue.tsx',import.meta.url),'utf8');
- assert.match(component,/이야기 선택/);
+ assert.match(component,/메인 화면으로/);
+ assert.match(page,/setProfileReward\(null\);\s*returnHome\(\);\s*setStoryOpen\(false\);\s*setBooksOpen\(false\)/);
  assert.match(component,/step>=8\?EPILOGUE_RETURN_IMAGE:meta\.image/);
  assert.doesNotMatch(component,/스킵/);
 });
@@ -45,4 +46,23 @@ test('all epilogue battle and return artwork is bundled with the game',()=>{
  assert.equal(new Set(STORY_EPILOGUE_IMAGES).size,10);
  for(const image of STORY_EPILOGUE_IMAGES)assert.match(image,/^\/story\/(?:epilogues|epilogues-v2|salsu-victory)/);
  for(const image of [...STORY_EPILOGUE_IMAGES,EPILOGUE_RETURN_IMAGE])assert.equal(existsSync(`${projectRoot}/public${image}`),true,image);
+});
+
+test('all story opening images, headings and dialogue pages are available',async()=>{
+ const {getStoryCampaign}=await import('../lib/story-campaigns.ts');
+ const projectRoot=fileURLToPath(new URL('..',import.meta.url));
+ for(let chapter=1;chapter<=10;chapter++){
+  const story=getStoryCampaign(chapter);
+  assert.equal(existsSync(`${projectRoot}/public${story.arrivalImage}`),true,story.title);
+  assert.equal(existsSync(`${projectRoot}/public${story.epilogue.image}`),true,story.title);
+  assert.ok(story.title.trim());
+  assert.ok(story.arrivalTitle.trim());
+  for(let step=0;step<5;step++){
+   const page=story.arrival(step,'홍길동');
+   assert.ok(page.speaker.trim()&&page.text.trim(),`${story.title} opening ${step+1}`);
+  }
+  for(const [index,page] of story.epilogue.pages('홍길동').entries()){
+   assert.ok(page.speaker.trim()&&page.text.trim(),`${story.title} epilogue ${index+1}`);
+  }
+ }
 });

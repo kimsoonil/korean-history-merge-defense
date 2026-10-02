@@ -1,0 +1,28 @@
+@media(max-width:800px){
+ .story-arrival{width:100%;height:100%;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+ .story-arrival>header{flex:none;display:flex;flex-wrap:nowrap;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;min-width:0}
+ .story-arrival>header>div:first-child{min-width:0;flex:1}
+ .story-arrival>header small{display:block;font-size:11px;line-height:1.35;letter-spacing:.04em}
+ .story-arrival>header h1{font:700 clamp(17px,4.8vw,21px)/1.3 serif;margin:2px 0 0;word-break:keep-all;overflow-wrap:anywhere}
+ .story-arrival>header>div:last-child{display:flex;flex:none;gap:5px;margin-left:0}
+ .story-arrival>header button{display:grid;place-items:center;min-width:34px;min-height:34px;padding:5px 7px;font-size:12px;white-space:nowrap}
+ .story-arrival .story-audio-button span{display:none}
+ .story-arrival .story-backdrop{position:relative;inset:auto;z-index:0;flex:none;width:100%;height:clamp(150px,29dvh,240px);background-color:#202829;background-size:contain;background-position:center;background-repeat:no-repeat}
+ .story-arrival .story-backdrop:after{display:none}
+ .story-arrival .story-content{flex:1;min-height:0;min-width:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;justify-content:flex-start;gap:9px;margin:0;padding:10px 14px calc(14px + env(safe-area-inset-bottom,0px))}
+ .story-arrival .story-journal{flex:none;align-self:stretch;max-height:none;margin:0;padding:10px 12px}
+ .story-arrival .story-journal h2{margin:2px 0 4px;font-size:14px;line-height:1.35;word-break:keep-all}
+ .story-arrival .story-journal p{margin:0;font-size:12px;line-height:1.5;word-break:keep-all}
+ .story-arrival .story-journal span{margin:5px 0 0;font-size:11px}
+ .story-arrival .story-dialogue{flex:none;box-sizing:border-box;width:100%;min-width:0;margin:0;padding:14px;border-radius:10px}
+ .story-arrival .story-dialogue h2{margin:0 0 6px;font-size:15px;line-height:1.35;word-break:keep-all}
+ .story-arrival .story-dialogue>p{margin:0;font-size:clamp(14px,3.8vw,16px);line-height:1.58;overflow-wrap:anywhere;word-break:keep-all}
+ .story-arrival .story-next-row{margin-top:10px;gap:8px}
+ .story-arrival .story-primary{min-height:38px;padding:8px 14px;font-size:13px;white-space:nowrap}
+ .story-epilogue .profile-reward-copy{display:block;margin-top:6px;font-size:12px;line-height:1.4}
+}
+@media(max-width:380px){
+ .story-arrival .story-backdrop{height:clamp(132px,25dvh,190px)}
+ .story-arrival>header{padding-inline:10px}
+ .story-arrival .story-content{padding-inline:10px}
+}
