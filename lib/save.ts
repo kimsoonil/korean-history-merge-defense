@@ -111,8 +111,8 @@ export function readGameSave(raw:string|null):GameSave|null{
       if(value.version===6&&value.roundRules===3&&Array.isArray(value.enemies)&&integer(value.round,1,65)){
         const savedRound=value.round,oldCartReward=200*savedRound/5,savedEnemies=value.enemies;
         const enemies=savedEnemies.filter(enemy=>!(savedRound===65&&record(enemy)&&enemy.name===SUPPLY_CART_NAME)).map(enemy=>
-          record(enemy)&&enemy.name===SUPPLY_CART_NAME&&isSupplyRound(savedRound)&&enemy.reward===oldCartReward
-            ? {...enemy,reward:supplyCartReward(savedRound)}:enemy);
+          record(enemy)&&enemy.name===SUPPLY_CART_NAME&&savedRound<=60&&savedRound%5===0&&enemy.reward===oldCartReward
+            ? {...enemy,reward:100*2**(savedRound/5-1)}:enemy);
         if(enemies.length!==savedEnemies.length||enemies.some((enemy,index)=>enemy!==savedEnemies[index]))
           return readGameSave(JSON.stringify({...value,enemies}));
       }
@@ -178,9 +178,11 @@ export function readGameSave(raw:string|null):GameSave|null{
     let bosses=0;
     for(const enemy of value.enemies){
       if(!record(enemy)||!integer(enemy.id,1,Number.MAX_SAFE_INTEGER-1)||ids.has(enemy.id)||typeof enemy.name!=='string'||!Object.hasOwn(enemyPortraits,enemy.name))return null;
-      if(!number(enemy.maxHp,1,1000000)||!number(enemy.hp,Number.MIN_VALUE,enemy.maxHp)||!number(enemy.progress,0,1-Number.EPSILON)||!number(enemy.speed,0.001,1)||!integer(enemy.reward,0,enemy.name===SUPPLY_CART_NAME?supplyCartReward(60):10000)||enemy.originStage!==value.stage||typeof enemy.boss!=='boolean')return null;
+      if(!number(enemy.maxHp,1,1000000)||!number(enemy.hp,Number.MIN_VALUE,enemy.maxHp)||!number(enemy.progress,0,1-Number.EPSILON)||!number(enemy.speed,0.001,1)||!integer(enemy.reward,0,enemy.name===SUPPLY_CART_NAME?204800:10000)||enemy.originStage!==value.stage||typeof enemy.boss!=='boolean')return null;
       const legacyStageBoss=enemy.boss&&enemy.name===legacyStageBossName((value.chapter??1) as ChapterId,Number(value.stage))&&value.round===stageRoundCount(Number(value.stage),difficulty);
-      if(enemy.name===SUPPLY_CART_NAME&&(enemy.boss||enemy.originRound!==value.round||!isSupplyRound(value.round)||enemy.reward!==supplyCartReward(value.round)))return null;
+      const currentCart=isSupplyRound(Number(value.stage),Number(value.round),difficulty)&&enemy.reward===supplyCartReward(Number(value.stage),Number(value.round),difficulty);
+      const legacyCart=Number(value.round)<=60&&Number(value.round)%5===0&&enemy.reward===100*2**(Number(value.round)/5-1);
+      if(enemy.name===SUPPLY_CART_NAME&&(enemy.boss||enemy.originRound!==value.round||!currentCart&&!legacyCart))return null;
       if(enemy.boss!==!allStoryEnemyNames.includes(enemy.name)||enemy.boss&&!legacyStageBoss&&!Array.from({length:value.round},(_,i)=>roundBossName(Number(value.stage),i+1,(value.chapter??1) as ChapterId,difficulty)).includes(enemy.name))return null;
       if(enemy.boss)bosses++;
       ids.add(enemy.id);

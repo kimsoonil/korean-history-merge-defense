@@ -134,15 +134,15 @@ export function enemyPortraitFor(enemy:Pick<Enemy,'name'|'boss'|'chapter'|'origi
  return enemyPortraits[enemy.name];
 }
 export function createRoundInvader(stage:number,round:number,index:number,id:number,difficulty:Difficulty='normal',chapter:ChapterId=1):Enemy{
+ const supplyCart=isSupplyRound(stage,round,difficulty)&&index===0;
  const bossName=index===0?roundBossName(stage,round,chapter,difficulty):null;
- const supplyCart=isSupplyRound(round)&&index===(roundBossName(stage,round,chapter,difficulty)?1:0);
  const level=Math.ceil(globalRound(stage,round)/5);
  const finalBoss=!!bossName&&round===stageRoundCount(stage,difficulty);
  const storyFinal=stage===10&&finalBoss;
  const {hp,armor}=enemyStats(round,index,!!bossName,storyFinal,difficulty,stage,chapter,finalBoss,stageRoundCount(stage,difficulty));
  const chapterEnemies=storyEnemyNames(chapter);
  const enemyHp=supplyCart?Math.round(hp*1.5):hp;
- return {id,chapter,name:bossName??(supplyCart?SUPPLY_CART_NAME:chapterEnemies[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))]),hp:enemyHp,maxHp:enemyHp,armor,progress:0,speed:bossName ? .025 : supplyCart ? .034 : .043+(index%4)*.003,reward:finalBoss?0:bossName?30*round:supplyCart?supplyCartReward(round):difficulty==='hard'?15:20,boss:!!bossName,originStage:stage,originRound:round};
+ return {id,chapter,name:bossName??(supplyCart?SUPPLY_CART_NAME:chapterEnemies[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))]),hp:enemyHp,maxHp:enemyHp,armor,progress:0,speed:bossName ? .025 : supplyCart ? .034 : .043+(index%4)*.003,reward:finalBoss?0:bossName?30*round:supplyCart?supplyCartReward(stage,round,difficulty):difficulty==='hard'?15:20,boss:!!bossName,originStage:stage,originRound:round};
 }
 // The invaders make one complete lap around the square unit field.
 export const pathAt=roadPosition;

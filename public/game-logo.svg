@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <defs><linearGradient id="gold" x1="12" y1="5" x2="50" y2="59" gradientUnits="userSpaceOnUse"><stop stop-color="#fff0bb"/><stop offset=".5" stop-color="#dbbb72"/><stop offset="1" stop-color="#9e773c"/></linearGradient></defs>
-  <path d="M32 3 56 13v20c0 13-13 23-24 28C21 56 8 46 8 33V13L32 3Z" fill="#142c25" stroke="url(#gold)" stroke-width="2.5"/>
-  <path d="m32 9 18 8v16c0 10-9 18-18 23-9-5-18-13-18-23V17l18-8Z" fill="#294638" stroke="#c6ac6d" stroke-opacity=".35"/>
-  <path d="m32 15 8 8-8 8-8-8 8-8Z" fill="url(#gold)"/>
-  <path d="m22 27 8 8-8 8-8-8 8-8Zm20 0 8 8-8 8-8-8 8-8Z" fill="url(#gold)"/>
-  <path d="m32 39 5 5-5 7-5-7 5-5Z" fill="#f8e6ad"/>
-  <path d="M20 11 32 6l12 5" stroke="#fff1bd" stroke-linecap="round"/>
-</svg>

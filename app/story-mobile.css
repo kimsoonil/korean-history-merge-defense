@@ -26,3 +26,21 @@
  .story-arrival>header{padding-inline:10px}
  .story-arrival .story-content{padding-inline:10px}
 }
+
+/* Opening and epilogue are presented as a phone-sized visual novel on desktop too. */
+.story-arrival:is(.story-opening,.story-epilogue){width:min(100%,430px);max-width:430px;height:100%;margin-inline:auto;box-shadow:0 0 48px #0008;overflow:hidden}
+.story-arrival:is(.story-opening,.story-epilogue) .story-backdrop{position:relative;inset:auto;z-index:0;flex:1 1 auto;min-height:0;height:auto;width:100%;background-color:#242829;background-size:cover;background-position:center 38%;background-repeat:no-repeat}
+.story-arrival:is(.story-opening,.story-epilogue) .story-backdrop:after{display:none}
+.story-arrival:is(.story-opening,.story-epilogue)>header{flex:none;min-width:0;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px}
+.story-arrival:is(.story-opening,.story-epilogue)>header>div:first-child{min-width:0;flex:1}
+.story-arrival:is(.story-opening,.story-epilogue)>header h1{font-size:clamp(17px,4.8vw,21px);line-height:1.3;overflow-wrap:anywhere}
+.story-arrival:is(.story-opening,.story-epilogue) .story-content{flex:none;min-height:0;max-height:48%;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:9px;margin:0;padding:10px 14px calc(14px + env(safe-area-inset-bottom,0px))}
+.story-arrival:is(.story-opening,.story-epilogue) .story-journal{flex:none;align-self:stretch;max-height:none;margin:0;padding:10px 12px}
+.story-arrival:is(.story-opening,.story-epilogue) .story-journal h2{margin:2px 0 4px;font-size:14px;line-height:1.35}
+.story-arrival:is(.story-opening,.story-epilogue) .story-journal p{margin:0;font-size:12px;line-height:1.5}
+.story-arrival:is(.story-opening,.story-epilogue) .story-journal span{margin:5px 0 0;font-size:11px}
+.story-arrival:is(.story-opening,.story-epilogue) .story-dialogue{flex:none;width:100%;box-sizing:border-box;margin:0;padding:14px;border-radius:10px}
+.story-arrival:is(.story-opening,.story-epilogue) .story-dialogue h2{margin:0 0 6px;font-size:15px}
+.story-arrival:is(.story-opening,.story-epilogue) .story-dialogue>p{margin:0;font-size:clamp(14px,3.8vw,16px);line-height:1.58}
+.story-arrival:is(.story-opening,.story-epilogue) .story-next-row{margin-top:10px}
+@media(max-width:380px){.story-arrival:is(.story-opening,.story-epilogue) .story-content{max-height:55%;padding-inline:10px}}

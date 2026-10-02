@@ -42,9 +42,9 @@ test('every normal and hard story final opens an epilogue instead of the result 
 test('all epilogue battle and return artwork is bundled with the game',()=>{
  const projectRoot=fileURLToPath(new URL('..',import.meta.url));
  assert.equal(SALSU_EPILOGUE_IMAGE,'/story/salsu-victory.png');
- assert.equal(EPILOGUE_RETURN_IMAGE,'/story/history-return.png');
+ assert.equal(EPILOGUE_RETURN_IMAGE,'/story/cinematics-mobile/history-return.jpg');
  assert.equal(new Set(STORY_EPILOGUE_IMAGES).size,10);
- for(const image of STORY_EPILOGUE_IMAGES)assert.match(image,/^\/story\/(?:epilogues|epilogues-v2|salsu-victory)/);
+ for(const image of STORY_EPILOGUE_IMAGES)assert.match(image,/^\/story\/cinematics-mobile\/.*-epilogue\.jpg$/);
  for(const image of [...STORY_EPILOGUE_IMAGES,EPILOGUE_RETURN_IMAGE])assert.equal(existsSync(`${projectRoot}/public${image}`),true,image);
 });
 

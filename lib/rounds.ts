@@ -1,7 +1,7 @@
 import type {ChapterId} from './ansi.ts';
 import type {Difficulty} from './enemy-stats.ts';
 import {storyBossName} from './story-battle.ts';
-import {stageRoundCount} from './round-config.ts';
+import {stageRoundCount,bossRounds} from './round-config.ts';
 export {stageRoundCount,bossRounds} from './round-config.ts';
 // Encounter progression is local to each stage; every new stage starts at one.
 export const globalRound=(_stage:number,round:number)=>round;
@@ -9,8 +9,12 @@ export const bossNames:Record<number,string>={10:'수나라 선봉장',20:'수�
 export const roundBossName=(stage:number,round:number,chapter:ChapterId=1,difficulty:Difficulty='hard')=>storyBossName(chapter,stage,round,difficulty);
 // Bosses count toward the total: normal 14 + boss, hard 19 + boss.
 export const roundEnemyCount=(_stage:number,_round:number,difficulty:'normal'|'hard'='normal')=>difficulty==='hard'?20:15;
-export const isSupplyRound=(round:number)=>round>0&&round<=60&&round%5===0;
-export const supplyCartReward=(round:number)=>isSupplyRound(round)?100*2**(round/5-1):0;
+// Each boss is preceded by a supply cart in the previous round, including the final boss.
+export const isSupplyRound=(stage:number,round:number,difficulty:Difficulty='hard')=>bossRounds(stage,difficulty).includes(round+1);
+export const supplyCartReward=(stage:number,round:number,difficulty:Difficulty='hard')=>{
+ const index=bossRounds(stage,difficulty).indexOf(round+1);
+ return index<0?0:100*2**index;
+};
 export const roundKey=(stage:number,round:number)=>stage*100+round;
 export const ROUND_CLEAR_GOLD=50;
 export const isStageComplete=(stage:number,round:number,difficulty:Difficulty='hard')=>round===stageRoundCount(stage,difficulty);

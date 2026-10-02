@@ -16,7 +16,9 @@ export function stageClearGold(stage:number){
 }
 
 export const ENEMY_LIMIT=100;
-export const isOverrun=(enemyCount:number)=>enemyCount>=ENEMY_LIMIT;
+export const HARD_ENEMY_LIMIT=70;
+export const enemyLimit=(difficulty:Difficulty='normal')=>difficulty==='hard'?HARD_ENEMY_LIMIT:ENEMY_LIMIT;
+export const isOverrun=(enemyCount:number,difficulty:Difficulty='normal')=>enemyCount>=enemyLimit(difficulty);
 export function canAutoAdvanceRound({phase,timeLeft,spawned,maxSpawn,paused}:StageProgress){
   return phase==='battle'&&!paused&&timeLeft<=0&&maxSpawn>0&&spawned>=maxSpawn;
 }

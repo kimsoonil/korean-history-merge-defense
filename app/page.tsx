@@ -107,9 +107,7 @@ import {
   readGambleState,
   readUnitGambleUsage,
   recordUnitGamble,
-  recordUnitGambleSuccess,
   unitGambles,
-  unitGamblesRemaining,
 } from "@/lib/gambling";
 import {
   battleQuests,
@@ -133,8 +131,7 @@ import {
   researchBossGold,
   researchBossTroops,
   researchDeployLimit,
-  researchGamblePityBonus,
-  researchGambleRefundPercent,
+  researchGambleDiscountPercent,
   researchQuestCitizens,
   researchQuestGold,
   researchQuestTroops,
@@ -168,6 +165,7 @@ import {
   canSkipStage,
   canAutoAdvanceRound,
   canCompleteStage,
+  enemyLimit,
   isOverrun,
 } from "@/lib/stage-flow";
 import TitleScreen, { NewGameConfirm } from "./TitleScreen";
@@ -1179,6 +1177,7 @@ export default function Game() {
     finalRound = isCampaignComplete(stage, round, difficulty),
     stageEnd = isStageComplete(stage, round, difficulty),
     maxSpawn = roundEnemyCount(stage, round, difficulty),
+    enemyCap = enemyLimit(difficulty),
     bossEnemy = enemies.find((e) => e.boss),
     sel = roster.find((s) => s.id === selected),
     selDef = sel ? byName[sel.name] : null,
@@ -1307,26 +1306,25 @@ export default function Game() {
     setRoster(nextRoster);
     setNotice(`${source} · ${name} 획득!`);
   };
-  const gambleUnit = (tier: 1 | 2 | 3) => {
+  const gambleUnit = (tier: 1 | 2 | 3 | 4) => {
     const option = unitGambles.find((item) => item.tier === tier),
       current = progressRef.current;
     if (!option || !gambleUnlocked(current.round, option.unlockRound)) return;
     const now = Date.now();
     if (!canGamble(current.gambleState, current.round, current.difficulty, now))
       return;
-    if (unitGamblesRemaining(tier, current.round, current.unitGambleUsage) <= 0)
-      return;
+    const effectiveCost=Math.round(option.cost*(1-researchGambleDiscountPercent(permanentResearch)/100));
     const names = Object.values(byName)
         .filter((unit) => unit.tier === tier && unit.name !== "시민")
         .map((unit) => unit.name),
       result = playUnitGamble(
-        option,
+        {...option,cost:effectiveCost},
         current.gold,
         names,
         current.difficulty,
-        current.gambleState.unitFailures[tier],
+        tier===4?0:current.gambleState.unitFailures[tier],
         Math.random,
-        researchGamblePityBonus(permanentResearch),
+        0,
       );
     if (!result) return;
     const nextGambleState = recordUnitGamble(
@@ -1341,8 +1339,8 @@ export default function Game() {
       current.questProgress,
       result.success,
     );
-    const extraRefund=!result.success?Math.round((option.cost-result.refund)*researchGambleRefundPercent(permanentResearch)/100):0,
-      adjustedGold=result.gold+extraRefund;
+    const extraRefund=0,
+      adjustedGold=result.gold;
     progressRef.current = {
       ...current,
       gold: adjustedGold,
@@ -1366,16 +1364,6 @@ export default function Game() {
       return;
     }
     setGambleResult(null);
-    const nextUsage = recordUnitGambleSuccess(
-      tier,
-      current.round,
-      current.unitGambleUsage,
-    );
-    progressRef.current = {
-      ...progressRef.current,
-      unitGambleUsage: nextUsage,
-    };
-    setUnitGambleUsage(nextUsage);
     receiveUnit(result.name, "유닛 도박 성공");
   };
   const changeBag = (
@@ -1969,13 +1957,18 @@ export default function Game() {
             s.difficulty,
             s.chapter,
           );
+          if(invader.boss){
+            const arrival=bossLine(invader.name,s.stage,false,s.chapter);
+            if(arrival)setBossDialogue({...arrival,id:Date.now()});
+            setNotice(`${invader.name} 출현! ${s.chapter}-${s.stage} · ${s.round}라운드`);
+          }
           setEnemies((old) => [...old, invader]);
           setSpawned((n) => n + 1);
-          if (isOverrun(s.enemies.length + 1)) {
+          if (isOverrun(s.enemies.length + 1,s.difficulty)) {
             setWall(0);
             setPhase("lost");
             deadlineRef.current = null;
-            setNotice("적군이 100명 누적되어 방어선이 무너졌습니다.");
+            setNotice(`적군이 ${enemyLimit(s.difficulty)}명 누적되어 방어선이 무너졌습니다.`);
             return;
           }
         }
@@ -2176,11 +2169,11 @@ export default function Game() {
   }, [home, phase, stage, round]);
   useEffect(() => {
     if (home || legendary.active || phase === "lost" || phase === "won") return;
-    if (isOverrun(enemies.length)) {
+    if (isOverrun(enemies.length,difficulty)) {
       setWall(0);
       setPhase("lost");
       deadlineRef.current = null;
-      setNotice("적군이 100명 누적되어 방어선이 무너졌습니다.");
+      setNotice(`적군이 ${enemyCap}명 누적되어 방어선이 무너졌습니다.`);
       return;
     }
     if (
@@ -2221,6 +2214,7 @@ export default function Game() {
     stage,
     round,
     maxSpawn,
+    difficulty,
     legendary.active,
     bossDialogue,
   ]);
@@ -2374,7 +2368,7 @@ export default function Game() {
           round={round}
           difficulty={difficulty}
           gambleState={gambleState}
-          unitUsage={unitGambleUsage}
+          discountPercent={researchGambleDiscountPercent(permanentResearch)}
           disabled={phase === "lost" || phase === "won" || stageCleared}
           onUnit={gambleUnit}
           onClose={() => setGambleOpen(false)}
@@ -2515,7 +2509,7 @@ export default function Game() {
               <small>남은 적</small>
               <b>
                 {enemies.length}
-                <span>/100</span>
+                <span>/{enemyCap}</span>
               </b>
             </div>
             <div className="status-gold">
@@ -2593,13 +2587,13 @@ export default function Game() {
                   <small>전장에 남은 적군</small>
                   <strong>
                     {enemies.length}
-                    <span>/100</span>
+                    <span>/{enemyCap}</span>
                   </strong>
                 </div>
                 <p>
                   이번 라운드 출현 {spawned} / {maxSpawn}
                   <br />
-                  100명 누적 시 패배합니다.
+                  {enemyCap}명 누적 시 패배합니다.
                 </p>
               </div>
               <div className="hud-stat">
@@ -2654,7 +2648,7 @@ export default function Game() {
               </section>
               <p className="hud-rule">
                 30초마다 다음 라운드 · 매 라운드 적 {maxSpawn}명 · 일반 적
-                처치당 {difficulty === "hard" ? 15 : 20}G. 적 100명 누적 시
+                처치당 {difficulty === "hard" ? 15 : 20}G. 적 {enemyCap}명 누적 시
                 패배합니다. 마지막 라운드는 남은 적을 모두 처치해야
                 클리어합니다.
               </p>
@@ -3319,7 +3313,7 @@ export default function Game() {
               </p>
               <b>04 · 도박</b>
               <p>
-                유닛 도박으로 1~3단계 유닛을 획득합니다. 시민은 도박에서
+                유닛 도박으로 1~4단계 유닛을 획득합니다. 시민은 도박에서
                 나오지 않습니다.
               </p>
               <b>음악 출처</b>
@@ -3412,7 +3406,7 @@ export default function Game() {
                 {phase === "lost"
                   ? expiredBoss(enemies)
                     ? `${expiredBoss(enemies)!.name}을(를) 90초 안에 처치하지 못했습니다.`
-                    : "전장에 적군이 100명 누적되었습니다. 병사를 조합하고 강화하여 다시 도전하세요."
+                    : `전장에 적군이 ${enemyCap}명 누적되었습니다. 병사를 조합하고 강화하여 다시 도전하세요.`
                   : campaign.victory}
               </p>
               <button onClick={reset}>

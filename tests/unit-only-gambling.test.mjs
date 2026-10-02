@@ -12,5 +12,5 @@ test('gold gambling is no longer offered or wired into the battle screen',()=>{
  assert.match(dialog,/유닛 도박/);
  const quests=battleQuests(emptyQuestProgress(),[],{},emptyUpgrades());
  assert.equal(quests.some(quest=>quest.id==='gold-gamble-10'),false);
- assert.equal(quests.find(quest=>quest.id==='gamble-fail-10')?.title,'유닛 도박 실패 10회');
+ assert.equal(quests.find(quest=>quest.id==='unit-gamble-20')?.title,'유닛 도박 20회 이용');
 });

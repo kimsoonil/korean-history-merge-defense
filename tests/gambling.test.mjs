@@ -1,33 +1,32 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {GAMBLE_COOLDOWN_MS,emptyGambleState,emptyUnitGambleUsage,gambleAttemptsRemaining,gambleCooldownRemaining,gambleUnlocked,recordUnitGamble,recordUnitGambleSuccess,readGambleState,readUnitGambleUsage,unitGambles,unitGamblesRemaining,playUnitGamble} from '../lib/gambling.ts';
+import {GAMBLE_COOLDOWN_MS,emptyGambleState,gambleAttemptsRemaining,gambleCooldownRemaining,gambleUnlocked,recordUnitGamble,readGambleState,unitGambles,playUnitGamble} from '../lib/gambling.ts';
 
-test('unit gamble tiers unlock at rounds 1, 10 and 20',()=>{
- assert.deepEqual(unitGambles.map(x=>x.unlockRound),[1,10,20]);
+test('unit gamble tiers unlock at rounds 1, 10, 20 and 30',()=>{
+ assert.deepEqual(unitGambles.map(x=>x.unlockRound),[1,10,20,30]);
  assert.equal(gambleUnlocked(9,10),false);assert.equal(gambleUnlocked(10,10),true);
- assert.deepEqual(unitGambles.map(x=>x.cost),[500,1000,3000]);
+ assert.deepEqual(unitGambles.map(x=>x.cost),[500,1000,2000,3000]);
 });
-test('shared gamble cooldown is three seconds and round limits differ by mode',()=>{
+test('shared gamble cooldown is one second and both modes allow five attempts per round',()=>{
  const initial=emptyGambleState(4,'normal'),played=recordUnitGamble(initial,4,'normal',1,false,1000);
- assert.equal(GAMBLE_COOLDOWN_MS,3000);assert.equal(gambleCooldownRemaining(played,1000),3000);assert.equal(gambleCooldownRemaining(played,3999),1);assert.equal(gambleCooldownRemaining(played,4000),0);
- assert.equal(gambleAttemptsRemaining(played,4,'normal'),2);
- let hard=emptyGambleState(4,'hard');hard=recordUnitGamble(hard,4,'hard',1,false,0);hard=recordUnitGamble(hard,4,'hard',1,true,4000);
- assert.equal(gambleAttemptsRemaining(hard,4,'hard'),0);assert.equal(gambleAttemptsRemaining(hard,5,'hard'),2);
+ assert.equal(GAMBLE_COOLDOWN_MS,1000);assert.equal(gambleCooldownRemaining(played,1000),1000);assert.equal(gambleCooldownRemaining(played,1999),1);assert.equal(gambleCooldownRemaining(played,2000),0);
+ assert.equal(gambleAttemptsRemaining(played,4,'normal'),4);
+ let hard=emptyGambleState(4,'hard');for(let i=0;i<5;i++)hard=recordUnitGamble(hard,4,'hard',1,true,i*1000);
+ assert.equal(gambleAttemptsRemaining(hard,4,'hard'),0);assert.equal(gambleAttemptsRemaining(hard,5,'hard'),5);
  assert.deepEqual(readGambleState(played,4,'normal'),played);
 });
-test('unit gamble observes failure refunds, pity-compatible success and quotas',()=>{
- assert.deepEqual(unitGambles.map(x=>[x.cost,x.failureChance,x.refund,x.unlockRound]),[[500,.1,100,1],[1000,.3,200,10],[3000,.5,500,20]]);
- assert.deepEqual(playUnitGamble(unitGambles[0],500,['창병'],'normal',0,()=>.99),{gold:100,success:false,refund:100,name:null});
- const rolls=[.1,.99];assert.deepEqual(playUnitGamble(unitGambles[0],500,['창병','활병'],'normal',0,()=>rolls.shift()),{gold:0,success:true,refund:0,name:'활병'});
- let usage=emptyUnitGambleUsage(1);for(let i=0;i<10;i++)usage=recordUnitGambleSuccess(1,1,usage);
- assert.equal(unitGamblesRemaining(1,1,usage),0);assert.equal(unitGamblesRemaining(1,11,usage),10);
- usage=recordUnitGambleSuccess(3,21,usage);assert.equal(unitGamblesRemaining(3,21,usage),1);assert.deepEqual(readUnitGambleUsage(usage,21),usage);
+test('unit gambles guarantee a unit with no ten-round quota',()=>{
+ assert.deepEqual(unitGambles.map(x=>[x.cost,x.failureChance,x.refund,x.unlockRound]),[[500,0,0,1],[1000,0,0,10],[2000,0,0,20],[3000,0,0,30]]);
+ assert.deepEqual(playUnitGamble(unitGambles[0],500,['창병'],'normal',0,()=>.99),{gold:0,success:true,refund:0,name:'창병'});
+ assert.deepEqual(playUnitGamble(unitGambles[3],3000,['광개토대왕'],'hard',0,()=>.99),{gold:0,success:true,refund:0,name:'광개토대왕'});
+ assert.deepEqual(playUnitGamble(unitGambles[0],500,['창병','활병'],'normal',0,()=>.99),{gold:0,success:true,refund:0,name:'활병'});
+ assert.equal(playUnitGamble(unitGambles[2],1999,['온달']),null);
 });
 test('battle gambling UI shows cooldown, attempts and only success/failure result labels',()=>{
  const page=readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8'),dialog=readFileSync(new URL('../app/GamblingDialog.tsx',import.meta.url),'utf8'),styles=readFileSync(new URL('../app/gambling.css',import.meta.url),'utf8');
  const unitHandler=page.slice(page.indexOf('const gambleUnit='),page.indexOf('const changeBag='));
- assert.match(dialog,/쿨타임 3초/);assert.match(dialog,/남은 도박/);assert.match(dialog,/천장/);assert.match(dialog,/도박하기/);assert.doesNotMatch(dialog,/도전하기|골드 도박/);
+ assert.match(dialog,/쿨타임 1초/);assert.match(dialog,/남은 도박/);assert.match(dialog,/확정 획득/);assert.match(dialog,/도박하기/);assert.doesNotMatch(dialog,/천장|도전하기|골드 도박/);
  assert.match(styles,/min-height:60px/);assert.match(styles,/grid-template-columns:28px minmax\(0,1fr\) 150px/);
  assert.doesNotMatch(page,/summary\.category|gambleGold/);assert.doesNotMatch(unitHandler,/setGambleOpen\(false\)/);
 });

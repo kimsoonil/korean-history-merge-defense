@@ -16,10 +16,12 @@ test('profile settings separates profile and title into tabs without frames',()=
  assert.ok(page.indexOf('className="reward-title player-title"')<page.indexOf('className="player-name"'));
 });
 
-test('only the profile avatar list owns a vertical scrollbar',()=>{
+test('profile avatar and title lists scroll independently inside the fixed dialog',()=>{
  const css=readFileSync(new URL('../app/profile-settings.css',import.meta.url),'utf8');
  const popupCss=readFileSync(new URL('../app/popup-scroll.css',import.meta.url),'utf8');
  assert.match(css,/\.profile-settings\{[^}]*overflow:hidden/);
  assert.match(css,/\.profile-avatar-scroll\{[^}]*overflow-y:auto/);
+ assert.match(css,/\.profile-reward-list\{[^}]*min-height:0[^}]*overflow-y:auto/);
+ assert.match(css,/\.profile-reward-list button\{[^}]*flex:none/);
  assert.doesNotMatch(popupCss,/profile-scroll-content/);
 });

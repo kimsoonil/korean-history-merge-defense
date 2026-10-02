@@ -1,10 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {isOverrun,canCompleteStage} from '../lib/stage-flow.ts';
+import {isOverrun,enemyLimit,canCompleteStage} from '../lib/stage-flow.ts';
 import {makeGameSave,readGameSave} from '../lib/save.ts';
 import {createRoundInvader} from '../lib/game.ts';
 test('100 enemies triggers defeat, but 99 does not',()=>{
  assert.equal(isOverrun(99),false);assert.equal(isOverrun(100),true);assert.equal(isOverrun(101),true);
+ assert.equal(enemyLimit('hard'),70);
+ assert.equal(isOverrun(69,'hard'),false);assert.equal(isOverrun(70,'hard'),true);assert.equal(isOverrun(71,'hard'),true);
+ assert.equal(isOverrun(70,'normal'),false);
 });
 test('carryover enemies and earlier bosses survive save and resume',()=>{
  const enemies=Array.from({length:40},(_,i)=>createRoundInvader(1,i<20?10:11,i%20,i+1));

@@ -4,7 +4,7 @@ import type {Difficulty} from './enemy-stats.ts';
 export type ResearchTab='stats'|'support';
 export type ResearchProgress=Record<string,number>;
 export type AccountProgress={level:number;xp:number;accountGold:number;research:ResearchProgress};
-export type ResearchKind='attack'|'speed'|'tier'|'role'|'hero'|'startGold'|'clearXp'|'clearGold'|'startTroop'|'startCitizen'|'deployLimit'|'questGold'|'questTroop'|'questCitizen'|'gambleRefund'|'gamblePity'|'bossGold'|'bossTroop'|'bossCitizen'|'recruitDiversity';
+export type ResearchKind='attack'|'speed'|'tier'|'role'|'hero'|'startGold'|'clearXp'|'clearGold'|'startTroop'|'startCitizen'|'deployLimit'|'questGold'|'questTroop'|'questCitizen'|'gambleDiscount'|'bossGold'|'bossTroop'|'bossCitizen'|'recruitDiversity';
 export type ResearchNode={id:string;tab:ResearchTab;title:string;description:string;unlockLevel:number;cost:number;requires:string[];kind:ResearchKind;value:number;targets?:string[];targetTier?:number;portrait?:string;iconIndex?:number};
 
 const masteryLevels:Record<number,number>={1:3,2:10,3:20,4:30,5:40,6:50,7:60};
@@ -32,8 +32,8 @@ const supportRows:Array<{level:number;nodes:SupportSeed[]}>= [
  {level:16,nodes:[{id:'quest-troop',title:'임무 병참',description:'한 전투에서 퀘스트 3개 완료 시 병력패 +1개',unlockLevel:16,cost:5000,kind:'questTroop',value:1,iconIndex:8}]},
  {level:19,nodes:[{id:'quest-citizen',title:'민심 결집',description:'한 전투에서 퀘스트 5개 완료 시 시민 +1명',unlockLevel:19,cost:5500,kind:'questCitizen',value:1,iconIndex:9}]},
  {level:20,nodes:[{id:'support-mastery-2',title:'지원 숙련 II',description:'클리어 경험치 +5%',unlockLevel:20,cost:6000,kind:'clearXp',value:5,iconIndex:1}]},
- {level:23,nodes:[{id:'gamble-refund',title:'손실 보전',description:'유닛 도박 실패 시 손실의 5%를 추가 환급',unlockLevel:23,cost:6500,kind:'gambleRefund',value:5,iconIndex:10}]},
- {level:26,nodes:[{id:'gamble-pity',title:'행운의 매듭',description:'유닛 도박 실패마다 다음 성공률 +1%p',unlockLevel:26,cost:7000,kind:'gamblePity',value:1,iconIndex:11}]},
+ {level:23,nodes:[{id:'gamble-refund',title:'병력 조달 I',description:'유닛 도박 비용 5% 할인',unlockLevel:23,cost:6500,kind:'gambleDiscount',value:5,iconIndex:10}]},
+ {level:26,nodes:[{id:'gamble-pity',title:'병력 조달 II',description:'유닛 도박 비용 추가 5% 할인',unlockLevel:26,cost:7000,kind:'gambleDiscount',value:5,iconIndex:11}]},
  {level:29,nodes:[{id:'reserve-gold-1',title:'예비 군자금 I',description:'전투 시작 골드 +200G',unlockLevel:29,cost:7500,kind:'startGold',value:200,iconIndex:12}]},
  {level:30,nodes:[{id:'support-mastery-3',title:'지원 숙련 III',description:'클리어 연구금 +5%',unlockLevel:30,cost:8000,kind:'clearGold',value:5,iconIndex:2}]},
  {level:33,nodes:[{id:'boss-gold',title:'대장 현상금',description:'중간 보스 처치 골드 +100G',unlockLevel:33,cost:8500,kind:'bossGold',value:100,iconIndex:13}]},
@@ -87,8 +87,7 @@ export const researchDeployLimit=(research?:ResearchProgress)=>research?sumKind(
 export const researchQuestGold=(research?:ResearchProgress)=>research?sumKind(research,'questGold'):0;
 export const researchQuestTroops=(research?:ResearchProgress)=>research?sumKind(research,'questTroop'):0;
 export const researchQuestCitizens=(research?:ResearchProgress)=>research?sumKind(research,'questCitizen'):0;
-export const researchGambleRefundPercent=(research?:ResearchProgress)=>research?sumKind(research,'gambleRefund'):0;
-export const researchGamblePityBonus=(research?:ResearchProgress)=>(research?sumKind(research,'gamblePity'):0)/100;
+export const researchGambleDiscountPercent=(research?:ResearchProgress)=>research?sumKind(research,'gambleDiscount'):0;
 export const researchBossGold=(research?:ResearchProgress)=>research?sumKind(research,'bossGold'):0;
 export const researchBossTroops=(research?:ResearchProgress)=>research?sumKind(research,'bossTroop'):0;
 export const researchBossCitizens=(research?:ResearchProgress)=>research?sumKind(research,'bossCitizen'):0;

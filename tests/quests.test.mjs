@@ -4,7 +4,7 @@ import {battleQuests,claimQuest,emptyQuestProgress,readQuestProgress,recordBasic
 import {emptyUpgrades} from '../lib/upgrades.ts';
 
 test('battle quests reset to an empty state for every new battle',()=>{
- assert.deepEqual(emptyQuestProgress(),{basicTypesPeak:0,supplyCartsDefeated:0,roleFormationAchieved:false,goldGambles:0,unitGambleWins:0,gambleFailures:0,earlyTier4:false,earlyTier6:false,tier7Combined:false,claimed:[]});
+ assert.deepEqual(emptyQuestProgress(),{basicTypesPeak:0,supplyCartsDefeated:0,roleFormationAchieved:false,goldGambles:0,unitGambleWins:0,gambleFailures:0,earlyTier4:false,tier5Combined:false,earlyTier6:false,tier7Combined:false,claimed:[]});
  assert.deepEqual(readQuestProgress(null),emptyQuestProgress());
 });
 test('supply cart quest counts unique recorded kills and survives a save',()=>{
@@ -43,14 +43,17 @@ test('the citizen quest requires seven distinct non-citizen Lv 1 types at once',
  const previouslyClaimed=readQuestProgress({...legacy,claimed:['basic-7']});
  assert.equal(battleQuests(previouslyClaimed,[],{},emptyUpgrades()).find(item=>item.id==='basic-7').claimed,true);
 });
-test('combination deadlines, gambling counters and tier upgrades drive quests',()=>{
- let progress=recordCombinedTier(emptyQuestProgress(),4,9);progress=recordCombinedTier(progress,6,29);progress=recordCombinedTier(progress,7,60);
+test('tier four through seven combination quests have no round deadline',()=>{
+ let progress=recordCombinedTier(emptyQuestProgress(),4,39);progress=recordCombinedTier(progress,5,49);progress=recordCombinedTier(progress,6,59);progress=recordCombinedTier(progress,7,60);
  for(let i=0;i<10;i++)progress=recordUnitQuest(progress,true);
  for(let i=0;i<4;i++)progress=recordUnitQuest(progress,false);
  const upgrades=emptyUpgrades();upgrades.tier['3']=20;
  const quests=battleQuests(progress,[],{},upgrades);
- for(const id of ['tier4-before-10','tier6-before-30','tier7-combine','unit-gamble-10','tier-upgrade-3'])assert.equal(quests.find(q=>q.id===id).complete,true,id);
+ for(const id of ['tier4-before-10','tier5-combine','tier6-before-30','tier7-combine','unit-gamble-10','tier-upgrade-3'])assert.equal(quests.find(q=>q.id===id).complete,true,id);
+ for(const id of ['tier4-before-10','tier5-combine','tier6-before-30','tier7-combine'])assert.deepEqual(quests.find(q=>q.id===id).reward,{gold:0,troopCards:2,citizens:1});
  assert.equal(quests.some(q=>q.id==='gold-gamble-10'),false);
  assert.deepEqual(quests.find(q=>q.id==='tier-upgrade-3').reward,{gold:3000,troopCards:3,citizens:0});
- assert.equal(quests.find(q=>q.id==='gamble-fail-10').progress,4);
+ assert.equal(quests.find(q=>q.id==='unit-gamble-20').progress,10);
+ const legacy=readQuestProgress({...progress,tier5Combined:undefined});
+ assert.equal(legacy.tier5Combined,false);
 });

@@ -1,18 +1,19 @@
 import type {Difficulty} from './enemy-stats.ts';
 
 type LegacyGoldGambleId='small'|'medium'|'large';
-export type UnitGamble={tier:1|2|3;cost:number;failureChance:number;refund:number;unlockRound:number};
+export type UnitGamble={tier:1|2|3|4;cost:number;failureChance:number;refund:number;unlockRound:number};
 export type UnitGambleUsage={block:number;successes:Record<1|2|3,number>};
 export type GambleState={round:number;difficulty:Difficulty;attempts:number;cooldownUntil:number;goldFailures:Record<LegacyGoldGambleId,number>;unitFailures:Record<1|2|3,number>};
 
-export const GAMBLE_COOLDOWN_MS=3000;
-export const GAMBLE_ROUND_LIMIT:Record<Difficulty,number>={normal:3,hard:2};
+export const GAMBLE_COOLDOWN_MS=1000;
+export const GAMBLE_ROUND_LIMIT:Record<Difficulty,number>={normal:5,hard:5};
 export const GAMBLE_PITY_STEP:Record<Difficulty,number>={normal:.03,hard:.04};
 export const GAMBLE_GUARANTEE_AFTER:Record<Difficulty,number>={normal:6,hard:7};
 export const unitGambles:UnitGamble[]=[
- {tier:1,cost:500,failureChance:.1,refund:100,unlockRound:1},
- {tier:2,cost:1000,failureChance:.3,refund:200,unlockRound:10},
- {tier:3,cost:3000,failureChance:.5,refund:500,unlockRound:20},
+ {tier:1,cost:500,failureChance:0,refund:0,unlockRound:1},
+ {tier:2,cost:1000,failureChance:0,refund:0,unlockRound:10},
+ {tier:3,cost:2000,failureChance:0,refund:0,unlockRound:20},
+ {tier:4,cost:3000,failureChance:0,refund:0,unlockRound:30},
 ];
 
 export const gambleUnlocked=(round:number,unlockRound:number)=>round>=unlockRound;
@@ -56,10 +57,10 @@ export function playUnitGamble(option:UnitGamble,gold:number,names:string[],diff
  if(gold<option.cost||names.length===0)return null;
  const difficulty=typeof difficultyOrRng==='function'?'normal':difficultyOrRng;
  if(typeof difficultyOrRng==='function')rng=difficultyOrRng;
- if(sample(rng)>=unitSuccessChance(option,difficulty,failures,pityStepBonus))return {gold:gold-option.cost+option.refund,success:false as const,refund:option.refund,name:null};
+ if(option.failureChance>0&&sample(rng)>=unitSuccessChance(option,difficulty,failures,pityStepBonus))return {gold:gold-option.cost+option.refund,success:false as const,refund:option.refund,name:null};
  const name=names[Math.floor(sample(rng)*names.length)];return {gold:gold-option.cost,success:true as const,refund:0,name};
 }
-export function recordUnitGamble(state:GambleState,round:number,difficulty:Difficulty,tier:1|2|3,success:boolean,now=Date.now()):GambleState{
- const current=syncGambleState(state,round,difficulty),failures=success?0:current.unitFailures[tier]+1;
- return {...current,attempts:current.attempts+1,cooldownUntil:now+GAMBLE_COOLDOWN_MS,unitFailures:{...current.unitFailures,[tier]:failures}};
+export function recordUnitGamble(state:GambleState,round:number,difficulty:Difficulty,_tier:1|2|3|4,_success:boolean,now=Date.now()):GambleState{
+ const current=syncGambleState(state,round,difficulty);
+ return {...current,attempts:current.attempts+1,cooldownUntil:now+GAMBLE_COOLDOWN_MS};
 }
