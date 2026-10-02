@@ -26,17 +26,18 @@ test('social auth is optional until public Supabase settings are provided',()=>{
 
 test('new players pass social login before the prologue',()=>{
  const page=readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8');
- const authGate=page.indexOf("auth.status==='loading'||auth.status==='signedOut'");
- const prologueGate=page.indexOf('if(!player||!player.prologueComplete');
+ const authGate=page.indexOf('auth.status === "loading" || auth.status === "signedOut"');
+ const prologueGate=page.indexOf('if (!player || !player.prologueComplete');
  assert.ok(authGate>0&&authGate<prologueGate);
 });
 
-test('login automatically resumes a save or starts a new game without a choice menu',()=>{
+test('login reaches a lobby that starts or resumes through one primary action',()=>{
  const title=readFileSync(new URL('../app/TitleScreen.tsx',import.meta.url),'utf8');
  const screen=title.slice(0,title.indexOf('export function NewGameConfirm'));
  assert.match(screen,/if\(resumable\)onContinue\(\);else onNew\(\)/);
  assert.match(screen,/sessionStorage\.setItem\(START_FLOW_KEY,'1'\)/);
- assert.match(screen,/sessionStorage\.removeItem\(START_FLOW_KEY\)/);
- assert.doesNotMatch(screen,/home-menu|home-primary|home-secondary/);
- assert.doesNotMatch(screen,/>이어하기<|>새로하기</);
+ assert.doesNotMatch(screen,/sessionStorage\.removeItem\(START_FLOW_KEY\)/);
+ assert.match(screen,/lobby-shell/);
+ assert.match(screen,/게임하기/);
+ assert.match(screen,/라운드부터 이어서 진행합니다/);
 });

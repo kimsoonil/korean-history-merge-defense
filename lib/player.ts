@@ -1,5 +1,7 @@
 import {units} from './game.ts';
 import type {ChapterId} from './ansi.ts';
+import {normalizeAccount,type ResearchProgress} from './research.ts';
+import {normalizeHeroRecords,type HeroRecords} from './hero-records.ts';
 
 export const PLAYER_KEY='salsu-player-v1';
 export type ProfileAvatar={id:string;name:string;tier:number;src:string;x?:number;y?:number;standalone:boolean};
@@ -15,8 +17,20 @@ export const profileAvatars:ProfileAvatar[]=units.map(unit=>{
  return {id:unit.name,name:unit.name,tier:unit.tier,src:atlas?.src??unit.portrait??'',...(center?{x:center[0],y:center[1]}:{}),standalone:!atlas};
 });
 export const defaultProfileAvatar='시민';
-export type PlayerProfile={version:1;nickname:string;prologueComplete:boolean;tutorialComplete?:boolean;avatar?:string;unlockedAvatars?:string[];claimedProfileRewards?:string[];hardClearReward?:boolean;title?:'salsu';frame?:'crimson'};
+export type HardRewardId=`hard-${ChapterId}`;
+export type PlayerProfile={version:1;nickname:string;prologueComplete:boolean;tutorialComplete?:boolean;avatar?:string;unlockedAvatars?:string[];claimedProfileRewards?:string[];hardClearReward?:boolean;unlockedTitles?:HardRewardId[];title?:HardRewardId;level?:number;xp?:number;accountGold?:number;research?:ResearchProgress;recordTickets?:number;heroRecords?:HeroRecords};
 export type ProfileReward={avatar:ProfileAvatar;chapter:ChapterId;stage:number};
+
+export const HARD_CLEAR_REWARDS:Record<ChapterId,{id:HardRewardId;story:string;title:string}>={
+ 1:{id:'hard-1',story:'평양성 전투',title:'평양성의 승리자'},2:{id:'hard-2',story:'고구려의 정복 전쟁',title:'영락의 계승자'},
+ 3:{id:'hard-3',story:'살수대첩',title:'살수의 지배자'},4:{id:'hard-4',story:'안시성 전투',title:'안시성 수호자'},
+ 5:{id:'hard-5',story:'황산벌 전투',title:'황산벌의 화랑'},6:{id:'hard-6',story:'나당전쟁',title:'삼국 통일의 수호자'},
+ 7:{id:'hard-7',story:'천문령 전투',title:'발해의 개척자'},8:{id:'hard-8',story:'고려거란 전쟁',title:'귀주의 명장'},
+ 9:{id:'hard-9',story:'처인성 전투',title:'처인성 수호자'},10:{id:'hard-10',story:'임진왜란',title:'난중의 영웅'},
+};
+const hardRewardIds=Object.values(HARD_CLEAR_REWARDS).map(reward=>reward.id);
+const validHardReward=(value:unknown):value is HardRewardId=>typeof value==='string'&&hardRewardIds.includes(value as HardRewardId);
+export const hardClearRewardForId=(id?:HardRewardId)=>Object.values(HARD_CLEAR_REWARDS).find(reward=>reward.id===id);
 
 // 55 planned rewards: seven tier-one units and eight units in every tier 2–7.
 // Tier 6/7 slots stay dormant until matching units are added to the game data.
@@ -47,9 +61,14 @@ export function awardStageProfile(profile:PlayerProfile,chapter:ChapterId,stage:
  return {profile:{...profile,unlockedAvatars:[...unlocked,avatar.id],claimedProfileRewards:[...claimed,key]},reward:{avatar,chapter,stage}};
 }
 export function resolveProfileAvatar(id?:string){return profileAvatars.find(a=>a.id===id)??profileAvatars.find(a=>a.id===defaultProfileAvatar)!;}
-export const HARD_CLEAR_TITLE='살수의 지배자';
-export function awardHardClear(profile:PlayerProfile,cleared:number):PlayerProfile{
- return cleared>=10&&!profile.hardClearReward?{...profile,hardClearReward:true,title:'salsu',frame:'crimson'}:profile;
+export const HARD_CLEAR_TITLE=HARD_CLEAR_REWARDS[3].title;
+export function awardHardClear(profile:PlayerProfile,chapterOrCleared:ChapterId|number,maybeCleared?:number):PlayerProfile{
+ const legacy=maybeCleared===undefined,chapter=(legacy?3:chapterOrCleared) as ChapterId,cleared=legacy?chapterOrCleared:maybeCleared!;
+ if(cleared<10)return profile;
+ const id=HARD_CLEAR_REWARDS[chapter].id,titles=new Set(profile.unlockedTitles??[]);
+ if(titles.has(id))return profile;
+ titles.add(id);
+ return {...profile,hardClearReward:true,unlockedTitles:[...titles],title:profile.title??id};
 }
 export function normalizeNickname(value:string){return value.normalize('NFC').trim();}
 export function nicknameError(value:string){
@@ -63,7 +82,14 @@ export function readPlayer(raw:string|null):PlayerProfile|null{
   const unlocked=unlockedProfileIds({avatar:value.avatar,unlockedAvatars:Array.isArray(value.unlockedAvatars)?value.unlockedAvatars:[]});
   const claimed:string[]=Array.isArray(value.claimedProfileRewards)?value.claimedProfileRewards.filter((key:unknown):key is string=>typeof key==='string'&&/^([1-9]|10)-([1-9]|10)$/.test(key)):[];
   const avatar=validAvatar(value.avatar)&&unlocked.has(value.avatar)?value.avatar:undefined;
-  return {version:1,nickname:normalizeNickname(value.nickname),prologueComplete:value.prologueComplete,...(value.tutorialComplete===true?{tutorialComplete:true}:{}),...(avatar?{avatar}:{}),...(unlocked.size>1?{unlockedAvatars:[...unlocked]}:{}),...(claimed.length?{claimedProfileRewards:[...new Set(claimed)]}:{}),...(value.hardClearReward===true?{hardClearReward:true,...(value.title==='salsu'?{title:'salsu' as const}:{}),...(value.frame==='crimson'?{frame:'crimson' as const}:{})}:{})};
+  const legacyReward=value.hardClearReward===true||value.title==='salsu'||value.frame==='crimson';
+  const titles=new Set<HardRewardId>(Array.isArray(value.unlockedTitles)?value.unlockedTitles.filter(validHardReward):[]);
+  if(legacyReward)titles.add('hard-3');
+  const title=value.title==='salsu'?'hard-3':validHardReward(value.title)&&titles.has(value.title)?value.title:undefined;
+  const account=normalizeAccount(value);
+  const recordTickets=Number.isSafeInteger(value.recordTickets)&&value.recordTickets>=0?value.recordTickets:0;
+  const heroRecords=normalizeHeroRecords(value.heroRecords);
+  return {version:1,nickname:normalizeNickname(value.nickname),prologueComplete:value.prologueComplete,...(value.tutorialComplete===true?{tutorialComplete:true}:{}),...(avatar?{avatar}:{}),...(unlocked.size>1?{unlockedAvatars:[...unlocked]}:{}),...(claimed.length?{claimedProfileRewards:[...new Set(claimed)]}:{}),...(titles.size?{hardClearReward:true,unlockedTitles:[...titles],...(title?{title}:{})}:{}),...account,recordTickets,heroRecords};
  }catch{return null;}
 }
 export function spiritDialogue(name:string){return `마침내... 천명을 이을 자가 나타났구나. ${name}, 들리느냐? 지금 누군가에 의해 우리의 역사가 지워지고 있다! 이대로 가면 네가 사는 미래도, 네 존재도 흔적 없이 사라질 것이다!`;}

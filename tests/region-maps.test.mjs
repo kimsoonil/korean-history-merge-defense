@@ -3,14 +3,15 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {regionMaps,regionPins,regionCanvasSize} from '../lib/region-maps.ts';
 
-test('every implemented chapter has its own panoramic region map, Salsu is retained',()=>{
- assert.equal(regionMaps[1],'/terrain/campaign-panorama.png');
+test('every implemented chapter has its own historical region image',()=>{
+ assert.equal(regionMaps[1],'/regions/pyongyang-v2.png');
+ assert.equal(regionMaps[10],'/regions/imjin-four-victories-v3.png');
  assert.equal(new Set(Object.values(regionMaps)).size,10);
  for(const [chapter,path] of Object.entries(regionMaps)){
-  if(chapter!=='1')assert.match(path,/^\/regions\//);
+  assert.match(path,/^\/(?:regions|terrain)\//);
   const png=readFileSync(new URL('../public'+path,import.meta.url));
   assert.equal(png.toString('ascii',1,4),'PNG');
-  assert.equal(png.readUInt32BE(16)/png.readUInt32BE(20),3);
+  assert.equal(png.readUInt32BE(16)/png.readUInt32BE(20),3,`chapter ${chapter} map must be a native 3:1 panorama`);
  }
 });
 test('region canvas and markers retain native aspect ratio on all viewport heights',()=>{
@@ -23,5 +24,6 @@ test('region canvas and markers retain native aspect ratio on all viewport heigh
  assert.match(component,/src=\{regionMaps\[chapter\]\}/);
  assert.match(component,/ResizeObserver/);
  const css=readFileSync(new URL('../app/region-map.css',import.meta.url),'utf8');
+ assert.match(css,/background-size:cover/);
  assert.doesNotMatch(css,/background-size:100% 100%|width:1700px/);
 });

@@ -9,6 +9,6 @@ test('story completion persists per chapter, not globally',()=>{
  assert.equal(hasSeenStory(storage.get(storySeenKey(1))),true);
  assert.equal(hasSeenStory(storage.get(storySeenKey(2))??null),false);
  assert.equal(new Set([1,2,3,4,5,6,7,8,9,10].map(storySeenKey)).size,10);
- assert.match(storySeenKey(10),/^noryang-/);
+ assert.match(storySeenKey(10),/^imjin-war-/);
  for(const raw of [null,'','false','{}','started'])assert.equal(hasSeenStory(raw),false);
 });

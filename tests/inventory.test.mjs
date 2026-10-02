@@ -8,8 +8,8 @@ const field=Array.from({length:25},(_,i)=>({id:i+1,name:'창병',slot:i}));
 test('auto-store begins disabled for every battle and routes recruits only after activation',()=>{
  const page=readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8');
  const modal=readFileSync(new URL('../app/UnitBag.tsx',import.meta.url),'utf8');
- assert.match(page,/autoStoreBasic\|\|roster.length>=DEPLOY_LIMIT/);
- assert.match(page,/if\(enabled\)changeBag\('store',1\)/);
+ assert.match(page,/autoStoreBasic\s*\|\|\s*roster\.length\s*>=\s*deployLimit/);
+ assert.match(page,/if\s*\(enabled\)\s*changeBag\("store",\s*1\)/);
  assert.doesNotMatch(page,/defense-auto-store-basic/);
  assert.ok((page.match(/setAutoStoreBasic\(false\)/g)??[]).length>=2);
  assert.match(modal,/type="checkbox" checked=\{autoStoreBasic\}/);
@@ -65,10 +65,10 @@ test('an exact tier-one material is consumed before a citizen wildcard',()=>{
  assert.deepEqual(status,[true,true]);
 });
 test('deposit by tier allows tier five and groups copies',()=>{
- const result=storeUnits([...field,{id:30,name:'주몽',slot:30}],{},1);
+ const result=storeUnits([...field,{id:30,name:'온조왕',slot:30}],{},1);
  assert.equal(result.bag.창병,25);assert.equal(result.roster.length,1);
  const stored=storeUnits(result.roster,result.bag,5);
- assert.equal(stored.count,1);assert.equal(stored.bag.주몽,1);
+ assert.equal(stored.count,1);assert.equal(stored.bag.온조왕,1);
 });
 test('withdraw only fills available capacity, with unique slots and ids',()=>{
  const result=deployUnits(field.slice(0,23),{창병:5},1,100);
@@ -82,7 +82,7 @@ test('one and all sales affect only the selected stored type',()=>{
  assert.equal(result.gold,35);assert.equal(result.bag.창병,2);
  const all=sellStored(result.bag,'창병',true);
  assert.equal(all.gold,70);assert.equal(all.bag.활병,2);
- assert.equal(sellStored({주몽:1},'주몽',true).gold,2700);
+ assert.equal(sellStored({온조왕:1},'온조왕',true).gold,2700);
 });
 test('legacy overflow deploys a promoted final hero and preserves the remaining bag',()=>{
  const result=migrateDeployment([...field,...Array.from({length:15},(_,i)=>({id:30+i,name:i===14?'이순신':'활병',slot:25+i}))],{포수:2});

@@ -37,7 +37,7 @@ export default function LoadingImage({src='',style,...props}:Omit<ImgHTMLAttribu
  const status=useImageStatus(src);
  return <><img {...props} src={src} data-image-status={status} style={{...style,visibility:status==='ready'?style?.visibility:'hidden'}}/><ImageLoadingIndicator status={status}/></>;
 }
-export function LoadingBackground({src,className,style}:{src:string;className:string;style?:CSSProperties}){
+export function LoadingBackground({src,className='',style}:{src:string;className?:string;style?:CSSProperties}){
  const status=useImageStatus(src);
  return <div className={className} aria-hidden="true" style={{...style,backgroundImage:status==='ready'?`url("${src}")`:'none'}}><ImageLoadingIndicator status={status}/></div>;
 }

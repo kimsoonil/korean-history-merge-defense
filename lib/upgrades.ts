@@ -6,13 +6,13 @@ export type Upgrades=Record<UpgradeKind,Record<string,number>>;
 export const MAX_UPGRADE_LEVEL=10;
 export const TIER_MAX_UPGRADE_LEVEL=20;
 export const upgradePercentPerLevel:Record<UpgradeKind,number>={tier:1,role:3,hero:5};
-export const tierUpgradeTotalCosts:Record<number,number>={1:1000,2:3000,3:10000,4:15000,5:20000,6:30000,7:50000};
+export const tierUpgradeTotalCosts:Record<number,number>={1:1000,2:2000,3:4000,4:7000,5:12000,6:20000,7:30000};
 export const maxUpgradeLevel=(kind:UpgradeKind)=>kind==='tier'?TIER_MAX_UPGRADE_LEVEL:MAX_UPGRADE_LEVEL;
 export const emptyUpgrades=():Upgrades=>({tier:{},role:{},hero:{}});
 export const upgradeOptions={
  tier:UNIT_TIERS.map(t=>({key:String(t),label:`${t}단계`,baseCost:tierUpgradeTotalCosts[t]/TIER_MAX_UPGRADE_LEVEL})),
  role:[...new Set(units.filter(u=>u.name!=='시민').map(u=>u.role))].map(role=>({key:role,label:role,baseCost:100})),
- hero:units.filter(u=>u.tier===5).map(u=>({key:u.name,label:u.name,baseCost:300})),
+ hero:units.filter(u=>u.tier===7).map(u=>({key:u.name,label:u.name,baseCost:300})),
 };
 export function readUpgrades(raw:unknown):Upgrades{
  const result=emptyUpgrades();
@@ -38,7 +38,7 @@ export function purchaseUpgrade(state:Upgrades,gold:number,kind:UpgradeKind,key:
  if(cost===null||gold<cost)return null;
  return {gold:gold-cost,upgrades:{...state,[kind]:{...state[kind],[key]:(state[kind][key]??0)+1}}};
 }
-export function upgradedAttack(unit:UnitDef,state?:Upgrades){
- const percent=(state?.tier[String(unit.tier)]??0)*upgradePercentPerLevel.tier+(state?.role[unit.role]??0)*upgradePercentPerLevel.role+(unit.tier===5?(state?.hero[unit.name]??0)*upgradePercentPerLevel.hero:0);
+export function upgradedAttack(unit:UnitDef,state?:Upgrades,bonusPercent=0){
+ const percent=(state?.tier[String(unit.tier)]??0)*upgradePercentPerLevel.tier+(state?.role[unit.role]??0)*upgradePercentPerLevel.role+(unit.tier===7?(state?.hero[unit.name]??0)*upgradePercentPerLevel.hero:0)+bonusPercent;
  return unit.damage*(100+percent)/100;
 }

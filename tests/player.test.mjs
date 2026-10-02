@@ -26,7 +26,7 @@ test('nickname validates before insertion and normalizes Korean text',()=>{
 test('profile resumes unfinished prologue and preserves completion',()=>{
  for(const complete of [true,false]){
   const profile={version:1,nickname:'홍길동',prologueComplete:complete};
-  assert.deepEqual(readPlayer(JSON.stringify(profile)),profile);
+  assert.deepEqual(readPlayer(JSON.stringify(profile)),{...profile,level:1,xp:0,accountGold:0,research:{},recordTickets:0,heroRecords:{}});
  }
  for(const raw of [null,'bad','{}','{"version":1,"nickname":"홍길동","prologueComplete":"false"}'])assert.equal(readPlayer(raw),null);
 });

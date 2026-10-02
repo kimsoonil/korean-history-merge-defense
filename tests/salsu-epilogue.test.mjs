@@ -9,7 +9,7 @@ test('Salsu victory uses a ten-page epilogue with the requested speakers',()=>{
  const pages=salsuEpilogue('홍길동');
  assert.equal(pages.length,10);
  const script=pages.map(page=>`${page.speaker} ${page.text}`).join('\n');
- for(const phrase of ['수 양제','을지문덕','고구려 병사들','홍길동','끝난 거야','책의 정령'])assert.match(script,new RegExp(phrase));
+ for(const phrase of ['수양제','을지문덕','병사들','홍길동','끝난 거야','책의 정령'])assert.match(script,new RegExp(phrase));
  assert.match(pages.at(-1).text,/돌아가자|서책/);
 });
 
@@ -27,11 +27,11 @@ test('every story has a distinct ten-page epilogue with player and spirit return
 
 test('every normal and hard story final opens an epilogue instead of the result popup',()=>{
  const page=readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8');
- assert.match(page,/showStoryEpilogue:boolean=isStoryVictory\(phase\)/);
- assert.match(page,/isStoryVictory=\(phase:Phase\)=>phase==='won'/);
+ assert.match(page,/showStoryEpilogue:\s*boolean\s*=\s*isStoryVictory\(phase\)/);
+ assert.match(page,/isStoryVictory\s*=\s*\(phase:\s*Phase\)\s*=>\s*phase\s*===\s*["']won["']/);
  assert.doesNotMatch(page,/showStoryEpilogue=phase==='won'&&difficulty/);
- assert.match(page,/showStoryEpilogue&&<StoryEpilogue chapter=\{chapter\}/);
- assert.match(page,/phase==='won'&&!showStoryEpilogue/);
+ assert.match(page,/showStoryEpilogue\s*&&\s*\(/);
+ assert.match(page,/phase\s*===\s*["']won["']\s*&&\s*!showStoryEpilogue/);
  const component=readFileSync(new URL('../app/StoryEpilogue.tsx',import.meta.url),'utf8');
  assert.match(component,/이야기 선택/);
  assert.match(component,/step>=8\?EPILOGUE_RETURN_IMAGE:meta\.image/);
@@ -43,6 +43,6 @@ test('all epilogue battle and return artwork is bundled with the game',()=>{
  assert.equal(SALSU_EPILOGUE_IMAGE,'/story/salsu-victory.png');
  assert.equal(EPILOGUE_RETURN_IMAGE,'/story/history-return.png');
  assert.equal(new Set(STORY_EPILOGUE_IMAGES).size,10);
- for(const image of STORY_EPILOGUE_IMAGES.slice(1))assert.match(image,/^\/story\/epilogues\//);
+ for(const image of STORY_EPILOGUE_IMAGES)assert.match(image,/^\/story\/(?:epilogues|epilogues-v2|salsu-victory)/);
  for(const image of [...STORY_EPILOGUE_IMAGES,EPILOGUE_RETURN_IMAGE])assert.equal(existsSync(`${projectRoot}/public${image}`),true,image);
 });

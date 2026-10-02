@@ -7,7 +7,7 @@ const progress=()=>({roster:[{id:1,name:'유생',slot:7},{id:3,name:'창병',slo
 const roundTrip=value=>readGameSave(JSON.stringify(value));
 
 test('save restores exact units, enemies, resources and remaining time',()=>{
- const state={...progress(),unitGambleUsage:{block:0,successes:{1:3,2:1,3:0}}},save=makeGameSave(state,123);
+ const state={...progress(),questProgress:{basicUnitsPeak:7,goldGambles:4,unitGambleWins:2,gambleFailures:3,earlyTier4:true,earlyTier6:false,tier7Combined:false,claimed:['basic-7']},gambleState:{round:1,difficulty:'normal',attempts:1,cooldownUntil:3123,goldFailures:{small:2,medium:0,large:0},unitFailures:{1:1,2:0,3:0}},unitGambleUsage:{block:0,successes:{1:3,2:1,3:0}}},save=makeGameSave(state,123);
  assert.deepEqual(roundTrip(save),save);
  assert.ok(canContinue(save));
  state.roster[0].slot=0;state.enemies[0].hp=1;
@@ -15,6 +15,15 @@ test('save restores exact units, enemies, resources and remaining time',()=>{
  const counters=restoredCounters(save,99999999);
  assert.equal(counters.deadline-99999999,12345);
  assert.equal(counters.nextId,9);assert.equal(counters.completedStage,0);
+});
+test('normal final-stage reinforcement progress survives reload without repeating damage',()=>{
+ const reinforcement={chapter:1,hero:'을지문덕',damageDealt:17500,halfSpoken:true};
+ const save=makeGameSave({...progress(),enemies:[],chapter:1,difficulty:'normal',stage:10,reinforcement},124);
+ const restored=roundTrip(save);
+ assert.deepEqual(restored.reinforcement,reinforcement);
+ assert.notEqual(restored.reinforcement,reinforcement);
+ assert.equal(roundTrip({...save,difficulty:'hard'}),null);
+ assert.equal(roundTrip({...save,stage:9}),null);
 });
 test('saving during a cinematic freezes the clock and overtime stays at zero',()=>{
  assert.equal(remainingStageMs(30000,'battle',22000,11000),19000);

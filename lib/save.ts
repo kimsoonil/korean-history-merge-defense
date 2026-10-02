@@ -15,16 +15,19 @@ import {hwangsanEnemyNames} from './hwangsan.ts';
 import {ansiEnemyNames,type ChapterId} from './ansi.ts';
 import {validBannedHeroes} from './hard-mode.ts';
 import type {Difficulty} from './enemy-stats.ts';
-import {readUnitGambleUsage,type UnitGambleUsage} from './gambling.ts';
+import {readGambleState,readUnitGambleUsage,type GambleState,type UnitGambleUsage} from './gambling.ts';
 import {hasHeroSkillTier} from './unit-tiers.ts';
+import {readQuestProgress,type QuestProgress} from './quests.ts';
+import {validReinforcement,type ReinforcementProgress} from './story-campaigns.ts';
+import {allStoryEnemyNames} from './story-battle.ts';
 export const SAVE_KEY='salsu-progress-v1';
 export type GamePhase='ready'|'battle'|'cleared'|'lost'|'won';
 export type GameProgress={
   chapter?:ChapterId; difficulty?:Difficulty; bannedHeroes?:string[];
   roster:Soldier[]; bag?:Bag; enemies:Enemy[]; gold:number; troopCards?:number; wall:number; stage:number; round:number;
-  phase:GamePhase; spawned:number; speed:number; remainingMs:number; heroCooldowns?:[number,number][]; upgrades?:Upgrades; unitGambleUsage?:UnitGambleUsage;
+  phase:GamePhase; spawned:number; speed:number; remainingMs:number; heroCooldowns?:[number,number][]; upgrades?:Upgrades; questProgress?:QuestProgress; gambleState?:GambleState; unitGambleUsage?:UnitGambleUsage; reinforcement?:ReinforcementProgress;
 };
-export type GameSave=GameProgress&{version:6;roundRules?:2;chapterScenario?:'noryang';savedAt:number};
+export type GameSave=GameProgress&{version:6;roundRules?:2;chapterScenario?:'imjin-war'|'noryang';savedAt:number};
 
 const record=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
 const number=(value:unknown,min:number,max:number):value is number=>typeof value==='number'&&Number.isFinite(value)&&value>=min&&value<=max;
@@ -37,7 +40,7 @@ export function remainingStageMs(deadline:number|null,phase:GamePhase,now:number
   return Math.max(0,Math.min(30000,deadline-(pausedAt??now)));
 }
 export function makeGameSave(progress:GameProgress,now=Date.now()):GameSave{
-  return {...progress,...(progress.chapter===10?{chapterScenario:'noryang' as const}:{}),...(progress.upgrades?{upgrades:readUpgrades(progress.upgrades)}:{}),roster:progress.roster.map(unit=>({...unit})),enemies:progress.enemies.map(enemy=>({...enemy})),version:6,roundRules:2,savedAt:now};
+  return {...progress,...(progress.chapter===10?{chapterScenario:'imjin-war' as const}:{}),...(progress.upgrades?{upgrades:readUpgrades(progress.upgrades)}:{}),...(progress.reinforcement?{reinforcement:{...progress.reinforcement}}:{}),roster:progress.roster.map(unit=>({...unit})),enemies:progress.enemies.map(enemy=>({...enemy})),version:6,roundRules:2,savedAt:now};
 }
 export function canContinue(save:GameSave|null):save is GameSave&{phase:'ready'|'battle'|'cleared'}{
   return !!save&&save.phase!=='lost'&&save.phase!=='won'&&!(save.phase==='cleared'&&isStageComplete(save.stage,save.round));
@@ -100,7 +103,7 @@ export function readGameSave(raw:string|null):GameSave|null{
     if(record(value)){
       // Do not resume the replaced siege scenario as a naval campaign.
       // Other chapters and the old campaign storage keys are left untouched.
-      if(value.chapter===10&&value.chapterScenario!=='noryang')return null;
+      if(value.chapter===10&&value.chapterScenario!=='imjin-war')return null;
       if(value.chapter!==undefined&&value.chapter!==1&&value.chapter!==2&&value.chapter!==3&&value.chapter!==4&&value.chapter!==5&&value.chapter!==6&&value.chapter!==7&&value.chapter!==8&&value.chapter!==9&&value.chapter!==10)return null;
       if(value.difficulty!==undefined&&!['normal','hard'].includes(String(value.difficulty)))return null;
       if(value.difficulty==='hard'&&!validBannedHeroes(value.bannedHeroes,value.chapter===10?10:value.chapter===9?9:value.chapter===8?8:value.chapter===7?7:value.chapter===6?6:value.chapter===5?5:value.chapter===4?4:value.chapter===3?3:value.chapter===2?2:1))return null;
@@ -149,7 +152,7 @@ export function readGameSave(raw:string|null):GameSave|null{
     for(const enemy of value.enemies){
       if(!record(enemy)||!integer(enemy.id,1,Number.MAX_SAFE_INTEGER-1)||ids.has(enemy.id)||typeof enemy.name!=='string'||!Object.hasOwn(enemyPortraits,enemy.name))return null;
       if(!number(enemy.maxHp,1,1000000)||!number(enemy.hp,Number.MIN_VALUE,enemy.maxHp)||!number(enemy.progress,0,1-Number.EPSILON)||!number(enemy.speed,0.001,1)||!integer(enemy.reward,0,10000)||enemy.originStage!==value.stage||typeof enemy.boss!=='boolean')return null;
-      if(enemy.boss!==(!['수나라 보병','수나라 창병','수나라 궁병','수나라 기병','수나라 공성병','수나라 정예군',...ansiEnemyNames,...hwangsanEnemyNames,...nadangEnemyNames,...gwijuEnemyNames,...cheoinEnemyNames,...hansandoEnemyNames,...haengjuEnemyNames,...myeongnyangEnemyNames,...noryangEnemyNames].includes(enemy.name))||enemy.boss&&!Array.from({length:value.round},(_,i)=>roundBossName(Number(value.stage),i+1,value.chapter===10?10:value.chapter===9?9:value.chapter===8?8:value.chapter===7?7:value.chapter===6?6:value.chapter===5?5:value.chapter===4?4:value.chapter===3?3:value.chapter===2?2:1)).includes(enemy.name))return null;
+      if(enemy.boss!==!allStoryEnemyNames.includes(enemy.name)||enemy.boss&&!Array.from({length:value.round},(_,i)=>roundBossName(Number(value.stage),i+1,(value.chapter??1) as ChapterId)).includes(enemy.name))return null;
       if(enemy.boss)bosses++;
       ids.add(enemy.id);
     }
@@ -171,7 +174,10 @@ export function readGameSave(raw:string|null):GameSave|null{
     if(value.enemies.some(enemy=>enemy.originRound!==undefined&&!integer(enemy.originRound,1,stageRoundCount(Number(value.stage)))))return null;
     if(value.enemies.some(enemy=>enemy.stunSeconds!==undefined&&!number(enemy.stunSeconds,0,.5)))return null;
     if(value.enemies.some(enemy=>enemy.bossSeconds!==undefined&&(!enemy.boss||!number(enemy.bossSeconds,0,90))))return null;
+    if(value.reinforcement!==undefined&&!validReinforcement(value.reinforcement,(value.chapter??1) as ChapterId,(value.difficulty??'normal') as Difficulty,Number(value.stage)))return null;
     if(value.upgrades!==undefined)value.upgrades=readUpgrades(value.upgrades);
+    if(value.questProgress!==undefined)value.questProgress=readQuestProgress(value.questProgress);
+    if(value.gambleState!==undefined)value.gambleState=readGambleState(value.gambleState,Number(value.round),(value.difficulty??'normal') as Difficulty);
     if(value.unitGambleUsage!==undefined)value.unitGambleUsage=readUnitGambleUsage(value.unitGambleUsage,Number(value.round));
     return value as GameSave;
   }catch{return null;}

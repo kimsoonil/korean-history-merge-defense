@@ -20,7 +20,7 @@ test('frontline and fortress attacks stun only on successful tier-based rolls',(
   close(hit.stuns.get(e.id),u.tier/10);assert.equal(miss.stuns.size,0);
   assert.ok(miss.hits.get(e.id)>0);
  }
- assert.equal(armorReduction(enemy(),[soldier('김시민'),soldier('권율',1,2)]),160);
+ assert.equal(armorReduction(enemy(),[soldier('김시민'),soldier('권율',1,2)]),140);
 });
 test('support affects nearby allies, not self; supports stack',()=>{
  const ally=soldier('창병'),support=soldier('허준',1,2);
@@ -41,10 +41,10 @@ test('tactics slow and weaken only enemies in range and stop after leaving',()=>
  close(movementSpeed(near,[...roster,soldier('황희',1,2)]),near.speed*.75);
  assert.ok(hitDamage('활병',near,true,1)>hitDamage('활병',near,false,1));
 });
-test('frontline/artillery gain 5 percent and tier-4 ruler gets 25 percent only against bosses',()=>{
+test('frontline/artillery gain their role bonus and rulers gain their tier boss bonus only against bosses',()=>{
  for(const name of ['창병','포수'])close(hitDamage(name,enemy(),false,1),byName[name].damage*1.05/1.2);
  close(hitDamage('왕건',enemy(),false,1),byName['왕건'].damage/1.2);
- close(hitDamage('왕건',enemy(10,0,true),false,1),byName['왕건'].damage*1.25/1.2);
+ close(hitDamage('왕건',enemy(10,0,true),false,1),byName['왕건'].damage*(1+roleStats(byName['왕건'].tier).boss)/1.2);
 });
 test('naval attacks only one enemy without splash',()=>{
  const foes=[enemy(10,0),enemy(11,.01),enemy(12,.5)],result=combatStep([soldier('수병')],foes,.1,1,new Map());

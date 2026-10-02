@@ -2,11 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
-test('profile settings separates profile, title and frame into tabs',()=>{
+test('profile settings separates profile and title into tabs without frames',()=>{
  const component=readFileSync(new URL('../app/ProfileSettings.tsx',import.meta.url),'utf8');
- for(const label of ['프로필','칭호','테두리'])assert.match(component,new RegExp(`>${label}<`));
+ for(const label of ['프로필','칭호'])assert.match(component,new RegExp(`>${label}<`));
+ assert.doesNotMatch(component,/>테두리</);
  assert.match(component,/role="tablist"/);
  assert.match(component,/role="tabpanel"/);
+ assert.doesNotMatch(component,/type="checkbox"/);
+ assert.match(component,/하드 최초 클리어 보상/);
+ assert.match(component,/profile-reward-list/);
+ assert.doesNotMatch(component,/profile-frame-list|profile-frame-hard/);
+ const page=readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8');
+ assert.ok(page.indexOf('className="reward-title player-title"')<page.indexOf('className="player-name"'));
 });
 
 test('only the profile avatar list owns a vertical scrollbar',()=>{

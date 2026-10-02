@@ -30,4 +30,5 @@ export function ansiArrival(step:number,name:string){
  {speaker:'책의 정령',text:'성문 방어, 공성전, 토산 쟁탈을 넘어 마지막 공세를 막아라. 전선 지도에서 전투를 선택하자.'},
  ][step];
 }
-export const progressKey=(chapter:ChapterId,hard=false)=>chapter===10?(hard?'noryang-hard-campaign-v1':'noryang-campaign-v1'):chapter===9?(hard?'myeongnyang-hard-campaign-v1':'myeongnyang-campaign-v1'):chapter===8?(hard?'haengju-hard-campaign-v1':'haengju-campaign-v1'):chapter===7?(hard?'hansando-hard-campaign-v1':'hansando-campaign-v1'):chapter===6?(hard?'cheoin-hard-campaign-v1':'cheoin-campaign-v1'):chapter===5?(hard?'gwiju-hard-campaign-v1':'gwiju-campaign-v1'):chapter===1?(hard?'salsu-hard-campaign-v1':'salsu-campaign-v1'):chapter===2?(hard?'ansi-hard-campaign-v1':'ansi-campaign-v1') :chapter===4?(hard?'nadang-hard-campaign-v1':'nadang-campaign-v1'):(hard?'hwangsan-hard-campaign-v1':'hwangsan-campaign-v1');
+const STORY_PROGRESS_SLUGS:Record<ChapterId,string>={1:'pyongyang',2:'goguryeo-conquests',3:'salsu',4:'ansi',5:'hwangsan',6:'nadang',7:'cheonmunryeong',8:'goryeo-khitan',9:'cheoin',10:'imjin-war'};
+export const progressKey=(chapter:ChapterId,hard=false)=>`${STORY_PROGRESS_SLUGS[chapter]}${hard?'-hard':''}-campaign-v1`;

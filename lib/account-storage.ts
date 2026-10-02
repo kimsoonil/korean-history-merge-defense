@@ -3,6 +3,7 @@ export type AccountScope=`guest`|`user:${string}`;
 type StorageLike={getItem:(key:string)=>string|null;setItem:(key:string,value:string)=>void;removeItem:(key:string)=>void};
 
 const PREFIX='khmd-account-v1';
+export const accountStoragePrefix=(scope:AccountScope)=>`${PREFIX}:${scope}:`;
 
 export function accountScopeFor(status:AuthStorageStatus,userId?:string|null):AccountScope|null{
  if(status==='guest')return 'guest';

@@ -23,3 +23,11 @@ test('recipe and bag interfaces use the shared tier collections',()=>{
  assert.doesNotMatch(page,/plannedUpperTierUnits/);
  assert.match(bag,/STORABLE_UNIT_TIERS\.map/);
 });
+
+test('recipe book and unit bag use compact Lv labels',()=>{
+ const page=readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8');
+ const bag=readFileSync(new URL('../app/UnitBag.tsx',import.meta.url),'utf8');
+ assert.match(page,/Lv \{n\}/);
+ assert.match(bag,/Lv \{t\}/);
+ assert.match(bag,/Lv 1 자동 넣기/);
+});

@@ -8,3 +8,8 @@
   .game-actions button small{font-size:7px}
   .action-gold{min-width:51px}
 }
+.story-reinforcement{position:absolute;left:50%;bottom:4%;z-index:8;display:flex;align-items:center;gap:8px;min-width:150px;max-width:42%;height:48px;padding:4px 10px 4px 5px;transform:translateX(-50%);overflow:hidden;border:1px solid #d9bc72;border-radius:6px;background:#182326e6;box-shadow:0 4px 16px #0008,0 0 14px #e0c77c55;color:#fff7db;pointer-events:none;animation:reinforcement-arrive .5s ease-out both}
+.story-reinforcement>img:first-child{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22;filter:saturate(.7)}
+.story-reinforcement .unit-portrait{position:relative;z-index:1;flex:none;width:39px;height:39px}.story-reinforcement>span:last-child{position:relative;z-index:1;display:flex;min-width:0;flex-direction:column}.story-reinforcement small{font-size:7px;letter-spacing:.08em;color:#e7ca82;white-space:nowrap}.story-reinforcement b{font:700 13px 'Noto Serif KR',serif;white-space:nowrap}
+@keyframes reinforcement-arrive{from{opacity:0;transform:translate(-50%,18px) scale(.92)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+@media(max-width:700px){.story-reinforcement{bottom:3%;height:42px;min-width:132px;max-width:55%;padding-right:7px}.story-reinforcement .unit-portrait{width:34px;height:34px}.story-reinforcement small{font-size:6px}.story-reinforcement b{font-size:11px}}

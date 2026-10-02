@@ -5,6 +5,7 @@ import {useEffect,useRef,type CSSProperties} from 'react';
 import {X} from 'lucide-react';
 import {byName} from '@/lib/game';
 import type {LegendaryScene} from '@/lib/legendary';
+import {atlasCellImageStyle} from '@/lib/portrait-crop';
 
 type Props={scene:LegendaryScene;preview:boolean;onClose:()=>void;embedded?:boolean};
 export default function LegendaryReveal({scene,preview,onClose,embedded=false}:Props){
@@ -28,9 +29,9 @@ export default function LegendaryReveal({scene,preview,onClose,embedded=false}:P
     <div className="legendary-vignette"/>
     <div className="legendary-rays" aria-hidden="true"/>
     {!embedded&&<div className="legendary-toolbar"><span>{preview?'연출 미리보기':'7단계 영웅 조합 성공'} · 전투 일시 정지</span><div><button onClick={onClose} aria-label="등장 연출 건너뛰기">건너뛰기 <X size={15}/></button></div></div>}
-    <div className="legendary-heading"><span>★★★★★</span><small>전설의 영웅</small><h2 id="legendary-name">{scene.name}</h2><p>{scene.title}</p></div>
+    <div className="legendary-heading">{!embedded&&<><span>★★★★★</span><small>전설의 영웅</small></>}<h2 id="legendary-name">{scene.name}</h2><p>{scene.title}</p></div>
     {scene.slug==='sejong'&&<div className="legendary-letters" aria-hidden="true"><span>훈민정음</span><i>ㄱ</i><i>ㄴ</i><i>ㅁ</i><i>ㅅ</i><i>ㅇ</i></div>}
-    <div className={`legendary-hero ${sprite?'':'standalone'}`} aria-hidden="true"><div className="legendary-hero-viewport">{sprite?<LoadingImage src={sprite.src} alt="" style={{left:`-${sprite.col*100}%`,top:`-${sprite.row*100}%`}}/>:<LoadingImage src={portrait??''} alt=""/>}</div></div>
+    <div className={`legendary-hero ${sprite?'':'standalone'}`} aria-hidden="true"><div className="legendary-hero-viewport">{sprite?<LoadingImage src={sprite.src} alt="" style={atlasCellImageStyle(sprite.col,sprite.row,scene.name)}/>:<LoadingImage src={portrait??''} alt=""/>}</div></div>
     <div className="legendary-caption"><span className="legendary-symbol">{scene.symbol}</span><blockquote id="legendary-quote">“{scene.quote}”</blockquote><small>{scene.attribution}</small></div>
   </div>;
 }

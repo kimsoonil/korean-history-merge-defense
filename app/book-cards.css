@@ -20,6 +20,9 @@
 .book-card.ready{cursor:pointer;background:#546b3f;border:2px solid #f4d88d;box-shadow:0 0 0 2px #725f2d,0 0 16px #f0cf6766}
 .book-card.ready:hover{background:#607847;box-shadow:0 0 0 2px #806b31,0 0 20px #f0cf6788}
 .book-card.ready:focus-visible{outline:3px solid #fff2b4;outline-offset:2px}
+.book-card.hard-banned{cursor:not-allowed;border-color:#817b78;filter:saturate(.65)}
+.book-hard-lock{position:absolute;z-index:4;inset:0;display:grid;place-items:center;background:#05050573;color:#fff;pointer-events:none;text-shadow:none}
+.book-hard-lock svg{width:34px;height:34px;filter:drop-shadow(0 2px 4px #000)}
 .selected-skill strong,.mobile-unit-info p strong{color:#ffe2a1;font-weight:500}
 @media(max-width:760px){
  .book-modal{height:calc(100dvh - 20px);padding:8px}

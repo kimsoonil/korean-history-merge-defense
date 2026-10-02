@@ -1,5 +1,6 @@
 .battle-intro-text{position:absolute;left:1%;bottom:calc(1% + 44px);z-index:9;width:min(360px,86%);box-sizing:border-box;padding:12px 14px;border-left:2px solid #e4c57f;border-radius:4px;background:linear-gradient(90deg,#15291bef,#15291bba);color:#fff1cb;pointer-events:none;text-shadow:0 1px 3px #000;animation:battle-intro-fade 8s ease both}
 .battle-intro-text strong,.battle-intro-text>b{display:block;font-size:14px;line-height:1.5}.battle-intro-text strong{color:#eacb85}.battle-intro-text p{margin:6px 0 0;font-size:13px;line-height:1.6;word-break:keep-all;overflow-wrap:anywhere}.battle-intro-text p span{color:#efd18e;font-weight:700}
+.battle-intro-text.hard-variant-intro{border-left-color:#df7768;background:linear-gradient(90deg,#3d2022f2,#2a1b20d9)}.battle-intro-text.hard-variant-intro strong,.battle-intro-text.hard-variant-intro p span{color:#ffb4a8}
 @keyframes battle-intro-fade{0%{opacity:0;transform:translateY(5px)}5%,85%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(0)}}
 @media(max-width:760px){.battle-intro-text{padding:8px 10px}.battle-intro-text strong,.battle-intro-text>b{font-size:12px}.battle-intro-text p{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.battle-intro-text{animation:none}}
