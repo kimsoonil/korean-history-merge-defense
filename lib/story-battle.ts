@@ -1,4 +1,6 @@
 import type {ChapterId} from './ansi.ts';
+import type {Difficulty} from './enemy-stats.ts';
+import {bossRounds,stageRoundCount} from './round-config.ts';
 import {getStoryCampaign,getStoryStage} from './story-campaigns.ts';
 
 export type StoryBattle={faction:string;enemyNames:readonly [string,string,string,string,string,string];naval?:boolean};
@@ -35,14 +37,14 @@ export const stageBossName=(chapter:ChapterId,stage:number)=>stage===10?getStory
 export const legacyStageBossName=(chapter:ChapterId,stage:number)=>`${getStoryStage(chapter,stage).title} 지휘관`;
 export const storyBattle=(chapter:ChapterId)=>battles[chapter];
 export const storyEnemyNames=(chapter:ChapterId)=>battles[chapter].enemyNames;
-export function storyBossName(chapter:ChapterId,stage:number,round:number){
- const finalRound=20+(stage-1)*5;
+export function storyBossName(chapter:ChapterId,stage:number,round:number,difficulty:Difficulty='hard'){
+ const finalRound=stageRoundCount(stage,difficulty);
  if(round===finalRound)return stageBossName(chapter,stage);
+ if(!bossRounds(stage,difficulty).includes(round))return null;
  if(chapter===3&&salsuBosses[round])return salsuBosses[round];
- if(round===10||round>=20&&round%5===0)return `${battles[chapter].faction} 장군`;
- return null;
+ return `${battles[chapter].faction} 장군`;
 }
-export const allStoryEnemyNames=[...Object.values(battles).flatMap(battle=>[...battle.enemyNames]),'일본 전선','일본 정예선'];
+export const allStoryEnemyNames=[...Object.values(battles).flatMap(battle=>[...battle.enemyNames]),'일본 전선','일본 정예선','군량 보급 수레'];
 export const allStoryBossNames=[...Array.from({length:10},(_,chapterIndex)=>Array.from({length:10},(_,stageIndex)=>{
  const stage=stageIndex+1,total=20+stageIndex*5;
  return Array.from({length:total},(_,roundIndex)=>storyBossName((chapterIndex+1) as ChapterId,stage,roundIndex+1)).filter((name):name is string=>!!name);

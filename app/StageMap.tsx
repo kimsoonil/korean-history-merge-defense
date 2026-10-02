@@ -285,7 +285,7 @@ export default function StageMap({
                     <b>
                       {b.name}
                       <small className="battle-round-count">
-                        1–{stageRoundCount(b.wave)}라운드
+                        1–{stageRoundCount(b.wave, hard ? 'hard' : 'normal')}라운드
                       </small>
                     </b>
                     <span className="map-battle-kind">

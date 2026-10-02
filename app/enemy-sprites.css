@@ -6,6 +6,8 @@
 .invader .enemy-sprite-viewport img{position:absolute;right:auto;bottom:auto;object-fit:fill}
 .invader .invader-hp{bottom:calc(100% + 1px);left:10%;right:10%;z-index:1;border:1px solid #efd0a0;height:5px;border-radius:3px;overflow:hidden}
 .invader.boss .boss-name{top:calc(100% - 4px)}
+.invader.supply-cart .enemy-sprite-viewport{inset:0;overflow:visible}
+.invader.supply-cart .supply-cart-reward{position:absolute;top:calc(100% + 1px);left:50%;transform:translateX(-50%);white-space:nowrap;color:#ffe6a0;background:#3e2b1cdb;border:1px solid #c3a36a;border-radius:4px;padding:1px 4px;font:700 9px/1.2 sans-serif;text-shadow:0 1px #321d11;pointer-events:none}
 @keyframes enemy-march{0%,100%{transform:translateY(1px) rotate(-1.2deg) scaleY(.99)}50%{transform:translateY(-2px) rotate(1.2deg) scaleY(1.01)}}
 @media(prefers-reduced-motion:reduce){.invader.is-moving .enemy-sprite-viewport{animation:none}}
 @media(max-width:760px){.invader{width:30px;height:33px}.invader.boss{width:54px;height:59px}.invader .invader-hp{height:4px}}

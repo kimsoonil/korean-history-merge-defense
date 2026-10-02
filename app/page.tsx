@@ -35,6 +35,7 @@ import {
   enemyPortraits,
   pathAt,
   recipes,
+  SUPPLY_CART_NAME,
   waveNames,
   type Enemy,
   type Soldier,
@@ -102,12 +103,9 @@ import {
   emptyGambleState,
   emptyUnitGambleUsage,
   gambleUnlocked,
-  goldGambles,
-  playGoldGamble,
   playUnitGamble,
   readGambleState,
   readUnitGambleUsage,
-  recordGoldGamble,
   recordUnitGamble,
   recordUnitGambleSuccess,
   unitGambles,
@@ -118,9 +116,10 @@ import {
   claimQuest,
   emptyQuestProgress,
   readQuestProgress,
-  recordBasicUnitsPeak,
+  recordBasicTypesPeak,
   recordCombinedTier,
-  recordGoldQuest,
+  recordRoleFormation,
+  recordSupplyCartDefeated,
   recordUnitQuest,
 } from "@/lib/quests";
 import {
@@ -740,6 +739,7 @@ export default function Game() {
     deadlineRef = useRef<number | null>(null),
     completedStageRef = useRef(0),
     rewardedBossesRef = useRef(new Set<number>()),
+    rewardedCartsRef = useRef(new Set<number>()),
     stateRef = useRef({
       roster,
       enemies,
@@ -835,7 +835,7 @@ export default function Game() {
   };
   useEffect(() => {
     const current = progressRef.current,
-      next = recordBasicUnitsPeak(current.questProgress, current.roster, current.bag);
+      next = recordRoleFormation(recordBasicTypesPeak(current.questProgress, current.roster, current.bag),current.roster);
     if (next === current.questProgress) return;
     progressRef.current = { ...current, questProgress: next };
     setQuestProgress(next);
@@ -917,6 +917,7 @@ export default function Game() {
     completedStageRef.current = counters.completedStage;
     deadlineRef.current = counters.deadline;
     rewardedBossesRef.current.clear();
+    rewardedCartsRef.current.clear();
     const restoredReinforcement = saved.reinforcement ?? null;
     reinforcementRef.current = restoredReinforcement;
     setReinforcement(restoredReinforcement);
@@ -1001,7 +1002,7 @@ export default function Game() {
       const myeongnyangFromSave =
         restored?.chapter === 9 && restored.difficulty !== "hard"
           ? (restored.phase === "cleared" || restored.phase === "won") &&
-            isStageComplete(restored.stage, restored.round)
+            isStageComplete(restored.stage, restored.round, restored.difficulty ?? 'normal')
             ? restored.stage
             : restored.stage - 1
           : 0;
@@ -1018,7 +1019,7 @@ export default function Game() {
       const haengjuFromSave =
         restored?.chapter === 8 && restored.difficulty !== "hard"
           ? (restored.phase === "cleared" || restored.phase === "won") &&
-            isStageComplete(restored.stage, restored.round)
+            isStageComplete(restored.stage, restored.round, restored.difficulty ?? 'normal')
             ? restored.stage
             : restored.stage - 1
           : 0;
@@ -1032,7 +1033,7 @@ export default function Game() {
       const hansandoFromSave =
         restored?.chapter === 7 && restored.difficulty !== "hard"
           ? (restored.phase === "cleared" || restored.phase === "won") &&
-            isStageComplete(restored.stage, restored.round)
+            isStageComplete(restored.stage, restored.round, restored.difficulty ?? 'normal')
             ? restored.stage
             : restored.stage - 1
           : 0;
@@ -1046,7 +1047,7 @@ export default function Game() {
       const cheoinFromSave =
         restored?.chapter === 6 && restored.difficulty !== "hard"
           ? (restored.phase === "cleared" || restored.phase === "won") &&
-            isStageComplete(restored.stage, restored.round)
+            isStageComplete(restored.stage, restored.round, restored.difficulty ?? 'normal')
             ? restored.stage
             : restored.stage - 1
           : 0;
@@ -1060,7 +1061,7 @@ export default function Game() {
       const gwijuFromSave =
         restored?.chapter === 5 && restored.difficulty !== "hard"
           ? (restored.phase === "cleared" || restored.phase === "won") &&
-            isStageComplete(restored.stage, restored.round)
+            isStageComplete(restored.stage, restored.round, restored.difficulty ?? 'normal')
             ? restored.stage
             : restored.stage - 1
           : 0;
@@ -1074,7 +1075,7 @@ export default function Game() {
       const nadangFromSave =
         restored?.chapter === 4 && restored.difficulty !== "hard"
           ? (restored.phase === "cleared" || restored.phase === "won") &&
-            isStageComplete(restored.stage, restored.round)
+            isStageComplete(restored.stage, restored.round, restored.difficulty ?? 'normal')
             ? restored.stage
             : restored.stage - 1
           : 0;
@@ -1088,7 +1089,7 @@ export default function Game() {
       const hwangsanFromSave =
         restored?.chapter === 3 && restored.difficulty !== "hard"
           ? (restored.phase === "cleared" || restored.phase === "won") &&
-            isStageComplete(restored.stage, restored.round)
+            isStageComplete(restored.stage, restored.round, restored.difficulty ?? 'normal')
             ? restored.stage
             : restored.stage - 1
           : 0;
@@ -1102,7 +1103,7 @@ export default function Game() {
       const ansiFromSave =
         restored?.chapter === 2 && restored.difficulty !== "hard"
           ? (restored.phase === "cleared" || restored.phase === "won") &&
-            isStageComplete(restored.stage, restored.round)
+            isStageComplete(restored.stage, restored.round, restored.difficulty ?? 'normal')
             ? restored.stage
             : restored.stage - 1
           : 0;
@@ -1121,7 +1122,7 @@ export default function Game() {
         (restored.chapter ?? 1) === 1 &&
         restored.difficulty !== "hard"
           ? (restored.phase === "cleared" || restored.phase === "won") &&
-            isStageComplete(restored.stage, restored.round)
+            isStageComplete(restored.stage, restored.round, restored.difficulty ?? 'normal')
             ? restored.stage
             : restored.stage - 1
           : 0;
@@ -1174,9 +1175,9 @@ export default function Game() {
     intro = frontIntro(stage, chapter);
   const permanentResearch=accountFromProfile(player??{}).research,
     deployLimit=DEPLOY_LIMIT+researchDeployLimit(permanentResearch);
-  const totalRounds = stageRoundCount(stage),
-    finalRound = isCampaignComplete(stage, round),
-    stageEnd = isStageComplete(stage, round),
+  const totalRounds = stageRoundCount(stage, difficulty),
+    finalRound = isCampaignComplete(stage, round, difficulty),
+    stageEnd = isStageComplete(stage, round, difficulty),
     maxSpawn = roundEnemyCount(stage, round, difficulty),
     bossEnemy = enemies.find((e) => e.boss),
     sel = roster.find((s) => s.id === selected),
@@ -1305,60 +1306,6 @@ export default function Game() {
     stateRef.current = { ...stateRef.current, roster: nextRoster };
     setRoster(nextRoster);
     setNotice(`${source} · ${name} 획득!`);
-  };
-  const gambleGold = (id: string) => {
-    const option = goldGambles.find((item) => item.id === id),
-      current = progressRef.current;
-    if (!option || !gambleUnlocked(current.round, option.unlockRound)) return;
-    const now = Date.now();
-    if (!canGamble(current.gambleState, current.round, current.difficulty, now))
-      return;
-    const failures = current.gambleState.goldFailures[option.id],
-      result = playGoldGamble(
-        option,
-        current.gold,
-        current.difficulty,
-        failures,
-        Math.random,
-        researchGamblePityBonus(permanentResearch),
-      );
-    if (!result) return;
-    const refund=result.outcome==='failure'?Math.round((option.cost-result.reward)*researchGambleRefundPercent(permanentResearch)/100):0,
-      adjustedGold=result.gold+refund,
-      net=adjustedGold-current.gold,
-      success = net >= 0,
-      sign = net > 0 ? "+" : "";
-    const nextGambleState = recordGoldGamble(
-      current.gambleState,
-      current.round,
-      current.difficulty,
-      option.id,
-      result.outcome,
-      now,
-    );
-    const nextQuestProgress = recordGoldQuest(
-      current.questProgress,
-      result.outcome === "failure",
-    );
-    setUnitReward(null);
-    setGambleResult({
-      id: Date.now(),
-      outcome: success ? "success" : "failure",
-      title: `${option.cost.toLocaleString()}G 도박 ${success ? "성공" : "실패"}`,
-      detail: `${sign}${net.toLocaleString()}G`,
-    });
-    progressRef.current = {
-      ...current,
-      gold: adjustedGold,
-      gambleState: nextGambleState,
-      questProgress: nextQuestProgress,
-    };
-    setGold(adjustedGold);
-    setGambleState(nextGambleState);
-    setQuestProgress(nextQuestProgress);
-    setNotice(
-      `골드 도박 ${success ? "성공" : "실패"} · ${sign}${net.toLocaleString()}G`,
-    );
   };
   const gambleUnit = (tier: 1 | 2 | 3) => {
     const option = unitGambles.find((item) => item.tier === tier),
@@ -1570,7 +1517,7 @@ export default function Game() {
       current.phase === "lost" ||
       current.phase === "won" ||
       (current.phase === "cleared" &&
-        isStageComplete(current.stage, current.round))
+        isStageComplete(current.stage, current.round, current.difficulty))
     )
       return;
     const result = purchaseUpgrade(
@@ -1655,7 +1602,7 @@ export default function Game() {
     setBattleIntro(
       nextRoundNumber === 1 && frontIntro(nextStage, chapter) !== null,
     );
-    const boss = roundBossName(nextStage, nextRoundNumber, chapter);
+    const boss = roundBossName(nextStage, nextRoundNumber, chapter, difficulty);
     const arrival = boss ? bossLine(boss, nextStage, false, chapter) : null;
     if (arrival) setBossDialogue({ ...arrival, id: Date.now() });
     deadlineRef.current = Date.now() + STAGE_SECONDS * 1000;
@@ -1691,7 +1638,7 @@ export default function Game() {
   const advance = () => {
     if (phase !== "cleared" || stageEnd || timeLeft > 0 || enemies.length > 0)
       return;
-    const next = nextRound(stage, round);
+    const next = nextRound(stage, round, difficulty);
     if (next) beginRound(next.stage, next.round);
   };
   const finishRound = (skipTime = false) => {
@@ -1734,7 +1681,7 @@ export default function Game() {
       return;
     }
     if (skipTime) {
-      const next = nextRound(stage, round);
+      const next = nextRound(stage, round, difficulty);
       if (next) beginRound(next.stage, next.round);
     } else {
       setPhase("cleared");
@@ -1788,6 +1735,7 @@ export default function Game() {
     deadlineRef.current = null;
     completedStageRef.current = 0;
     rewardedBossesRef.current.clear();
+    rewardedCartsRef.current.clear();
     idRef.current = 1;
     setConfirmNew(false);
     const permanent = accountFromProfile(player ?? {}),
@@ -1957,7 +1905,7 @@ export default function Game() {
       const storyBoss = timedEnemies.find(
         (enemy) =>
           enemy.boss &&
-          isCampaignComplete(enemy.originStage, enemy.originRound ?? s.round),
+          isCampaignComplete(enemy.originStage, enemy.originRound ?? s.round, s.difficulty),
       );
       let activeReinforcement = reinforcementRef.current;
       if (
@@ -2134,7 +2082,7 @@ export default function Game() {
       const defeatedBosses = s.enemies.filter(
         (enemy) =>
           enemy.boss &&
-          !isStageComplete(enemy.originStage, enemy.originRound ?? s.round) &&
+          !isStageComplete(enemy.originStage, enemy.originRound ?? s.round, s.difficulty) &&
           enemy.hp > 0 &&
           enemy.hp <= (hits.get(enemy.id) ?? 0) &&
           !rewardedBossesRef.current.has(enemy.id),
@@ -2195,11 +2143,19 @@ export default function Game() {
           (e) =>
             e.hp <= (hits.get(e.id) ?? 0) &&
             !(
-              e.boss && isStageComplete(e.originStage, e.originRound ?? s.round)
+              e.boss && isStageComplete(e.originStage, e.originRound ?? s.round, s.difficulty)
             ),
         )
         .reduce((total, e) => total + e.reward, 0);
       if (killGold) setGold((g) => g + killGold);
+      const defeatedCarts=s.enemies.filter(e=>e.name===SUPPLY_CART_NAME&&e.hp>0&&e.hp<=(hits.get(e.id)??0)&&!rewardedCartsRef.current.has(e.id));
+      for(const cart of defeatedCarts){
+        rewardedCartsRef.current.add(cart.id);
+        const current=progressRef.current,nextQuestProgress=recordSupplyCartDefeated(current.questProgress);
+        progressRef.current={...current,questProgress:nextQuestProgress};
+        setQuestProgress(nextQuestProgress);
+        setNotice(`군량 보급 수레 처치! ${cart.reward.toLocaleString()}G 획득`);
+      }
       setEnemies((old) => {
         if (!old.length) return old;
         const bossTime = new Map(
@@ -2239,6 +2195,7 @@ export default function Game() {
         },
         stage,
         round,
+        difficulty,
       ) &&
       !(
         !stageEnd &&
@@ -2419,7 +2376,6 @@ export default function Game() {
           gambleState={gambleState}
           unitUsage={unitGambleUsage}
           disabled={phase === "lost" || phase === "won" || stageCleared}
-          onGold={gambleGold}
           onUnit={gambleUnit}
           onClose={() => setGambleOpen(false)}
         />
@@ -2609,7 +2565,7 @@ export default function Game() {
                 </strong>
                 <b>
                   라운드 {round} / {totalRounds}
-                  {roundBossName(stage, round, chapter) ? " · 보스전" : ""}
+                  {roundBossName(stage, round, chapter, difficulty) ? " · 보스전" : ""}
                 </b>
               </div>
               <div
@@ -2800,11 +2756,12 @@ export default function Game() {
                           isStageComplete(
                             e.originStage,
                             e.originRound ?? round,
+                            difficulty,
                           );
                       return (
                         <div
                           key={e.id}
-                          className={`invader ${e.boss ? `boss ${finalBoss ? "final-boss" : "mid-boss"}` : ""} ${phase === "lost" || phase === "won" ? "" : "is-moving"}`}
+                          className={`invader ${e.boss ? `boss ${finalBoss ? "final-boss" : "mid-boss"}` : ""} ${e.name===SUPPLY_CART_NAME ? "supply-cart" : ""} ${phase === "lost" || phase === "won" ? "" : "is-moving"}`}
                           style={{
                             left: `${e.boss ? Math.min(92, Math.max(8, p.x)) : p.x}%`,
                             top: `${e.boss ? Math.min(90, Math.max(10, p.y)) : p.y}%`,
@@ -2859,6 +2816,7 @@ export default function Game() {
                           {e.boss && (
                             <span className="boss-name">{e.name}</span>
                           )}
+                          {e.name===SUPPLY_CART_NAME&&<span className="supply-cart-reward">+{e.reward.toLocaleString()}G</span>}
                         </div>
                       );
                     })}
@@ -3361,8 +3319,8 @@ export default function Game() {
               </p>
               <b>04 · 도박</b>
               <p>
-                골드 도박으로 무작위 골드를 얻거나 유닛 도박으로 1~3단계 유닛을
-                획득합니다. 시민은 도박에서 나오지 않습니다.
+                유닛 도박으로 1~3단계 유닛을 획득합니다. 시민은 도박에서
+                나오지 않습니다.
               </p>
               <b>음악 출처</b>
               <p>

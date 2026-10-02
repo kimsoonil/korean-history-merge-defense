@@ -8,7 +8,7 @@ import {nadangEnemyNames,nadangBossNames} from './nadang.ts';
 import {hwangsanEnemyNames,hwangsanBossNames} from './hwangsan.ts';
 import {ansiEnemyNames,ansiBossNames,type ChapterId} from './ansi.ts';
 import {chapterOneBattles,FINAL_WAVE,waveCombatLevel} from './campaign.ts';
-import {globalRound,roundBossName,stageRoundCount} from './rounds.ts';
+import {globalRound,isSupplyRound,roundBossName,stageRoundCount,supplyCartReward} from './rounds.ts';
 import {roadPosition} from './battlefield.ts';
 import {enemyStats,type Difficulty} from './enemy-stats.ts';
 import {type UnitTier} from './unit-tiers.ts';
@@ -59,6 +59,7 @@ export const waveNames=chapterOneBattles.map(battle=>battle.name);
 export const enemyNames=['수나라 보병','수나라 창병','수나라 궁병','수나라 기병','수나라 공성병','수나라 정예군'];
 export type EnemyPortrait={src:string;col:number;row:number;standalone?:boolean;crop?:{x:number;y:number;w:number;h:number}};
 export const enemyPortraits=Object.fromEntries([...enemyNames,'수양제'].map((name,index)=>[name,{src:'/portraits/sui-enemies-atlas.png',col:index%4,row:Math.floor(index/4)}])) as Record<string,EnemyPortrait>;
+export const SUPPLY_CART_NAME='군량 보급 수레';
 export function createInvader(stage:number,index:number,id:number):Enemy{const level=waveCombatLevel(stage),boss=stage===FINAL_WAVE&&index===0,regularHp=55+level*38+(index%4)*18,hp=boss?(55+level*38+3*18)*10:regularHp;return {id,name:boss?'수양제':enemyNames[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))],hp,maxHp:hp,progress:0,speed:boss?.025:.043+(index%4)*.003,reward:boss?850:11+level*2,boss,originStage:stage}}
 export function recipeStatus(recipe:string[],owned:Soldier[]){const pool=[...owned]; return recipe.map(n=>{let i=pool.findIndex(s=>s.name===n);if(i<0&&byName[n]?.tier===1)i=pool.findIndex(s=>s.name==='시민');if(i<0)return false;pool.splice(i,1);return true})}
 // The general deliberately reuses an enlarged elite soldier, rather than the emperor art.
@@ -117,6 +118,7 @@ for(const [index,name] of ['수나라 선봉장','수나라 공성대장','우�
 // Old in-progress Imjin saves used ship names; keep them loadable, but draw soldiers.
 enemyPortraits['일본 전선']=storyEnemyArt(10,4);
 enemyPortraits['일본 정예선']=storyEnemyArt(10,5);
+enemyPortraits[SUPPLY_CART_NAME]={src:'/portraits/enemies/supply-cart.png',col:0,row:0,standalone:true};
 export function enemyPortraitFor(enemy:Pick<Enemy,'name'|'boss'|'chapter'|'originStage'|'originRound'>):EnemyPortrait{
  const chapter=enemy.chapter;
  if(chapter){
@@ -132,13 +134,15 @@ export function enemyPortraitFor(enemy:Pick<Enemy,'name'|'boss'|'chapter'|'origi
  return enemyPortraits[enemy.name];
 }
 export function createRoundInvader(stage:number,round:number,index:number,id:number,difficulty:Difficulty='normal',chapter:ChapterId=1):Enemy{
- const bossName=index===0?roundBossName(stage,round,chapter):null;
+ const bossName=index===0?roundBossName(stage,round,chapter,difficulty):null;
+ const supplyCart=isSupplyRound(round)&&index===(roundBossName(stage,round,chapter,difficulty)?1:0);
  const level=Math.ceil(globalRound(stage,round)/5);
- const finalBoss=!!bossName&&round===stageRoundCount(stage);
+ const finalBoss=!!bossName&&round===stageRoundCount(stage,difficulty);
  const storyFinal=stage===10&&finalBoss;
- const {hp,armor}=enemyStats(round,index,!!bossName,storyFinal,difficulty,stage,chapter,finalBoss,stageRoundCount(stage));
+ const {hp,armor}=enemyStats(round,index,!!bossName,storyFinal,difficulty,stage,chapter,finalBoss,stageRoundCount(stage,difficulty));
  const chapterEnemies=storyEnemyNames(chapter);
- return {id,chapter,name:bossName??chapterEnemies[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))],hp,maxHp:hp,armor,progress:0,speed:bossName?.025:.043+(index%4)*.003,reward:finalBoss?0:bossName?30*round:difficulty==='hard'?15:20,boss:!!bossName,originStage:stage,originRound:round};
+ const enemyHp=supplyCart?Math.round(hp*1.5):hp;
+ return {id,chapter,name:bossName??(supplyCart?SUPPLY_CART_NAME:chapterEnemies[Math.min(5,Math.floor(level/2)+(index%3===0?1:0))]),hp:enemyHp,maxHp:enemyHp,armor,progress:0,speed:bossName ? .025 : supplyCart ? .034 : .043+(index%4)*.003,reward:finalBoss?0:bossName?30*round:supplyCart?supplyCartReward(round):difficulty==='hard'?15:20,boss:!!bossName,originStage:stage,originRound:round};
 }
 // The invaders make one complete lap around the square unit field.
 export const pathAt=roadPosition;

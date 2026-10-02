@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {START_TROOP_CARDS,ROUND_TROOP_CARDS,BOSS_TROOP_CARDS,RECRUIT_TROOP_COST,bossCitizenRewardCount,bossUnitRewardTier,randomName} from '../lib/troop-cards.ts';
 import {makeGameSave,readGameSave} from '../lib/save.ts';
 import {basics,byName,createRoundInvader} from '../lib/game.ts';
+import {bossRounds} from '../lib/round-config.ts';
 
 test('troop card economy uses the requested starting, round and boss amounts',()=>{
  assert.equal(START_TROOP_CARDS,4);
@@ -11,11 +12,18 @@ test('troop card economy uses the requested starting, round and boss amounts',()
  assert.equal(RECRUIT_TROOP_COST,1);
 });
 
-test('boss unit rewards step through tiers two, three and four',()=>{
- assert.deepEqual([10,20,30,40,50,60,65].map(bossUnitRewardTier),[2,2,3,3,4,4,null]);
- assert.deepEqual([10,20,30,40,50,60,65].map(bossCitizenRewardCount),[1,1,2,2,3,3,3]);
- assert.equal(bossCitizenRewardCount(21),0);
+test('boss unit and citizen rewards advance every five rounds',()=>{
+ const rounds=[10,15,20,25,30,35,40,45,50,55,60,65];
+ assert.deepEqual(rounds.map(bossUnitRewardTier),[2,2,3,3,3,4,4,4,5,5,5,null]);
+ assert.deepEqual(rounds.map(bossCitizenRewardCount),[1,1,1,1,2,2,2,2,3,3,3,0]);
+ assert.equal(bossUnitRewardTier(14),2);
+ assert.equal(bossUnitRewardTier(21),3);
+ assert.equal(bossUnitRewardTier(36),4);
+ assert.equal(bossCitizenRewardCount(21),1);
  assert.equal(createRoundInvader(10,10,0,1).originRound,10);
+ assert.equal(bossRounds(10,'hard').includes(15),true);
+ assert.equal(bossRounds(1,'normal').includes(15),true);
+ assert.equal(bossRounds(2,'normal').includes(15),false);
 });
 
 test('citizen is a zero-attack tier-one reward outside the recruit pool',()=>{

@@ -1,8 +1,9 @@
 import {FINAL_WAVE} from './campaign.ts';
 import {isStageComplete} from './rounds.ts';
+import type {Difficulty} from './enemy-stats.ts';
 type StageProgress={phase:string;timeLeft:number;spawned:number;maxSpawn:number;enemyCount:number;paused:boolean};
-export function canCompleteStage(progress:StageProgress,stage:number,round:number){
- return isStageComplete(stage,round)&&progress.phase==='battle'&&!progress.paused&&progress.maxSpawn>0&&progress.spawned>=progress.maxSpawn&&progress.enemyCount===0;
+export function canCompleteStage(progress:StageProgress,stage:number,round:number,difficulty:Difficulty='hard'){
+ return isStageComplete(stage,round,difficulty)&&progress.phase==='battle'&&!progress.paused&&progress.maxSpawn>0&&progress.spawned>=progress.maxSpawn&&progress.enemyCount===0;
 }
 
 /** A quiet gap between spawns is not a cleared wave. Never skip living enemies. */

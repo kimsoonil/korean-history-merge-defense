@@ -5,9 +5,9 @@ import {hansandoEnemyNames} from './hansando.ts';
 import {cheoinEnemyNames} from './cheoin.ts';
 import {gwijuEnemyNames} from './gwiju.ts';
 import {nadangEnemyNames} from './nadang.ts';
-import {byName,enemyPortraits,type Enemy,type Soldier} from './game.ts';
+import {byName,enemyPortraits,SUPPLY_CART_NAME,type Enemy,type Soldier} from './game.ts';
 import {FINAL_WAVE} from './campaign.ts';
-import {stageRoundCount,roundBossName,roundEnemyCount,roundKey,isCampaignComplete,isStageComplete} from './rounds.ts';
+import {stageRoundCount,bossRounds,isSupplyRound,supplyCartReward,roundBossName,roundEnemyCount,roundKey,isCampaignComplete,isStageComplete} from './rounds.ts';
 
 import {readUpgrades,type Upgrades} from './upgrades.ts';
 import {validBag,type Bag} from './inventory.ts';
@@ -27,7 +27,7 @@ export type GameProgress={
   roster:Soldier[]; bag?:Bag; enemies:Enemy[]; gold:number; troopCards?:number; wall:number; stage:number; round:number;
   phase:GamePhase; spawned:number; speed:number; remainingMs:number; heroCooldowns?:[number,number][]; upgrades?:Upgrades; questProgress?:QuestProgress; gambleState?:GambleState; unitGambleUsage?:UnitGambleUsage; reinforcement?:ReinforcementProgress;
 };
-export type GameSave=GameProgress&{version:6;roundRules?:2;chapterScenario?:'imjin-war'|'noryang';savedAt:number};
+export type GameSave=GameProgress&{version:6;roundRules?:2|3;chapterScenario?:'imjin-war'|'noryang';savedAt:number};
 
 const record=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
 const number=(value:unknown,min:number,max:number):value is number=>typeof value==='number'&&Number.isFinite(value)&&value>=min&&value<=max;
@@ -40,10 +40,10 @@ export function remainingStageMs(deadline:number|null,phase:GamePhase,now:number
   return Math.max(0,Math.min(30000,deadline-(pausedAt??now)));
 }
 export function makeGameSave(progress:GameProgress,now=Date.now()):GameSave{
-  return {...progress,...(progress.chapter===10?{chapterScenario:'imjin-war' as const}:{}),...(progress.upgrades?{upgrades:readUpgrades(progress.upgrades)}:{}),...(progress.reinforcement?{reinforcement:{...progress.reinforcement}}:{}),roster:progress.roster.map(unit=>({...unit})),enemies:progress.enemies.map(enemy=>({...enemy})),version:6,roundRules:2,savedAt:now};
+  return {...progress,...(progress.chapter===10?{chapterScenario:'imjin-war' as const}:{}),...(progress.upgrades?{upgrades:readUpgrades(progress.upgrades)}:{}),...(progress.questProgress?{questProgress:readQuestProgress(progress.questProgress)}:{}),...(progress.reinforcement?{reinforcement:{...progress.reinforcement}}:{}),roster:progress.roster.map(unit=>({...unit})),enemies:progress.enemies.map(enemy=>({...enemy})),version:6,roundRules:3,savedAt:now};
 }
 export function canContinue(save:GameSave|null):save is GameSave&{phase:'ready'|'battle'|'cleared'}{
-  return !!save&&save.phase!=='lost'&&save.phase!=='won'&&!(save.phase==='cleared'&&isStageComplete(save.stage,save.round));
+  return !!save&&save.phase!=='lost'&&save.phase!=='won'&&!(save.phase==='cleared'&&isStageComplete(save.stage,save.round,save.difficulty??'normal'));
 }
 export function restoredCounters(save:GameSave,now=Date.now()){
   return {
@@ -108,6 +108,14 @@ export function readGameSave(raw:string|null):GameSave|null{
       if(value.difficulty!==undefined&&!['normal','hard'].includes(String(value.difficulty)))return null;
       if(value.difficulty==='hard'&&!validBannedHeroes(value.bannedHeroes,value.chapter===10?10:value.chapter===9?9:value.chapter===8?8:value.chapter===7?7:value.chapter===6?6:value.chapter===5?5:value.chapter===4?4:value.chapter===3?3:value.chapter===2?2:1))return null;
       if(value.difficulty!=='hard'&&value.bannedHeroes!==undefined&&(!Array.isArray(value.bannedHeroes)||value.bannedHeroes.length))return null;
+      if(value.version===6&&value.roundRules===3&&Array.isArray(value.enemies)&&integer(value.round,1,65)){
+        const savedRound=value.round,oldCartReward=200*savedRound/5,savedEnemies=value.enemies;
+        const enemies=savedEnemies.filter(enemy=>!(savedRound===65&&record(enemy)&&enemy.name===SUPPLY_CART_NAME)).map(enemy=>
+          record(enemy)&&enemy.name===SUPPLY_CART_NAME&&isSupplyRound(savedRound)&&enemy.reward===oldCartReward
+            ? {...enemy,reward:supplyCartReward(savedRound)}:enemy);
+        if(enemies.length!==savedEnemies.length||enemies.some((enemy,index)=>enemy!==savedEnemies[index]))
+          return readGameSave(JSON.stringify({...value,enemies}));
+      }
     }
     if(record(value)&&(value.version===1||value.version===2)){
       const legacy=readLegacySave(raw);if(!legacy)return null;
@@ -134,12 +142,31 @@ export function readGameSave(raw:string|null):GameSave|null{
       return readGameSave(JSON.stringify({...value,version:6,roundRules:2,round}));
     }
     if(value.version===5)return readGameSave(JSON.stringify({...value,version:6}));
+    if(value.version===6&&value.roundRules!==3){
+      const mode=(value.difficulty??'normal') as Difficulty;
+      if(integer(value.stage,1,10)&&integer(value.round,1,stageRoundCount(value.stage,'hard'))){
+        const last=stageRoundCount(value.stage,mode);
+        if(value.round>last){
+          const completed=value.phase==='cleared'||value.phase==='won';
+          return readGameSave(JSON.stringify({...value,roundRules:3,round:last,
+            phase:completed?value.phase:'ready',enemies:[],spawned:completed?roundEnemyCount(value.stage,last,mode):0,
+            remainingMs:completed?0:30000}));
+        }
+        if(mode==='normal'&&bossRounds(value.stage,mode).includes(value.round)&&!bossRounds(value.stage,'hard').includes(value.round)&&['battle','cleared'].includes(String(value.phase))){
+          // This round gained a boss under the shorter schedule: replay it
+          // from preparation rather than silently clearing a boss never fought.
+          return readGameSave(JSON.stringify({...value,roundRules:3,phase:'ready',enemies:[],spawned:0,remainingMs:30000}));
+        }
+        return readGameSave(JSON.stringify({...value,roundRules:3}));
+      }
+    }
     const lastWave=FINAL_WAVE;
     if(!integer(value.stage,1,lastWave)||!integer(value.gold,0,Number.MAX_SAFE_INTEGER)||!integer(value.wall,0,10))return null;
     if(value.troopCards!==undefined&&!integer(value.troopCards,0,Number.MAX_SAFE_INTEGER))return null;
     if(!['ready','battle','cleared','lost','won'].includes(String(value.phase))||![1,2,3].includes(Number(value.speed))||typeof value.speed!=='number')return null;
-    if(!integer(value.round,1,stageRoundCount(value.stage)))return null;
-    const limit=value.version===3?Math.min(40,5+value.stage*2+Math.floor((value.round-1)/5)*2):roundEnemyCount(value.stage,value.round);
+    const difficulty=(value.difficulty??'normal') as Difficulty;
+    if(!integer(value.round,1,stageRoundCount(value.stage,difficulty)))return null;
+    const limit=value.version===3?Math.min(40,5+value.stage*2+Math.floor((value.round-1)/5)*2):roundEnemyCount(value.stage,value.round,difficulty);
     // Existing twenty-enemy rounds remain resumable without dropping enemies.
     if(!integer(value.spawned,0,Math.max(20,limit))||!number(value.remainingMs,0,30000))return null;
     if(!Array.isArray(value.roster)||value.roster.length>40||!Array.isArray(value.enemies)||value.enemies.length>100)return null;
@@ -151,16 +178,17 @@ export function readGameSave(raw:string|null):GameSave|null{
     let bosses=0;
     for(const enemy of value.enemies){
       if(!record(enemy)||!integer(enemy.id,1,Number.MAX_SAFE_INTEGER-1)||ids.has(enemy.id)||typeof enemy.name!=='string'||!Object.hasOwn(enemyPortraits,enemy.name))return null;
-      if(!number(enemy.maxHp,1,1000000)||!number(enemy.hp,Number.MIN_VALUE,enemy.maxHp)||!number(enemy.progress,0,1-Number.EPSILON)||!number(enemy.speed,0.001,1)||!integer(enemy.reward,0,10000)||enemy.originStage!==value.stage||typeof enemy.boss!=='boolean')return null;
-      const legacyStageBoss=enemy.boss&&enemy.name===legacyStageBossName((value.chapter??1) as ChapterId,Number(value.stage))&&value.round===stageRoundCount(Number(value.stage));
-      if(enemy.boss!==!allStoryEnemyNames.includes(enemy.name)||enemy.boss&&!legacyStageBoss&&!Array.from({length:value.round},(_,i)=>roundBossName(Number(value.stage),i+1,(value.chapter??1) as ChapterId)).includes(enemy.name))return null;
+      if(!number(enemy.maxHp,1,1000000)||!number(enemy.hp,Number.MIN_VALUE,enemy.maxHp)||!number(enemy.progress,0,1-Number.EPSILON)||!number(enemy.speed,0.001,1)||!integer(enemy.reward,0,enemy.name===SUPPLY_CART_NAME?supplyCartReward(60):10000)||enemy.originStage!==value.stage||typeof enemy.boss!=='boolean')return null;
+      const legacyStageBoss=enemy.boss&&enemy.name===legacyStageBossName((value.chapter??1) as ChapterId,Number(value.stage))&&value.round===stageRoundCount(Number(value.stage),difficulty);
+      if(enemy.name===SUPPLY_CART_NAME&&(enemy.boss||enemy.originRound!==value.round||!isSupplyRound(value.round)||enemy.reward!==supplyCartReward(value.round)))return null;
+      if(enemy.boss!==!allStoryEnemyNames.includes(enemy.name)||enemy.boss&&!legacyStageBoss&&!Array.from({length:value.round},(_,i)=>roundBossName(Number(value.stage),i+1,(value.chapter??1) as ChapterId,difficulty)).includes(enemy.name))return null;
       if(enemy.boss)bosses++;
       ids.add(enemy.id);
     }
     if(bosses>Math.floor(value.round/5)+1)return null;
     if(value.phase==='ready'&&(value.spawned!==0||value.enemies.length||value.remainingMs!==30000))return null;
     if((value.phase==='cleared'||value.phase==='won')&&((value.spawned!==limit&&value.spawned!==10&&value.spawned!==20)||value.enemies.length||value.remainingMs!==0))return null;
-    if(value.phase==='won'&&!isCampaignComplete(value.stage,value.round)||value.phase==='cleared'&&isCampaignComplete(value.stage,value.round))return null;
+    if(value.phase==='won'&&!isCampaignComplete(value.stage,value.round,difficulty)||value.phase==='cleared'&&isCampaignComplete(value.stage,value.round,difficulty))return null;
     if(value.phase==='lost'?value.wall!==0:value.wall===0)return null;
     if(value.heroCooldowns!==undefined){
       if(!Array.isArray(value.heroCooldowns)||value.heroCooldowns.length>40)return null;
@@ -172,7 +200,7 @@ export function readGameSave(raw:string|null):GameSave|null{
     }
     if(value.bag!==undefined&&!validBag(value.bag))return null;
     if(value.enemies.some(enemy=>enemy.armor!==undefined&&!number(enemy.armor,0,1000000)))return null;
-    if(value.enemies.some(enemy=>enemy.originRound!==undefined&&!integer(enemy.originRound,1,stageRoundCount(Number(value.stage)))))return null;
+    if(value.enemies.some(enemy=>enemy.originRound!==undefined&&!integer(enemy.originRound,1,stageRoundCount(Number(value.stage),difficulty))))return null;
     if(value.enemies.some(enemy=>enemy.stunSeconds!==undefined&&!number(enemy.stunSeconds,0,.5)))return null;
     if(value.enemies.some(enemy=>enemy.bossSeconds!==undefined&&(!enemy.boss||!number(enemy.bossSeconds,0,90))))return null;
     if(value.reinforcement!==undefined&&!validReinforcement(value.reinforcement,(value.chapter??1) as ChapterId,(value.difficulty??'normal') as Difficulty,Number(value.stage)))return null;

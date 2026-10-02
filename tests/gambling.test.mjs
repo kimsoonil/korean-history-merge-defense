@@ -1,33 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {GAMBLE_COOLDOWN_MS,emptyGambleState,emptyUnitGambleUsage,gambleAttemptsRemaining,gambleCooldownRemaining,gambleUnlocked,goldGambles,goldGambleOutcomes,goldSuccessChance,recordGoldGamble,recordUnitGambleSuccess,readGambleState,readUnitGambleUsage,unitGambles,unitGamblesRemaining,playGoldGamble,playUnitGamble} from '../lib/gambling.ts';
+import {GAMBLE_COOLDOWN_MS,emptyGambleState,emptyUnitGambleUsage,gambleAttemptsRemaining,gambleCooldownRemaining,gambleUnlocked,recordUnitGamble,recordUnitGambleSuccess,readGambleState,readUnitGambleUsage,unitGambles,unitGamblesRemaining,playUnitGamble} from '../lib/gambling.ts';
 
-test('gold gamble tiers unlock at rounds 1, 10 and 20',()=>{
- assert.deepEqual(goldGambles.map(x=>x.unlockRound),[1,10,20]);
+test('unit gamble tiers unlock at rounds 1, 10 and 20',()=>{
+ assert.deepEqual(unitGambles.map(x=>x.unlockRound),[1,10,20]);
  assert.equal(gambleUnlocked(9,10),false);assert.equal(gambleUnlocked(10,10),true);
- assert.deepEqual(goldGambles.map(x=>x.cost),[100,500,1000]);
-});
-test('normal and hard gold odds use the agreed success, draw and failure split',()=>{
- for(const [difficulty,expected] of [['normal',[.3,.2,.5]],['hard',[.5,.2,.3]]]){
-  const outcomes=goldGambleOutcomes(difficulty);
-  const failure=outcomes.filter(x=>x.multiplier<1).reduce((s,x)=>s+x.chance,0),draw=outcomes.find(x=>x.multiplier===1).chance,success=outcomes.filter(x=>x.multiplier>1).reduce((s,x)=>s+x.chance,0);
-  assert.ok(Math.abs(failure-expected[0])<1e-9);assert.ok(Math.abs(draw-expected[1])<1e-9);assert.ok(Math.abs(success-expected[2])<1e-9);
- }
- assert.equal(goldSuccessChance('normal',1),.53);assert.equal(goldSuccessChance('hard',1),.34);
- assert.equal(goldSuccessChance('normal',6),1);assert.equal(goldSuccessChance('hard',7),1);
-});
-test('gold gamble samples bounds and uses difficulty payouts',()=>{
- assert.deepEqual(playGoldGamble(goldGambles[0],100,'normal',0,()=>0),{gold:0,reward:0,category:'대실패',outcome:'failure'});
- assert.deepEqual(playGoldGamble(goldGambles[0],100,'normal',0,()=>.999),{gold:600,reward:600,category:'대박',outcome:'success'});
- assert.deepEqual(playGoldGamble(goldGambles[0],100,'hard',0,()=>.999),{gold:700,reward:700,category:'대박',outcome:'success'});
- assert.equal(playGoldGamble(goldGambles[0],99,'normal',0,()=>0),null);
+ assert.deepEqual(unitGambles.map(x=>x.cost),[500,1000,3000]);
 });
 test('shared gamble cooldown is three seconds and round limits differ by mode',()=>{
- const initial=emptyGambleState(4,'normal'),played=recordGoldGamble(initial,4,'normal','small','failure',1000);
+ const initial=emptyGambleState(4,'normal'),played=recordUnitGamble(initial,4,'normal',1,false,1000);
  assert.equal(GAMBLE_COOLDOWN_MS,3000);assert.equal(gambleCooldownRemaining(played,1000),3000);assert.equal(gambleCooldownRemaining(played,3999),1);assert.equal(gambleCooldownRemaining(played,4000),0);
  assert.equal(gambleAttemptsRemaining(played,4,'normal'),2);
- let hard=emptyGambleState(4,'hard');hard=recordGoldGamble(hard,4,'hard','small','draw',0);hard=recordGoldGamble(hard,4,'hard','small','draw',4000);
+ let hard=emptyGambleState(4,'hard');hard=recordUnitGamble(hard,4,'hard',1,false,0);hard=recordUnitGamble(hard,4,'hard',1,true,4000);
  assert.equal(gambleAttemptsRemaining(hard,4,'hard'),0);assert.equal(gambleAttemptsRemaining(hard,5,'hard'),2);
  assert.deepEqual(readGambleState(played,4,'normal'),played);
 });
@@ -41,10 +26,10 @@ test('unit gamble observes failure refunds, pity-compatible success and quotas',
 });
 test('battle gambling UI shows cooldown, attempts and only success/failure result labels',()=>{
  const page=readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8'),dialog=readFileSync(new URL('../app/GamblingDialog.tsx',import.meta.url),'utf8'),styles=readFileSync(new URL('../app/gambling.css',import.meta.url),'utf8');
- const goldHandler=page.slice(page.indexOf('const gambleGold='),page.indexOf('const gambleUnit=')),unitHandler=page.slice(page.indexOf('const gambleUnit='),page.indexOf('const changeBag='));
- assert.match(dialog,/공통 쿨타임 3초/);assert.match(dialog,/남은 도박/);assert.match(dialog,/천장/);assert.match(dialog,/도박하기/);assert.doesNotMatch(dialog,/도전하기/);
+ const unitHandler=page.slice(page.indexOf('const gambleUnit='),page.indexOf('const changeBag='));
+ assert.match(dialog,/쿨타임 3초/);assert.match(dialog,/남은 도박/);assert.match(dialog,/천장/);assert.match(dialog,/도박하기/);assert.doesNotMatch(dialog,/도전하기|골드 도박/);
  assert.match(styles,/min-height:60px/);assert.match(styles,/grid-template-columns:28px minmax\(0,1fr\) 150px/);
- assert.doesNotMatch(page,/summary\.category/);assert.match(page,/success = net >= 0/);assert.doesNotMatch(goldHandler,/setGambleOpen\(false\)/);assert.doesNotMatch(unitHandler,/setGambleOpen\(false\)/);
+ assert.doesNotMatch(page,/summary\.category|gambleGold/);assert.doesNotMatch(unitHandler,/setGambleOpen\(false\)/);
 });
 test('battle utility popups use a bottom sheet while keeping the field visible',()=>{
  const css=readFileSync(new URL('../app/bottom-sheets.css',import.meta.url),'utf8'),page=readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8');
