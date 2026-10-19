@@ -1,0 +1,25 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const read=path=>readFileSync(new URL(`../${path}`,import.meta.url),'utf8');
+test('Android OAuth return URI matches the registered app identity and manifest',()=>{
+ const id='com.kimsoonil.koreanhistorymergedefense';
+ const config=read('capacitor.config.ts');
+ const gradle=read('android/app/build.gradle');
+ const strings=read('android/app/src/main/res/values/strings.xml');
+ const manifest=read('android/app/src/main/AndroidManifest.xml');
+ const auth=read('app/AuthProvider.tsx');
+ const callback=new URL(auth.match(/const NATIVE_CALLBACK='([^']+)'/)[1]);
+ assert.equal(config.match(/appId:'([^']+)'/)[1],id);
+ assert.equal(gradle.match(/applicationId "([^"]+)"/)[1],id);
+ assert.equal(gradle.match(/namespace = "([^"]+)"/)[1],id);
+ assert.equal(strings.match(/name="custom_url_scheme">([^<]+)/)[1],id);
+ const [,scheme,host,path]=manifest.match(/<data android:scheme="([^"]+)" android:host="([^"]+)" android:path="([^"]+)"/);
+ assert.equal(callback.protocol,`${scheme}:`);
+ assert.equal(callback.host,host);
+ assert.equal(callback.pathname,path);
+ assert.equal(callback.href,`${id}://auth/callback`);
+ assert.ok(auth.includes(`url.protocol!=='${callback.protocol}'`));
+ assert.ok(auth.includes(`url.host!=='${host}'`));
+ assert.ok(auth.includes(`url.pathname!=='${path}'`));
+});

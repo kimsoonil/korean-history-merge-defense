@@ -1,9 +1,9 @@
 import type {CapacitorConfig} from '@capacitor/cli';
 
 const config:CapacitorConfig={
-  // Provisional identifier. Confirm availability and ownership before Play Console upload.
+  // Keep this identifier and the OAuth callback stable when changing the display name.
   appId:'com.kimsoonil.koreanhistorymergedefense',
-  appName:'한국사 조합 디펜스',
+  appName:'영웅합전서',
   webDir:'out',
 };
 

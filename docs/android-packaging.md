@@ -4,12 +4,12 @@
 
 ## 현재 범위
 
-- 임시 앱 ID: `com.kimsoonil.koreanhistorymergedefense`. Play Console에 앱을 만들기 전에 소유자와 사용 가능 여부를 확인하고 확정해야 합니다.
-- 앱 이름: `한국사 조합 디펜스`
+- 앱 ID: `com.kimsoonil.koreanhistorymergedefense`. 이번 출시 명칭 변경에서는 유지합니다. 변경은 Play Console 등록 상태와 OAuth 영향을 별도로 검토한 뒤 진행해야 합니다.
+- 앱 이름: `영웅합전서`
 - Android `compileSdkVersion`/`targetSdkVersion`: 36 (Capacitor 8 기본값)
 - Android Studio와 SDK가 설치되지 않은 현재 개발 환경에서는 APK/AAB 컴파일이나 실기기 검증은 아직 하지 못했습니다.
 - Google OAuth Android 복귀와 계정별 Supabase 저장 코드가 준비되었습니다. 아래 대시보드 설정과 실기기 검증을 마치기 전에는 출시용으로 사용하지 마세요.
-- 출시 아이콘과 스플래시 이미지는 아직 Capacitor 기본 자산입니다.
+- 런처 아이콘은 서책 이미지가 적용되어 있고, 스플래시는 Capacitor 기본 자산입니다. 상세 점검은 [출시 명칭 점검](release-name-audit.md)을 참고하세요.
 
 ## 개발 및 검증
 
@@ -31,7 +31,7 @@
 
 ## 다음 작업
 
-1. 확정된 패키지명과 출시용 아이콘·스플래시 적용
+1. Play Console 패키지 등록 상태 확인 및 출시용 스플래시 적용
 2. Google OAuth 복귀·계정별 서버 저장 실기기 검증 및 계정 삭제 기능
 4. 광고 SDK·보상 검증과 개인정보 동의
 5. 서명된 AAB 생성, Play Console 내부/비공개 테스트
