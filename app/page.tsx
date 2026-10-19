@@ -7,6 +7,7 @@ import LoadingImage, {
 } from "./LoadingImage";
 
 import { useEffect, useRef, useState } from "react";
+import CloudSaveRecovery from "./CloudSaveRecovery";
 import {
   Backpack,
   BookOpen,
@@ -363,7 +364,9 @@ function AttackOverlay({ effects }: { effects: AttackEffect[] }) {
   );
 }
 
-export default function Game() {
+export default function Game(){return <CloudSaveRecovery><GameSession/></CloudSaveRecovery>;}
+
+function GameSession() {
   const auth = useSocialAuth();
   const storageScope = accountScopeFor(auth.status, auth.user?.id);
   const [hydratedScope,setHydratedScope]=useState<string|null>(null);
@@ -380,11 +383,11 @@ export default function Game() {
     if(auth.status!=='authenticated'||!auth.user){setHydratedScope(storageScope);return()=>{active=false;};}
     const client=getSupabaseClient();
     if(!client){setCloudStorageError(true);setHydratedScope(storageScope);return()=>{active=false;};}
-    void hydrateCloudSave(client,auth.user.id,localStorage).then(()=>{
+    void hydrateCloudSave(client,auth.user.id,localStorage,()=>active).then(()=>{
       if(!active)return;
-      cloudQueue.current=createCloudSaveQueue(client,auth.user!.id,()=>setCloudStorageError(true));
+      cloudQueue.current=createCloudSaveQueue(client,auth.user!.id,()=>setCloudStorageError(true),localStorage);
       setHydratedScope(storageScope);
-    }).catch(()=>{if(active){setCloudStorageError(true);setHydratedScope(storageScope);}});
+    }).catch(()=>{if(active){setCloudStorageError(true);cloudQueue.current=createCloudSaveQueue(client,auth.user!.id,()=>setCloudStorageError(true),localStorage);setHydratedScope(storageScope);}});
     return()=>{active=false;cloudQueue.current?.close();cloudQueue.current=null;};
   },[storageScope,auth.status,auth.user?.id]);
   useEffect(()=>{
@@ -392,7 +395,8 @@ export default function Game() {
     const pageHide=()=>{void cloudQueue.current?.flush();};
     document.addEventListener('visibilitychange',flush);
     window.addEventListener('pagehide',pageHide);
-    return()=>{document.removeEventListener('visibilitychange',flush);window.removeEventListener('pagehide',pageHide);};
+    window.addEventListener('online',pageHide);
+    return()=>{document.removeEventListener('visibilitychange',flush);window.removeEventListener('pagehide',pageHide);window.removeEventListener('online',pageHide);};
   },[]);
   const isAdmin = isAdminAccount(
     auth.user?.email,
