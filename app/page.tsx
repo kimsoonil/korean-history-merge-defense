@@ -3290,7 +3290,7 @@ export default function Game() {
               <X size={21} />
             </button>
             <small>HOW TO PLAY</small>
-            <h2>한국사 조합 디펜스</h2>
+            <h2>영웅합전서</h2>
             <div>
               <b>01 · 병력 모집</b>
               <p>
